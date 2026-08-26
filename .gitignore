@@ -2,6 +2,7 @@
 
 # dependencies
 node_modules/
+package-lock.json
 
 # Expo
 .expo/
@@ -9,7 +10,11 @@ dist/
 web-build/
 expo-env.d.ts
 
-# Native
+# Native build folders
+/ios
+/android
+
+# Native files
 .kotlin/
 *.orig.*
 *.jks
@@ -28,14 +33,37 @@ yarn-error.*
 
 # macOS
 .DS_Store
+
+# certificates
 *.pem
 
-# local env files
+# environment variables (SENSÍVEL - nunca subir!)
+.env
+.env.*
 .env*.local
+
+# Google Services (SENSÍVEL - contém API keys)
+google-services.json
+GoogleService-Info.plist
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude / AI assistants
+.claude/
+CLAUDE.md
 
 # typescript
 *.tsbuildinfo
 
-# generated native folders
-/ios
-/android
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# logs
+*.log

@@ -1,20 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import TriboApp from './src/tribo-app';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'Expo AV has been deprecated',
+  'Listening to push token changes is not yet fully supported',
+  'Animated: `useNativeDriver` is not supported'
+]);
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <TriboApp />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
