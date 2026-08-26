@@ -22,7 +22,7 @@
 
 **Tribo** é uma rede social mobile construída para quem busca conexões reais. A plataforma vai além de curtidas e seguidores  ela cria espaços onde pessoas se encontram, compartilham e constroem comunidades com significado.
 
-Feed inteligente, mensagens em tempo real, stories, reels, tribos temáticas e muito mais — tudo em uma experiência fluida e nativa.
+Feed inteligente, mensagens em tempo real, stories, reels, tribos temáticas e muito mais  tudo em uma experiência fluida e nativa.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%" />
