@@ -5,12 +5,13 @@ import {
   Modal,
   Platform,
   Pressable,
+  Share,
   StyleSheet,
   Text,
   TextInput,
-  View } from
-"react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
+  View
+} from "react-native";
+import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { api } from "../../api";
 import { Avatar, VerificationBadge } from "../ui/ui";
 import { userName } from "../../lib/format";
@@ -23,20 +24,29 @@ export function ShareReelModal({
   onSent
 }) {
   const { colors } = useTheme();
+  const [activeTab, setActiveTab] = useState("direct");
   const [conversations, setConversations] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterText, setFilterText] = useState("");
-  const [sendingToUserId, setSendingToUserId] = useState(null);
-  const [sentUserIds, setSentUserIds] = useState(new Set());
+  const [sendingTargetId, setSendingTargetId] = useState(null);
+  const [sentTargetIds, setSentTargetIds] = useState(new Set());
 
-  const loadConversations = useCallback(async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await api.messages.conversations();
-      const list = Array.isArray(res) ? res : res?.conversations || [];
-      setConversations(list);
+      const [convRes, groupsRes] = await Promise.all([
+        api.messages.conversations().catch(() => []),
+        api.groups.list().catch(() => [])
+      ]);
+
+      const convList = Array.isArray(convRes) ? convRes : convRes?.conversations || [];
+      const groupsList = Array.isArray(groupsRes) ? groupsRes : groupsRes?.groups || [];
+
+      setConversations(convList);
+      setGroups(groupsList);
     } catch (err) {
-      console.warn("[ShareReelModal] Erro ao carregar conversas:", err);
+      console.warn("[ShareReelModal] Erro ao carregar dados de compartilhamento:", err);
     } finally {
       setLoading(false);
     }
@@ -44,59 +54,110 @@ export function ShareReelModal({
 
   useEffect(() => {
     if (visible) {
-      loadConversations();
-      setSentUserIds(new Set());
+      loadData();
+      setSentTargetIds(new Set());
       setFilterText("");
     }
-  }, [visible, loadConversations]);
+  }, [visible, loadData]);
 
-  const handleSendToUser = async (targetUser) => {
-    const targetUserId = targetUser?.id || targetUser?.userId || targetUser?._id;
-    if (!targetUserId || sendingToUserId || sentUserIds.has(targetUserId) || !reel) return;
-
-    try {
-      setSendingToUserId(targetUserId);
-
-      const reelPayload = {
-        id: reel.id || reel._id,
-        title: reel.title || "Reel da Tribo",
-        video_id: reel.videoId || reel.video_id || reel.youtube_video_id,
-        thumbnail_url:
+  const getReelPayload = () => {
+    if (!reel) return null;
+    return {
+      id: reel.id || reel._id,
+      title: reel.title || "Reel da Tribo",
+      video_id: reel.videoId || reel.video_id || reel.youtube_video_id,
+      thumbnail_url:
         reel.thumbnail_url ||
         reel.thumbnailUrl ||
         `https://img.youtube.com/vi/${reel.videoId || reel.video_id}/hqdefault.jpg`,
-        author_name:
+      author_name:
         reel.author_name ||
         reel.authorName ||
         reel.channel ||
         reel.channelTitle ||
         "Tribo"
-      };
+    };
+  };
+
+  const handleSendToUser = async (targetUser) => {
+    const targetUserId = targetUser?.id || targetUser?.userId || targetUser?._id;
+    if (!targetUserId || sendingTargetId || sentTargetIds.has(`user_${targetUserId}`) || !reel) return;
+
+    try {
+      setSendingTargetId(`user_${targetUserId}`);
+      const payload = getReelPayload();
 
       await api.messages.send({
+        receiver_id: targetUserId,
         recipient_id: targetUserId,
         type: "reel_share",
         media_type: "REEL_SHARE",
-        content: JSON.stringify(reelPayload)
+        content: JSON.stringify(payload)
       });
 
-      setSentUserIds((prev) => new Set([...prev, targetUserId]));
+      setSentTargetIds((prev) => new Set([...prev, `user_${targetUserId}`]));
       if (onSent) {
-        onSent(targetUser, reelPayload);
+        onSent(targetUser, payload, "direct");
       }
     } catch (err) {
-      console.warn("[ShareReelModal] Erro ao enviar reel:", err);
+      console.warn("[ShareReelModal] Erro ao enviar reel para usuário:", err);
     } finally {
-      setSendingToUserId(null);
+      setSendingTargetId(null);
     }
   };
 
-  const filtered = conversations.filter((item) => {
+  const handleSendToGroup = async (group) => {
+    const groupId = group?.id || group?._id;
+    if (!groupId || sendingTargetId || sentTargetIds.has(`group_${groupId}`) || !reel) return;
+
+    try {
+      setSendingTargetId(`group_${groupId}`);
+      const payload = getReelPayload();
+
+      await api.groups.sendMessage(groupId, {
+        content: JSON.stringify(payload),
+        media_type: "REEL_SHARE",
+        mediaType: "REEL_SHARE",
+        type: "reel_share"
+      });
+
+      setSentTargetIds((prev) => new Set([...prev, `group_${groupId}`]));
+      if (onSent) {
+        onSent(group, payload, "group");
+      }
+    } catch (err) {
+      console.warn("[ShareReelModal] Erro ao enviar reel para grupo:", err);
+    } finally {
+      setSendingTargetId(null);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    try {
+      const vId = reel?.videoId || reel?.video_id;
+      const shareUrl = reel?.videoUrl || `https://www.youtube.com/shorts/${vId}`;
+      await Share.share({
+        message: `${reel?.title || "Reel da Tribo"}\n\nAssista no Tribo: ${shareUrl}`,
+        url: shareUrl
+      });
+      onClose();
+    } catch (err) {
+      console.warn("Erro ao compartilhar externamente:", err);
+    }
+  };
+
+  const filteredConversations = conversations.filter((item) => {
     const userObj = item.contact || item.user || item.participant || {};
     const name = (userName(userObj) || "").toLowerCase();
     const handle = (userObj.username || "").toLowerCase();
     const q = filterText.toLowerCase();
     return name.includes(q) || handle.includes(q);
+  });
+
+  const filteredGroups = groups.filter((g) => {
+    const name = (g.name || g.title || "").toLowerCase();
+    const q = filterText.toLowerCase();
+    return name.includes(q);
   });
 
   return (
@@ -106,23 +167,19 @@ export function ShareReelModal({
       animationType="slide"
       onRequestClose={onClose}
       statusBarTranslucent>
-      
       <View style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFillObject} onPress={onClose} />
 
         <View
           style={[
-          styles.sheetContainer,
-          {
-            backgroundColor: colors.surface || "#18181b",
-            borderColor: colors.border || "rgba(255, 255, 255, 0.1)"
-          }]
-          }>
-          
-          {}
+            styles.sheetContainer,
+            {
+              backgroundColor: colors.surface || "#18181b",
+              borderColor: colors.border || "rgba(255, 255, 255, 0.1)"
+            }
+          ]}>
           <View style={styles.handleBar} />
 
-          {}
           <View style={styles.header}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <Ionicons name="share-social" size={20} color={colors.primary || "#3b82f6"} />
@@ -135,111 +192,262 @@ export function ShareReelModal({
             </Pressable>
           </View>
 
-          {}
+          <View style={styles.tabBar}>
+            <Pressable
+              onPress={() => setActiveTab("direct")}
+              style={[
+                styles.tabItem,
+                activeTab === "direct" && {
+                  backgroundColor: colors.surfaceAlt || "#27272a",
+                  borderColor: colors.primary || "#3b82f6"
+                }
+              ]}>
+              <Feather
+                name="message-circle"
+                size={15}
+                color={activeTab === "direct" ? colors.primary || "#3b82f6" : colors.muted || "#a1a1aa"}
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  {
+                    color:
+                      activeTab === "direct"
+                        ? colors.text
+                        : colors.muted || "#a1a1aa",
+                    fontFamily:
+                      activeTab === "direct"
+                        ? "Poppins_600SemiBold"
+                        : "Poppins_400Regular"
+                  }
+                ]}>
+                Chat Privado
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => setActiveTab("tribos")}
+              style={[
+                styles.tabItem,
+                activeTab === "tribos" && {
+                  backgroundColor: colors.surfaceAlt || "#27272a",
+                  borderColor: colors.primary || "#3b82f6"
+                }
+              ]}>
+              <Ionicons
+                name="people"
+                size={16}
+                color={activeTab === "tribos" ? colors.primary || "#3b82f6" : colors.muted || "#a1a1aa"}
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  {
+                    color:
+                      activeTab === "tribos"
+                        ? colors.text
+                        : colors.muted || "#a1a1aa",
+                    fontFamily:
+                      activeTab === "tribos"
+                        ? "Poppins_600SemiBold"
+                        : "Poppins_400Regular"
+                  }
+                ]}>
+                Grupos da Tribo
+              </Text>
+            </Pressable>
+          </View>
+
           <View
             style={[
-            styles.searchBar,
-            {
-              backgroundColor: colors.surfaceAlt || "#27272a",
-              borderColor: colors.border || "rgba(255, 255, 255, 0.08)"
-            }]
-            }>
-            
+              styles.searchBar,
+              {
+                backgroundColor: colors.surfaceAlt || "#27272a",
+                borderColor: colors.border || "rgba(255, 255, 255, 0.08)"
+              }
+            ]}>
             <Feather name="search" size={16} color={colors.muted || "#a1a1aa"} style={{ marginRight: 8 }} />
             <TextInput
-              placeholder="Buscar amigos ou conversas..."
+              placeholder={
+                activeTab === "direct"
+                  ? "Buscar amigos ou conversas..."
+                  : "Buscar grupos da Tribo..."
+              }
               placeholderTextColor={colors.muted || "#71717a"}
               value={filterText}
               onChangeText={setFilterText}
-              style={[styles.searchInput, { color: colors.text }]} />
-            
-            {!!filterText &&
-            <Pressable onPress={() => setFilterText("")} style={{ padding: 4 }}>
+              style={[styles.searchInput, { color: colors.text }]}
+            />
+            {!!filterText && (
+              <Pressable onPress={() => setFilterText("")} style={{ padding: 4 }}>
                 <Feather name="x" size={14} color={colors.muted || "#a1a1aa"} />
               </Pressable>
-            }
+            )}
           </View>
 
-          {}
-          {loading ?
-          <View style={styles.centerContainer}>
+          {loading ? (
+            <View style={styles.centerContainer}>
               <ActivityIndicator size="small" color={colors.primary || "#3b82f6"} />
               <Text style={[styles.loadingText, { color: colors.muted || "#a1a1aa" }]}>
-                Carregando conversas...
+                Carregando...
               </Text>
-            </View> :
-          filtered.length === 0 ?
-          <View style={styles.centerContainer}>
-              <Feather name="message-square" size={32} color={colors.muted || "#71717a"} />
-              <Text style={[styles.emptyText, { color: colors.muted || "#a1a1aa" }]}>
-                {filterText ? "Nenhum amigo encontrado" : "Nenhuma conversa recente"}
-              </Text>
-            </View> :
+            </View>
+          ) : activeTab === "direct" ? (
+            filteredConversations.length === 0 ? (
+              <View style={styles.centerContainer}>
+                <Feather name="message-square" size={32} color={colors.muted || "#71717a"} />
+                <Text style={[styles.emptyText, { color: colors.muted || "#a1a1aa" }]}>
+                  {filterText ? "Nenhum amigo encontrado" : "Nenhuma conversa recente"}
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredConversations}
+                keyExtractor={(item, index) => String(item.id || item.contact?.id || index)}
+                contentContainerStyle={styles.listContent}
+                renderItem={({ item }) => {
+                  const targetUser = item.contact || item.user || item.participant || {};
+                  const targetUserId = targetUser?.id || targetUser?.userId;
+                  const key = `user_${targetUserId}`;
+                  const isSending = sendingTargetId === key;
+                  const isSent = sentTargetIds.has(key);
 
-          <FlatList
-            data={filtered}
-            keyExtractor={(item, index) => String(item.id || item.contact?.id || index)}
-            contentContainerStyle={styles.listContent}
-            renderItem={({ item }) => {
-              const targetUser = item.contact || item.user || item.participant || {};
-              const targetUserId = targetUser?.id || targetUser?.userId;
-              const isSending = sendingToUserId === targetUserId;
-              const isSent = sentUserIds.has(targetUserId);
-
-              return (
-                <View
-                  style={[
-                  styles.userRow,
-                  {
-                    borderBottomColor: colors.border || "rgba(255, 255, 255, 0.05)"
-                  }]
-                  }>
-                  
-                    <View style={styles.userInfo}>
-                      <Avatar user={targetUser} size={44} />
-                      <View style={styles.nameDetails}>
-                        <View style={styles.nameRow}>
-                          <Text numberOfLines={1} style={[styles.userNameText, { color: colors.text }]}>
-                            {userName(targetUser)}
+                  return (
+                    <View
+                      style={[
+                        styles.userRow,
+                        {
+                          borderBottomColor: colors.border || "rgba(255, 255, 255, 0.05)"
+                        }
+                      ]}>
+                      <View style={styles.userInfo}>
+                        <Avatar user={targetUser} size={44} />
+                        <View style={styles.nameDetails}>
+                          <View style={styles.nameRow}>
+                            <Text numberOfLines={1} style={[styles.userNameText, { color: colors.text }]}>
+                              {userName(targetUser)}
+                            </Text>
+                            <VerificationBadge user={targetUser} size={14} />
+                          </View>
+                          <Text numberOfLines={1} style={[styles.userHandleText, { color: colors.muted || "#a1a1aa" }]}>
+                            @{targetUser.username || "usuario"}
                           </Text>
-                          <VerificationBadge user={targetUser} size={14} />
                         </View>
-                        <Text numberOfLines={1} style={[styles.userHandleText, { color: colors.muted || "#a1a1aa" }]}>
-                          @{targetUser.username || "usuario"}
-                        </Text>
                       </View>
+
+                      <Pressable
+                        onPress={() => handleSendToUser(targetUser)}
+                        disabled={isSending || isSent}
+                        style={[
+                          styles.sendBtn,
+                          isSent
+                            ? styles.sentBtn
+                            : { backgroundColor: colors.primary || "#3b82f6" }
+                        ]}>
+                        {isSending ? (
+                          <ActivityIndicator size="small" color="#ffffff" />
+                        ) : isSent ? (
+                          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                            <Feather name="check" size={14} color="#22c55e" />
+                            <Text style={styles.sentBtnText}>Enviado</Text>
+                          </View>
+                        ) : (
+                          <Text style={styles.sendBtnText}>Enviar</Text>
+                        )}
+                      </Pressable>
                     </View>
+                  );
+                }}
+              />
+            )
+          ) : (
+            filteredGroups.length === 0 ? (
+              <View style={styles.centerContainer}>
+                <Ionicons name="people-outline" size={32} color={colors.muted || "#71717a"} />
+                <Text style={[styles.emptyText, { color: colors.muted || "#a1a1aa" }]}>
+                  {filterText ? "Nenhum grupo encontrado" : "Você ainda não participa de nenhuma Tribo"}
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={filteredGroups}
+                keyExtractor={(item, index) => String(item.id || item._id || index)}
+                contentContainerStyle={styles.listContent}
+                renderItem={({ item }) => {
+                  const groupId = item.id || item._id;
+                  const key = `group_${groupId}`;
+                  const isSending = sendingTargetId === key;
+                  const isSent = sentTargetIds.has(key);
 
-                    <Pressable
-                    onPress={() => handleSendToUser(targetUser)}
-                    disabled={isSending || isSent}
-                    style={[
-                    styles.sendBtn,
-                    isSent ?
-                    styles.sentBtn :
-                    { backgroundColor: colors.primary || "#3b82f6" }]
-                    }>
-                    
-                      {isSending ?
-                    <ActivityIndicator size="small" color="#ffffff" /> :
-                    isSent ?
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                          <Feather name="check" size={14} color="#22c55e" />
-                          <Text style={styles.sentBtnText}>Enviado</Text>
-                        </View> :
+                  return (
+                    <View
+                      style={[
+                        styles.userRow,
+                        {
+                          borderBottomColor: colors.border || "rgba(255, 255, 255, 0.05)"
+                        }
+                      ]}>
+                      <View style={styles.userInfo}>
+                        <View style={[styles.groupAvatar, { backgroundColor: colors.surfaceAlt || "#27272a" }]}>
+                          <Ionicons name="people" size={20} color={colors.primary || "#3b82f6"} />
+                        </View>
+                        <View style={styles.nameDetails}>
+                          <Text numberOfLines={1} style={[styles.userNameText, { color: colors.text }]}>
+                            {item.name || item.title || "Grupo da Tribo"}
+                          </Text>
+                          <Text numberOfLines={1} style={[styles.userHandleText, { color: colors.muted || "#a1a1aa" }]}>
+                            {item.members_count ? `${item.members_count} membros` : "Grupo ativo"}
+                          </Text>
+                        </View>
+                      </View>
 
-                    <Text style={styles.sendBtnText}>Enviar</Text>
-                    }
-                    </Pressable>
-                  </View>);
+                      <Pressable
+                        onPress={() => handleSendToGroup(item)}
+                        disabled={isSending || isSent}
+                        style={[
+                          styles.sendBtn,
+                          isSent
+                            ? styles.sentBtn
+                            : { backgroundColor: colors.primary || "#3b82f6" }
+                        ]}>
+                        {isSending ? (
+                          <ActivityIndicator size="small" color="#ffffff" />
+                        ) : isSent ? (
+                          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                            <Feather name="check" size={14} color="#22c55e" />
+                            <Text style={styles.sentBtnText}>Enviado</Text>
+                          </View>
+                        ) : (
+                          <Text style={styles.sendBtnText}>Enviar</Text>
+                        )}
+                      </Pressable>
+                    </View>
+                  );
+                }}
+              />
+            )
+          )}
 
-            }} />
-
-          }
+          <View style={styles.footerAction}>
+            <Pressable
+              onPress={handleNativeShare}
+              style={[
+                styles.nativeShareBtn,
+                {
+                  backgroundColor: colors.surfaceAlt || "#27272a",
+                  borderColor: colors.border || "rgba(255, 255, 255, 0.08)"
+                }
+              ]}>
+              <Ionicons name="share-outline" size={18} color={colors.text} style={{ marginRight: 8 }} />
+              <Text style={[styles.nativeShareText, { color: colors.text }]}>
+                Compartilhar em outros aplicativos (WhatsApp, Insta, etc.)
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
-    </Modal>);
-
+    </Modal>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -249,7 +457,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end"
   },
   sheetContainer: {
-    height: "65%",
+    height: "75%",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     borderWidth: 1,
@@ -270,7 +478,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16
+    marginBottom: 12
   },
   headerTitle: {
     fontSize: 16,
@@ -279,6 +487,25 @@ const styles = StyleSheet.create({
   closeBtn: {
     padding: 6
   },
+  tabBar: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12
+  },
+  tabItem: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "transparent",
+    gap: 6
+  },
+  tabText: {
+    fontSize: 12.5
+  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -286,7 +513,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    marginBottom: 14
+    marginBottom: 10
   },
   searchInput: {
     flex: 1,
@@ -295,7 +522,7 @@ const styles = StyleSheet.create({
     padding: 0
   },
   listContent: {
-    paddingBottom: 20
+    paddingBottom: 16
   },
   userRow: {
     flexDirection: "row",
@@ -309,6 +536,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     marginRight: 12
+  },
+  groupAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)"
   },
   nameDetails: {
     marginLeft: 12,
@@ -355,7 +591,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 40,
+    paddingVertical: 30,
     gap: 10
   },
   loadingText: {
@@ -366,5 +602,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Poppins_400Regular",
     textAlign: "center"
+  },
+  footerAction: {
+    marginTop: 6,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(255, 255, 255, 0.1)",
+    paddingTop: 8
+  },
+  nativeShareBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1
+  },
+  nativeShareText: {
+    fontSize: 12,
+    fontFamily: "Poppins_500Medium"
   }
 });

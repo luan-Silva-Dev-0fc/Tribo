@@ -25,7 +25,8 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   LayoutAnimation,
-  BackHandler } from
+  BackHandler,
+  Linking } from
 "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -43,6 +44,7 @@ import { errorMessage, userName, listFrom } from "../../lib/format";
 import { PostCard } from "../../components/feed/PostCard";
 import { Composer } from "../../components/feed/Composer";
 import { AudioMessagePlayer } from "../mensagens/Mensagens";
+import { ReelShareCard } from "../../components/chat/ReelShareCard";
 import { MediaViewerModal } from "../../components/modals/media-viewer-modal";
 import { TriboAlertModal } from "../../components/modals/tribo-alert-modal";
 import { GoldBadgeBenefitsModal } from "../../components/modals/gold-badge-modal";
@@ -1228,6 +1230,19 @@ function GroupFeedTab({
           "#a1a1aa" :
           "#64748b";
 
+          const isReelShare =
+            item.media_type === "REEL_SHARE" ||
+            item.mediaType === "REEL_SHARE" ||
+            item.type === "reel_share";
+          let reelData = null;
+          if (isReelShare && item.content) {
+            try {
+              reelData = typeof item.content === "string" ? JSON.parse(item.content) : item.content;
+            } catch (e) {
+              reelData = null;
+            }
+          }
+
           return (
             <SwipeableMessageRow
               item={item}
@@ -1361,7 +1376,19 @@ function GroupFeedTab({
                           isMe={true} />
 
                         }
-                                {!!item.content &&
+                                {isReelShare && !!reelData && (
+                                  <ReelShareCard
+                                    reelData={reelData}
+                                    isMe={true}
+                                    onPress={(data) => {
+                                      const vId = data?.video_id || data?.videoId || data?.youtube_video_id;
+                                      if (vId) {
+                                        Linking.openURL(`https://www.youtube.com/shorts/${vId}`).catch(() => {});
+                                      }
+                                    }}
+                                  />
+                                )}
+                                {!!item.content && !isReelShare && (
                         <View
                           style={{
                             flexDirection: "row",
@@ -1419,7 +1446,7 @@ function GroupFeedTab({
                                       </View>
                                     </View>
                                   </View>
-                        }
+                                )}
                               </>
                       }
                           </View>
@@ -1574,7 +1601,19 @@ function GroupFeedTab({
                           isMe={false} />
 
                         }
-                                {!!item.content &&
+                                {isReelShare && !!reelData && (
+                                  <ReelShareCard
+                                    reelData={reelData}
+                                    isMe={false}
+                                    onPress={(data) => {
+                                      const vId = data?.video_id || data?.videoId || data?.youtube_video_id;
+                                      if (vId) {
+                                        Linking.openURL(`https://www.youtube.com/shorts/${vId}`).catch(() => {});
+                                      }
+                                    }}
+                                  />
+                                )}
+                                {!!item.content && !isReelShare && (
                         <View
                           style={{
                             flexDirection: "row",
@@ -1607,7 +1646,7 @@ function GroupFeedTab({
                                       </Text>
                           }
                                   </View>
-                        }
+                                )}
                               </>
                       }
                           </View>
