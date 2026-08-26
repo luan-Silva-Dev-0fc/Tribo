@@ -15,6 +15,7 @@ import {
   View } from
 "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useVideoPlayer, VideoView } from "expo-video";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
@@ -79,6 +80,7 @@ export function MediaViewerModal({
   onDelete = null,
   onClose
 }) {
+  const insets = useSafeAreaInsets();
   const [controlsVisible, setControlsVisible] = useState(true);
   const [imageLoading, setImageLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -353,9 +355,15 @@ export function MediaViewerModal({
           }
         </View>
 
-        {}
+        {/* Barra Superior */}
         <Animated.View
-          style={[styles.topBar, { opacity: controlsFadeAnim }]}
+          style={[
+            styles.topBar,
+            {
+              top: Math.max(insets.top, Platform.OS === "ios" ? 50 : 36) + 4,
+              opacity: controlsFadeAnim,
+            },
+          ]}
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
           <View style={styles.authorRow}>
@@ -431,9 +439,15 @@ export function MediaViewerModal({
           </View>
         </Animated.View>
 
-        {}
+        {/* Barra Inferior com Safe Area */}
         <Animated.View
-          style={[styles.bottomBar, { opacity: controlsFadeAnim }]}
+          style={[
+            styles.bottomBar,
+            {
+              bottom: Math.max(insets.bottom, 20) + 12,
+              opacity: controlsFadeAnim,
+            },
+          ]}
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
 
@@ -489,12 +503,12 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   fullImage: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT * 0.82
+    width: "100%",
+    height: "100%",
   },
   fullVideo: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT * 0.82
+    width: "100%",
+    height: "100%",
   },
   centerLoader: {
     ...StyleSheet.absoluteFillObject,

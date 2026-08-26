@@ -84,22 +84,19 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     marginTop: -32,
-    marginHorizontal: 16,
-    padding: 20,
-    paddingTop: 24,
-
-
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    marginHorizontal: 0,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    paddingTop: 16,
+    borderTopLeftRadius: 36,
+    borderTopRightRadius: 36,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     marginBottom: 0,
-
-
     overflow: "hidden",
-
-
-    borderWidth: 1,
+    borderTopWidth: 1,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
     borderBottomWidth: 0,
 
     ...Platform.select({

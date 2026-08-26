@@ -117,12 +117,20 @@ export function useStickerSpatialAudio(player, containerRef) {
     try {
       if (player.loop !== true) player.loop = true;
 
-      if (targetVolume <= 0.005) {
+      if (targetVolume <= 0.01) {
         player.volume = 0;
         player.muted = true;
+        try {
+          player.pause();
+        } catch (e) {}
       } else {
         player.muted = false;
         player.volume = Math.min(1.0, Math.max(0.01, targetVolume));
+        try {
+          if (!player.playing) {
+            Promise.resolve(player.play()).catch(() => {});
+          }
+        } catch (e) {}
       }
     } catch (e) {}
   };
@@ -142,16 +150,15 @@ export function useStickerSpatialAudio(player, containerRef) {
 
         const screenHeight = Dimensions.get("window").height;
         const screenCenterY = screenHeight / 2;
-        const cardCenterY = y + height / 2;
+        const cardCenterY = y + (height || 0) / 2;
         const distanceFromCenter = Math.abs(cardCenterY - screenCenterY);
-        const maxDistance = screenHeight * 0.45;
+        const maxDistance = screenHeight * 0.42;
 
         let proximityFactor = 0;
 
-        if (y + height > 0 && y < screenHeight) {
-          proximityFactor = Math.max(0, 1 - distanceFromCenter / maxDistance);
-
-          proximityFactor = Math.pow(proximityFactor, 2);
+        if (y + (height || 0) > 0 && y < screenHeight) {
+          const rawProximity = Math.max(0, 1 - distanceFromCenter / maxDistance);
+          proximityFactor = Math.pow(rawProximity, 1.8);
         }
 
         proximityRef.current = proximityFactor;

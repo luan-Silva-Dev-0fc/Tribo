@@ -29,6 +29,7 @@ import {
   Linking } from
 "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { api, getUploadUrl } from "../../api";
 import {
@@ -1230,16 +1231,31 @@ function GroupFeedTab({
           "#a1a1aa" :
           "#64748b";
 
-          const isReelShare =
+          let isReelShare =
             item.media_type === "REEL_SHARE" ||
+            item.media_type === "reel_share" ||
             item.mediaType === "REEL_SHARE" ||
-            item.type === "reel_share";
+            item.mediaType === "reel_share" ||
+            item.type === "reel_share" ||
+            item.type === "REEL_SHARE";
           let reelData = null;
-          if (isReelShare && item.content) {
-            try {
-              reelData = typeof item.content === "string" ? JSON.parse(item.content) : item.content;
-            } catch (e) {
-              reelData = null;
+          if (item.content) {
+            if (typeof item.content === "object" && item.content !== null) {
+              if (item.content.video_id || item.content.videoId || item.content.youtube_video_id) {
+                reelData = item.content;
+                isReelShare = true;
+              }
+            } else if (typeof item.content === "string") {
+              const trimmed = item.content.trim();
+              if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+                try {
+                  const parsed = JSON.parse(trimmed);
+                  if (parsed && (parsed.video_id || parsed.videoId || parsed.youtube_video_id || parsed.thumbnail_url || parsed.thumbnailUrl)) {
+                    reelData = parsed;
+                    isReelShare = true;
+                  }
+                } catch (e) {}
+              }
             }
           }
 
@@ -2103,6 +2119,8 @@ ref)
   const [isMeSpeaking, setIsMeSpeaking] = useState(false);
   const [activeSpeakers, setActiveSpeakers] = useState([]);
   const [viewerMedia, setViewerMedia] = useState(null);
+  const [firstUnreadGroupId, setFirstUnreadGroupId] = useState(null);
+  const groupInitialScrollDoneRef = useRef(false);
 
   useEffect(() => {
     const showEvent =
@@ -2201,23 +2219,16 @@ ref)
         }
       });
     } else {
-
-      liveVoiceStreamer.stopStreaming();
-      setIsMeSpeaking(false);
       const socket = getChatSocket();
       if (socket) {
         socket.emit("group-live-voice-stop", {
           room: groupId,
           groupId,
-          userId: user?.id,
-          user: {
-            id: user?.id,
-            name: user?.name,
-            username: user?.username,
-            avatar_url: user?.avatar_url
-          }
+          userId: user?.id
         });
       }
+      liveVoiceStreamer.stopStreaming();
+      setIsMeSpeaking(false);
       await setLiveVoiceAudioMode(false).catch(() => {});
     }
   };
@@ -2373,14 +2384,14 @@ ref)
       setModernToast({
         visible: true,
         message: "Mensagem apagada para todos.",
-        type: "success"
+        type: "info"
       });
 
       try {
         const socket = getChatSocket();
         if (socket) {
-          socket.emit("delete-message", {
-            room: "group_" + groupId,
+          socket.emit("group-message-deleted", {
+            groupId: String(groupId),
             messageId: msgId,
             forEveryone: true
           });
@@ -2410,12 +2421,56 @@ ref)
 
       list.sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt));
       setMessages(list);
+
+      const lastReadTimeStr = await AsyncStorage.getItem(`@tribo_group_last_read_${groupId}`);
+      if (!groupInitialScrollDoneRef.current && lastReadTimeStr) {
+        const lastReadTime = new Date(lastReadTimeStr).getTime();
+        const unreadMsgs = list.filter((m) => {
+          const isSenderMe = [
+            m.userId,
+            m.user_id,
+            m.user?.id,
+            m.sender?.id,
+            m.author?.id
+          ].some((id) => String(id) === String(user?.id));
+          const msgTime = new Date(m.createdAt || m.created_at || 0).getTime();
+          return !isSenderMe && msgTime > lastReadTime;
+        });
+
+        if (unreadMsgs.length > 0) {
+          const oldestUnread = unreadMsgs[unreadMsgs.length - 1];
+          const oldestUnreadId = String(oldestUnread.id || oldestUnread._id);
+          const oldestUnreadIdx = list.findIndex((m) => String(m.id || m._id) === oldestUnreadId);
+
+          if (oldestUnreadIdx > 0) {
+            setFirstUnreadGroupId(oldestUnreadId);
+            groupInitialScrollDoneRef.current = true;
+            setTimeout(() => {
+              try {
+                flatListRef.current?.scrollToIndex({
+                  index: oldestUnreadIdx,
+                  animated: true,
+                  viewPosition: 0.5
+                });
+              } catch (e) {
+                flatListRef.current?.scrollToOffset({
+                  offset: oldestUnreadIdx * 75,
+                  animated: true
+                });
+              }
+            }, 250);
+          }
+        }
+      }
+
+      AsyncStorage.setItem(`@tribo_group_last_read_${groupId}`, new Date().toISOString()).catch(() => {});
+      AsyncStorage.setItem(`@tribo_unread_count_${groupId}`, "0").catch(() => {});
     } catch (err) {
       console.warn("Erro ao buscar mensagens:", errorMessage(err));
     } finally {
       setLoading(false);
     }
-  }, [groupId]);
+  }, [groupId, user?.id]);
 
   useEffect(() => {
     loadMessages();
@@ -3205,6 +3260,35 @@ ref)
           const isViewOnce = Boolean(item.is_view_once || item.isViewOnce);
           const isBorderlessMedia = isSticker || isViewOnce;
           const isAudio = Boolean(item.audio_url || item.audioUrl);
+
+          let isReelShare =
+            item.media_type === "REEL_SHARE" ||
+            item.media_type === "reel_share" ||
+            item.mediaType === "REEL_SHARE" ||
+            item.mediaType === "reel_share" ||
+            item.type === "reel_share" ||
+            item.type === "REEL_SHARE";
+          let reelData = null;
+          if (item.content) {
+            if (typeof item.content === "object" && item.content !== null) {
+              if (item.content.video_id || item.content.videoId || item.content.youtube_video_id) {
+                reelData = item.content;
+                isReelShare = true;
+              }
+            } else if (typeof item.content === "string") {
+              const trimmed = item.content.trim();
+              if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+                try {
+                  const parsed = JSON.parse(trimmed);
+                  if (parsed && (parsed.video_id || parsed.videoId || parsed.youtube_video_id || parsed.thumbnail_url || parsed.thumbnailUrl)) {
+                    reelData = parsed;
+                    isReelShare = true;
+                  }
+                } catch (e) {}
+              }
+            }
+          }
+
           const isMediaOnly = Boolean(
             (item.media_url || item.mediaUrl) &&
             !item.audio_url &&
@@ -3213,8 +3297,6 @@ ref)
             !resolvedReplyContext
           );
 
-
-
           const bubbleBg = isMe ?
           isAudio ?
           "#1e293b" :
@@ -3222,15 +3304,40 @@ ref)
           "#18181b";
 
           const bubbleBorderColor = isMe ? "transparent" : "#27272a";
+          const isFirstUnread = String(item.id || item._id) === String(firstUnreadGroupId);
 
           return (
-            <SwipeableMessageRow
-              item={item}
-              onSwipeToReply={handleSwipeToReply}
-              isHighlighted={
-              highlightedMessageId === String(item.id || item._id)
-              }
-              disabled={isBanned}>
+            <View key={String(item.id || item._id)}>
+              {isFirstUnread && (
+                <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 12, paddingHorizontal: 16 }}>
+                  <View style={{ flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)" }} />
+                  <View style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: colors.primary || "#0284c7",
+                    paddingHorizontal: 12,
+                    paddingVertical: 5,
+                    borderRadius: 14,
+                    marginHorizontal: 8,
+                    shadowColor: "#0284c7",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 3
+                  }}>
+                    <Feather name="bell" size={11} color="#ffffff" style={{ marginRight: 5 }} />
+                    <Text style={{ color: "#ffffff", fontSize: 11, fontFamily: "Poppins_600SemiBold" }}>Novas Mensagens Não Lidas</Text>
+                  </View>
+                  <View style={{ flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)" }} />
+                </View>
+              )}
+              <SwipeableMessageRow
+                item={item}
+                onSwipeToReply={handleSwipeToReply}
+                isHighlighted={
+                highlightedMessageId === String(item.id || item._id)
+                }
+                disabled={isBanned}>
               
                 <Pressable
                 onLongPress={handleLongPress}
@@ -3401,7 +3508,23 @@ ref)
                                     </Pressable>)
 
                         }
-                                {Boolean(item.content) &&
+                                {isReelShare && !!reelData && (
+                                  <ReelShareCard
+                                    reelData={reelData}
+                                    isMe={true}
+                                    onPress={(data) => {
+                                      const vId = data?.video_id || data?.videoId || data?.youtube_video_id;
+                                      if (vId) {
+                                        if (Platform.OS === "web" && typeof window !== "undefined") {
+                                          window.open(`https://www.youtube.com/shorts/${vId}`, "_blank");
+                                        } else {
+                                          Linking.openURL(`https://www.youtube.com/shorts/${vId}`).catch(() => {});
+                                        }
+                                      }
+                                    }}
+                                  />
+                                )}
+                                {Boolean(item.content) && !isReelShare && (
                         <View
                           style={{
                             flexDirection: "row",
@@ -3459,7 +3582,7 @@ ref)
                                       </View>
                                     </View>
                                   </View>
-                        }
+                                )}
                               </>
                       }
                           </View>
@@ -3665,7 +3788,23 @@ ref)
                                     </Pressable>)
 
                         }
-                                {Boolean(item.content) &&
+                                {isReelShare && !!reelData && (
+                                  <ReelShareCard
+                                    reelData={reelData}
+                                    isMe={false}
+                                    onPress={(data) => {
+                                      const vId = data?.video_id || data?.videoId || data?.youtube_video_id;
+                                      if (vId) {
+                                        if (Platform.OS === "web" && typeof window !== "undefined") {
+                                          window.open(`https://www.youtube.com/shorts/${vId}`, "_blank");
+                                        } else {
+                                          Linking.openURL(`https://www.youtube.com/shorts/${vId}`).catch(() => {});
+                                        }
+                                      }
+                                    }}
+                                  />
+                                )}
+                                {Boolean(item.content) && !isReelShare && (
                         <View
                           style={{
                             flexDirection: "row",
@@ -3698,7 +3837,7 @@ ref)
                                       </Text>
                           }
                                   </View>
-                        }
+                                )}
                               </>
                       }
                           </View>
@@ -3707,7 +3846,9 @@ ref)
                     </View>
                 }
                 </Pressable>
-              </SwipeableMessageRow>);
+              </SwipeableMessageRow>
+            </View>
+          );
 
         }}
         ListEmptyComponent={

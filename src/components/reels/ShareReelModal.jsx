@@ -388,15 +388,17 @@ export function ShareReelModal({
                         }
                       ]}>
                       <View style={styles.userInfo}>
-                        <View style={[styles.groupAvatar, { backgroundColor: colors.surfaceAlt || "#27272a" }]}>
-                          <Ionicons name="people" size={20} color={colors.primary || "#3b82f6"} />
-                        </View>
+                        <Avatar
+                          url={item.avatarUrl || item.avatar_url || item.image || item.photo || item.icon}
+                          size={44}
+                          fallback={item.name || item.title || "T"}
+                        />
                         <View style={styles.nameDetails}>
                           <Text numberOfLines={1} style={[styles.userNameText, { color: colors.text }]}>
                             {item.name || item.title || "Grupo da Tribo"}
                           </Text>
                           <Text numberOfLines={1} style={[styles.userHandleText, { color: colors.muted || "#a1a1aa" }]}>
-                            {item.members_count ? `${item.members_count} membros` : "Grupo ativo"}
+                            {item.members_count ? `${item.members_count} membros` : item.memberCount ? `${item.memberCount} membros` : "Grupo ativo"}
                           </Text>
                         </View>
                       </View>

@@ -534,11 +534,11 @@ function SafePostInlineVideo({ url, styles }) {
     return (
       <View
         style={[
-        styles.postImage,
-        { backgroundColor: "#000000", minHeight: 220 }]
-        } />);
-
-
+          styles.postImage,
+          { backgroundColor: "#000000", height: 460, borderRadius: 16 }
+        ]}
+      />
+    );
   }
 
   return (
@@ -546,18 +546,19 @@ function SafePostInlineVideo({ url, styles }) {
       key={url}
       player={player}
       style={[
-      styles.postImage,
-      {
-        backgroundColor: "#000000",
-        height: undefined,
-        minHeight: 220,
-        maxHeight: 500
-      }]
-      }
-      contentFit="contain"
-      nativeControls={false} />);
-
-
+        styles.postImage,
+        {
+          backgroundColor: "#000000",
+          width: "100%",
+          height: 460,
+          borderRadius: 16,
+          overflow: "hidden"
+        }
+      ]}
+      contentFit="cover"
+      nativeControls={false}
+    />
+  );
 }
 
 function QuoteVideo({ url, styles }) {

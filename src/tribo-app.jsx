@@ -4,11 +4,13 @@ import {
   Alert,
   StyleSheet,
   View,
+  Text,
   BackHandler,
   Platform } from
 "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { Feather } from "@expo/vector-icons";
 import {
   useFonts,
   Poppins_400Regular,
@@ -36,11 +38,13 @@ import { ArchivedPostsScreen } from "./pages/perfil/ArchivedPosts";
 import { AppearanceScreen } from "./pages/aparencia/Aparencia";
 import { AppShell } from "./components/layout/app-shell";
 import { SuspendedModal } from "./components/modals/suspended-modal";
+import { PlatformSuspendedScreen } from "./components/modals/PlatformSuspendedScreen";
 import { PublicProfile } from "./components/profile/public-profile";
 import { ThemeProvider, useTheme } from "./theme";
 import { UserProvider } from "./context/user-context";
 import { normalizeUser, unwrap } from "./lib/format";
 import { initGlobalAudioMode } from "./services/audioRecordingDucking";
+import { getChatSocket } from "./services/chatSocket";
 import * as Notifications from "expo-notifications";
 import {
   registerForPushNotificationsAsync,
@@ -61,9 +65,26 @@ function TriboRoot() {
   const [activeGroupObject, setActiveGroupObject] = useState(null);
   const [showIntro, setShowIntro] = useState(false);
   const [bannedMessage, setBannedMessage] = useState(null);
+  const [platformSuspended, setPlatformSuspended] = useState(null);
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
+
+  const checkPlatformStatus = useCallback(async () => {
+    try {
+      const res = await api.app.version().catch(() => null);
+      if (res?.platform_status && res.platform_status !== "ACTIVE") {
+        setPlatformSuspended({
+          status: res.platform_status,
+          message: res.suspension_reason || res.message,
+          reason: res.suspension_reason
+        });
+      } else {
+        setPlatformSuspended(null);
+      }
+    } catch (e) {}
+  }, []);
 
   useEffect(() => {
-    const unsubscribe = api.onBan((message) => {
+    const unsubBan = api.onBan((message) => {
       setUser(null);
       setScreen("feed");
       setBannedMessage(
@@ -71,8 +92,48 @@ function TriboRoot() {
         "Sua conta foi banida por violação das diretrizes da comunidade."
       );
     });
-    return unsubscribe;
-  }, []);
+
+    const unsubSuspension = api.onPlatformSuspended((payload) => {
+      setPlatformSuspended({
+        status: payload?.status || payload?.platform_status || "MAINTENANCE",
+        message: payload?.message || "",
+        reason: payload?.reason || payload?.suspension_reason || ""
+      });
+    });
+
+    // Escuta em tempo real via WebSocket (Socket.io)
+    const socket = getChatSocket();
+    const handleStatusChangedSocket = (payload) => {
+      if (payload?.platform_status && payload.platform_status !== "ACTIVE") {
+        setPlatformSuspended({
+          status: payload.platform_status,
+          message: payload.suspension_reason || payload.message || "",
+          reason: payload.suspension_reason || ""
+        });
+      } else if (payload?.platform_status === "ACTIVE" || payload?.status === "ACTIVE") {
+        setPlatformSuspended(null);
+      }
+    };
+
+    if (socket) {
+      socket.on("platform-status-changed", handleStatusChangedSocket);
+      socket.on("platform_status_changed", handleStatusChangedSocket);
+    }
+
+    // Checagem inicial e polling de heartbeat a cada 3.5 segundos
+    checkPlatformStatus();
+    const interval = setInterval(checkPlatformStatus, 3500);
+
+    return () => {
+      unsubBan();
+      unsubSuspension();
+      clearInterval(interval);
+      if (socket) {
+        socket.off("platform-status-changed", handleStatusChangedSocket);
+        socket.off("platform_status_changed", handleStatusChangedSocket);
+      }
+    };
+  }, [checkPlatformStatus]);
 
   useEffect(() => {
     const handleBackPress = () => {
@@ -259,6 +320,10 @@ function TriboRoot() {
     setScreen("feed");
   };
 
+  const isMasterAdmin = Boolean(
+    user?.email?.trim().toLowerCase() === "luansilva@gmail.com"
+  );
+
   if (booting)
   return (
     <View style={[styles.loading, { backgroundColor: colors.ink }]}>
@@ -266,7 +331,29 @@ function TriboRoot() {
         <ActivityIndicator size="large" color={colors.accent} />
       </View>);
 
-  if (!user) return <AuthScreen onAuthenticated={authenticated} />;
+  if (platformSuspended && !isMasterAdmin && !showAdminAuth) {
+    return (
+      <PlatformSuspendedScreen
+        visible={true}
+        status={platformSuspended.status}
+        message={platformSuspended.message}
+        reason={platformSuspended.reason}
+        onRetry={checkPlatformStatus}
+        onAdminLogin={() => setShowAdminAuth(true)}
+      />
+    );
+  }
+
+  if (!user) {
+    return (
+      <AuthScreen
+        onAuthenticated={(current) => {
+          setShowAdminAuth(false);
+          authenticated(current);
+        }}
+      />
+    );
+  }
 
   if (showIntro) {
     return <IntroScreen onFinish={() => setShowIntro(false)} />;
@@ -394,6 +481,27 @@ function TriboRoot() {
           edges={["top", "bottom"]}>
           
           <StatusBar style="light" />
+
+          {/* Banner de Bypass do Administrador Mestre */}
+          {platformSuspended && isMasterAdmin && (
+            <View style={{
+              backgroundColor: platformSuspended.status === "LEGAL_ORDER" ? "#ef4444" : "#f59e0b",
+              paddingVertical: 5,
+              paddingHorizontal: 12,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6
+            }}>
+              <Feather name="shield" size={13} color="#000000" />
+              <Text style={{ color: "#000000", fontSize: 11, fontFamily: "Poppins_700Bold" }}>
+                {platformSuspended.status === "LEGAL_ORDER"
+                  ? "Modo Ordem Legal Ativo • Acesso Master Liberado (luansilva@gmail.com)"
+                  : "Modo Manutenção Ativo • Acesso Master Liberado (luansilva@gmail.com)"}
+              </Text>
+            </View>
+          )}
+
           {pages[screen]}
           <PublicProfile
             user={profileToOpen}
@@ -406,6 +514,13 @@ function TriboRoot() {
               handleOpenChat(target);
             }} />
           
+          <PlatformSuspendedScreen
+            visible={Boolean(platformSuspended && !isMasterAdmin)}
+            status={platformSuspended?.status}
+            message={platformSuspended?.message}
+            reason={platformSuspended?.reason}
+            onRetry={checkPlatformStatus}
+          />
         </SafeAreaView>
       </UserProvider>);
 
@@ -422,6 +537,27 @@ function TriboRoot() {
         <SafeAreaView style={{ backgroundColor: "#000000" }} edges={["top"]}>
           <StatusBar style="light" />
         </SafeAreaView>
+
+        {/* Banner de Bypass do Administrador Mestre */}
+        {platformSuspended && isMasterAdmin && (
+          <View style={{
+            backgroundColor: platformSuspended.status === "LEGAL_ORDER" ? "#ef4444" : "#f59e0b",
+            paddingVertical: 5,
+            paddingHorizontal: 12,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6
+          }}>
+            <Feather name="shield" size={13} color="#000000" />
+            <Text style={{ color: "#000000", fontSize: 11, fontFamily: "Poppins_700Bold" }}>
+              {platformSuspended.status === "LEGAL_ORDER"
+                ? "Modo Ordem Legal Ativo • Acesso Master Liberado (luansilva@gmail.com)"
+                : "Modo Manutenção Ativo • Acesso Master Liberado (luansilva@gmail.com)"}
+            </Text>
+          </View>
+        )}
+
         <View
           style={{ flex: 1, backgroundColor: colors.card || colors.background }}>
           
@@ -449,7 +585,14 @@ function TriboRoot() {
             visible={!!bannedMessage}
             message={bannedMessage}
             onClose={() => setBannedMessage(null)} />
-          
+
+          <PlatformSuspendedScreen
+            visible={Boolean(platformSuspended && !isMasterAdmin)}
+            status={platformSuspended?.status}
+            message={platformSuspended?.message}
+            reason={platformSuspended?.reason}
+            onRetry={checkPlatformStatus}
+          />
         </View>
       </View>
     </UserProvider>);

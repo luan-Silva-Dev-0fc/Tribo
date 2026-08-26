@@ -281,7 +281,7 @@ export const ReelItem = React.memo(function ReelItem({
       <body>
         <div class="video-container">
           <iframe 
-            src="https://www.youtube.com/embed/${item.videoId}?autoplay=0&mute=0&controls=0&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&origin=https://lonelycpp.github.io" 
+            src="https://www.youtube.com/embed/${item.videoId}?autoplay=0&mute=0&controls=0&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&showinfo=0&autohide=1&origin=https://lonelycpp.github.io" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen>
@@ -302,14 +302,14 @@ export const ReelItem = React.memo(function ReelItem({
           />
         )}
 
-        {(isActive || shouldPreload) && (
+        {isActive && (
           Platform.OS === "web" ? (
             <iframe
               id={`youtube-iframe-${item.videoId}`}
               onLoad={() => {
-                setTimeout(() => setIsReady(true), 800);
+                setTimeout(() => setIsReady(true), 400);
               }}
-              src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1`}
+              src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&mute=0&controls=0&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&showinfo=0&autohide=1`}
               style={{
                 width: "100%",
                 height: "100%",
@@ -325,9 +325,51 @@ export const ReelItem = React.memo(function ReelItem({
           ) : (
             <WebView
               ref={webViewRef}
-              source={{ html: embedHtml, baseUrl: "https://lonelycpp.github.io" }}
+              source={{
+                html: `
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                    <style>
+                      * { margin: 0; padding: 0; box-sizing: border-box; }
+                      body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; }
+                      .video-container {
+                        position: relative;
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                      }
+                      iframe {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        width: 100vw;
+                        height: 100vh;
+                        border: none;
+                        transform: translate(-50%, -50%) scale(1.3);
+                        pointer-events: none;
+                      }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="video-container">
+                      <iframe 
+                        src="https://www.youtube.com/embed/${item.videoId}?autoplay=1&mute=0&controls=0&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&showinfo=0&autohide=1&origin=https://lonelycpp.github.io" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                      </iframe>
+                    </div>
+                  </body>
+                </html>
+              `,
+                baseUrl: "https://lonelycpp.github.io"
+              }}
               onLoad={() => {
-                setTimeout(() => setIsReady(true), 800);
+                setTimeout(() => setIsReady(true), 400);
               }}
               style={[StyleSheet.absoluteFillObject, { zIndex: 1 }]}
               allowsInlineMediaPlayback={true}
@@ -346,9 +388,6 @@ export const ReelItem = React.memo(function ReelItem({
       <Pressable
         style={[StyleSheet.absoluteFillObject, { zIndex: 1, justifyContent: "center", alignItems: "center" }]}
         onPress={handleScreenPress}>
-        {!isPlaying && (
-          <Ionicons name="play" size={100} color="rgba(255, 255, 255, 0.85)" style={styles.playIconShadow} />
-        )}
         <Animated.View
           style={{
             position: "absolute",

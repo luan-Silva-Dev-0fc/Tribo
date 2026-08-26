@@ -19,7 +19,6 @@ import { ReelsOnboardingModal } from "../../components/reels/reels-onboarding-mo
 import { ShareReelModal } from "../../components/reels/ShareReelModal";
 import { SavedReelsModal } from "../../components/reels/SavedReelsModal";
 import { ReelsSearchModal } from "../../components/reels/ReelsSearchModal";
-import { ReelsCategoryFilterModal } from "../../components/reels/ReelsCategoryFilterModal";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -93,7 +92,8 @@ export function TelaReels({ user }) {
         setUserPreferences({
           onboardingCompleted: prefsRes.onboardingCompleted,
           selectedCategories: prefsRes.selectedCategories || [],
-          categoryScores: prefsRes.categoryScores || {}
+          categoryScores: prefsRes.categoryScores || {},
+          customPrompt: prefsRes.customPrompt || "",
         });
 
         if (prefsRes.onboardingCompleted === false) {
@@ -105,13 +105,15 @@ export function TelaReels({ user }) {
     }
   }, []);
 
-  const loadFeed = useCallback(async () => {
-    setLoading(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const loadFeed = useCallback(async (isRefresh = false) => {
+    if (!isRefresh) setLoading(true);
     try {
-      const res = await api.reels.feed({ limit: 25 });
-      if (res?.reels) {
+      const res = await api.reels.feed({ limit: 25, reset: isRefresh });
+      if (res?.reels && res.reels.length > 0) {
         setReels(res.reels);
-      } else {
+      } else if (!isRefresh) {
         setReels([]);
       }
     } catch (err) {
@@ -123,6 +125,26 @@ export function TelaReels({ user }) {
     }
   }, [showToast]);
 
+  const handleLoadMore = useCallback(async () => {
+    if (loadingMore || loading || reels.length === 0) return;
+    setLoadingMore(true);
+    try {
+      const currentIds = reels.map((r) => r.videoId);
+      const res = await api.reels.feed({ limit: 20, excludeIds: currentIds });
+      if (res?.reels && res.reels.length > 0) {
+        const existingSet = new Set(currentIds);
+        const newReels = res.reels.filter((r) => !existingSet.has(r.videoId));
+        if (newReels.length > 0) {
+          setReels((prev) => [...prev, ...newReels]);
+        }
+      }
+    } catch (err) {
+      console.warn("[TelaReels] Erro ao carregar mais reels:", err.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, loading, reels]);
+
   useEffect(() => {
     loadPreferencesAndCategories();
     loadFeed();
@@ -130,7 +152,7 @@ export function TelaReels({ user }) {
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    loadFeed();
+    loadFeed(true);
   }, [loadFeed]);
 
   const handleToggleLike = useCallback(
@@ -195,9 +217,10 @@ export function TelaReels({ user }) {
   );
 
   const handlePreferencesSaved = useCallback(
-    (selected) => {
-      showToast("Preferências salvas! Recarregando feed...", "success");
-      loadFeed();
+    (savedPrompt) => {
+      showToast("✨ Algoritmo calibrado com suas preferências!", "success");
+      setUserPreferences((prev) => ({ ...prev, customPrompt: savedPrompt, onboardingCompleted: true }));
+      loadFeed(true);
       loadPreferencesAndCategories();
     },
     [showToast, loadFeed, loadPreferencesAndCategories]
@@ -284,16 +307,13 @@ export function TelaReels({ user }) {
           </Pressable>
 
           <Pressable
-            onPress={() => setCategoryModalVisible(true)}
-            style={[
-              styles.headerIconButton,
-              activeCategoryFilter !== "all" && styles.headerIconButtonActive
-            ]}
+            onPress={() => setOnboardingVisible(true)}
+            style={styles.headerIconButton}
             hitSlop={6}>
             <Ionicons
               name="sparkles"
               size={18}
-              color={activeCategoryFilter !== "all" ? "#f59e0b" : "#ffffff"}
+              color="#f59e0b"
             />
           </Pressable>
         </View>
@@ -324,13 +344,20 @@ export function TelaReels({ user }) {
           <Ionicons name="film-outline" size={48} color="#71717a" />
           <Text style={styles.emptyTitle}>Nenhum Reel encontrado</Text>
           <Text style={styles.emptySubtitle}>
-            Ajuste suas preferências para calibrar o algoritmo de recomendação.
+            Escreva o que você gostaria de ver para o algoritmo calibrar seus Reels.
           </Text>
-          <Pressable
-            onPress={() => setCategoryModalVisible(true)}
-            style={styles.emptyButton}>
-            <Text style={styles.emptyButtonText}>Ver Categorias</Text>
-          </Pressable>
+          <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+            <Pressable
+              onPress={() => loadFeed(true)}
+              style={[styles.emptyButton, { backgroundColor: "#18181b", borderWidth: 1, borderColor: "rgba(255, 255, 255, 0.15)" }]}>
+              <Text style={styles.emptyButtonText}>Recarregar</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setOnboardingVisible(true)}
+              style={styles.emptyButton}>
+              <Text style={styles.emptyButtonText}>Escrever Preferências</Text>
+            </Pressable>
+          </View>
         </View>
       ) : (
         <FlatList
@@ -341,12 +368,12 @@ export function TelaReels({ user }) {
             <ReelItem
               item={item}
               isActive={index === activeVideoIndex}
-              shouldPreload={Math.abs(index - activeVideoIndex) <= 1}
+              shouldPreload={false}
               onToggleLike={handleToggleLike}
               onToggleSave={handleToggleSave}
               onMoreLikeThis={handleMoreLikeThis}
               onNotInterested={handleNotInterested}
-              onOpenPreferences={() => setCategoryModalVisible(true)}
+              onOpenPreferences={() => setOnboardingVisible(true)}
               onOpenShare={handleOpenShare}
               containerHeight={SCREEN_HEIGHT}
             />
@@ -370,6 +397,8 @@ export function TelaReels({ user }) {
             offset: SCREEN_HEIGHT * index,
             index
           })}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
           windowSize={3}
           initialNumToRender={1}
           maxToRenderPerBatch={2}
@@ -397,21 +426,11 @@ export function TelaReels({ user }) {
         onSelectReel={handleSelectFromSearch}
       />
 
-      <ReelsCategoryFilterModal
-        visible={categoryModalVisible}
-        onClose={() => setCategoryModalVisible(false)}
-        categories={categories}
-        activeCategory={activeCategoryFilter}
-        onSelectCategory={setActiveCategoryFilter}
-        onOpenCalibrate={() => setOnboardingVisible(true)}
-      />
-
       <ReelsOnboardingModal
         visible={onboardingVisible}
         onClose={() => setOnboardingVisible(false)}
         onPreferencesSaved={handlePreferencesSaved}
-        currentCategories={userPreferences.selectedCategories}
-        currentScores={userPreferences.categoryScores}
+        currentPrompt={userPreferences.customPrompt}
       />
     </View>
   );

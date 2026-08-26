@@ -822,12 +822,8 @@ export default function FeedScreen({ user, onOpenProfile, scrollToTopSignal }) {
   };
 
   return (
-    <AppLayout
-      tagText="★ Tribo"
-      title="Seu Feed"
-      description="Acompanhe o que está acontecendo na Tribo.">
-      
-      <View style={{ marginBottom: 16, zIndex: 10 }}>
+    <AppLayout>
+      <View style={{ marginTop: 0, marginBottom: 10, zIndex: 10 }}>
         <StoriesBar user={user} />
       </View>
       <View style={{ flex: 1 }}>

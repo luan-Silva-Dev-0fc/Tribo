@@ -122,6 +122,23 @@ function notifyAccountBanned(message) {
   }
 }
 
+const platformSuspensionListeners = new Set();
+
+export function onPlatformSuspended(listener) {
+  platformSuspensionListeners.add(listener);
+  return () => platformSuspensionListeners.delete(listener);
+}
+
+export function notifyPlatformSuspended(data) {
+  for (const listener of platformSuspensionListeners) {
+    try {
+      listener(data);
+    } catch (e) {
+      console.error("Error in platform suspension listener:", e);
+    }
+  }
+}
+
 async function request(
 path,
 { method = "GET", body, headers = {}, signal } = {})
@@ -161,6 +178,15 @@ path,
   if (!response.ok) {
     const errorMsg =
     payload?.message || payload?.error || `Erro HTTP ${response.status}`;
+
+    if (
+      response.status === 503 ||
+      response.status === 423 ||
+      payload?.error === "PLATFORM_SUSPENDED" ||
+      payload?.code === "PLATFORM_SUSPENDED"
+    ) {
+      notifyPlatformSuspended(payload || { error: "PLATFORM_SUSPENDED", message: errorMsg });
+    }
 
     if (response.status === 403) {
       const isAccountBan =
@@ -614,9 +640,11 @@ export const api = {
     conversations: () => request("/messages/conversations"),
     getHistory: (userId) => request(`/messages/${userId}`),
     markRead: (id) => request(`/messages/${id}/read`, { method: "PATCH" }),
+    markConversationRead: (senderId) =>
+      request("/messages/read", { method: "PATCH", body: { senderId } }),
     markViewed: (id) => request(`/messages/${id}/view`, { method: "PUT" }),
     delete: (id, options = { forEveryone: true }) =>
-    request(`/messages/${id}`, { method: "DELETE", body: options }),
+      request(`/messages/${id}`, { method: "DELETE", body: options }),
 
     list: () => request("/messages"),
     conversation: (conversation) =>
@@ -743,14 +771,24 @@ export const api = {
   reels: {
     categories: () => request("/reels/categories"),
     preferences: () => request("/reels/preferences"),
-    savePreferences: (selectedCategories) =>
-    request("/reels/preferences", {
-      method: "POST",
-      body: { selectedCategories }
-    }),
+    savePreferences: (payload) => {
+      const body = typeof payload === "string" 
+        ? { customPrompt: payload } 
+        : Array.isArray(payload) 
+        ? { selectedCategories: payload } 
+        : payload;
+      return request("/reels/preferences", {
+        method: "POST",
+        body
+      });
+    },
     feed: (params = {}) => {
       const query = new URLSearchParams();
       if (params.limit) query.set("limit", params.limit);
+      if (params.excludeIds) {
+        query.set("excludeIds", Array.isArray(params.excludeIds) ? params.excludeIds.join(",") : params.excludeIds);
+      }
+      if (params.reset) query.set("reset", "true");
       const qs = query.toString();
       return request(`/reels/feed${qs ? `?${qs}` : ""}`);
     },
@@ -814,7 +852,8 @@ export const api = {
     get: (id) => request(`/stickers/${id}`)
   },
 
-  onBan: onAccountBanned
+  onBan: onAccountBanned,
+  onPlatformSuspended: onPlatformSuspended
 };
 
 export function asList(payload, keys = []) {

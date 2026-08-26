@@ -1,361 +1,395 @@
 import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableWithoutFeedback,
   View,
-  Image } from
-"react-native";
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 import { api } from "../../api";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+const QUICK_IDEAS = [
+  "Memes de 2026",
+  "Tecnologia & IA",
+  "Programação React",
+  "Shitpost Engraçado",
+  "Jogos & Gaming",
+  "Carros & Drift",
+  "Futebol & Gols",
+  "Animes & Cenas",
+  "Curiosidades Incríveis",
+  "Trap & Funk Brasil",
+];
 
 export function ReelsOnboardingModal({
   visible,
   onClose,
   onPreferencesSaved,
-  currentCategories = [],
-  currentScores = {}
+  currentPrompt = "",
 }) {
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const [categories, setCategories] = useState([]);
-  const [selected, setSelected] = useState(new Set(currentCategories));
-  const [loading, setLoading] = useState(false);
+  const [prompt, setPrompt] = useState(currentPrompt || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
     if (visible) {
-      setSelected(new Set(currentCategories));
-      loadCategories();
+      setPrompt(currentPrompt || "");
+      setError(null);
     }
-  }, [visible, currentCategories]);
+  }, [visible, currentPrompt]);
 
-  async function loadCategories() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.reels.categories();
-      if (res?.categories) {
-        setCategories(res.categories);
-      }
-    } catch (err) {
-      console.warn("[ReelsModal] Erro ao carregar categorias:", err.message);
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
-      const CDN_URL = "https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/";
-      setCategories([
-      { id: "tecnologia", label: "Tecnologia & Programação", iconUrl: `${CDN_URL}tecnologia.png` },
-      { id: "shitpost", label: "Shitposts & Memes", iconUrl: `${CDN_URL}shitpost.png` },
-      { id: "musica", label: "Música & Clips", iconUrl: `${CDN_URL}musica.png` },
-      { id: "jogos", label: "Jogos & Gaming", iconUrl: `${CDN_URL}jogos.png` },
-      { id: "carros", label: "Carros & Automóveis", iconUrl: `${CDN_URL}carros.png` },
-      { id: "esportes", label: "Futebol & Esportes", iconUrl: `${CDN_URL}esportes.png` },
-      { id: "filmes_animes", label: 'Filmes & Animes', iconUrl: `${CDN_URL}filmes_animes.png` },
-      { id: "curiosidades", label: "Curiosidades & Fatos", iconUrl: `${CDN_URL}curiosidades.png` },
-      { id: "lutas", label: "Lutas & Artes Marciais", iconUrl: `${CDN_URL}lutas.png` }]
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function toggleCategory(catId) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(catId)) {
-        next.delete(catId);
-      } else {
-        next.add(catId);
-      }
-      return next;
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
     });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  function handleAddTag(tag) {
+    if (!prompt.trim()) {
+      setPrompt(tag);
+    } else if (!prompt.toLowerCase().includes(tag.toLowerCase())) {
+      setPrompt((prev) => `${prev.trim()}, ${tag}`);
+    }
   }
 
   async function handleSave() {
-    if (selected.size === 0) {
-      setError("Selecione ao menos 1 interesse para calibrar o algoritmo.");
+    if (!prompt.trim()) {
+      setError("Escreva o que você gostaria de receber no seu feed.");
       return;
     }
 
+    Keyboard.dismiss();
     setSaving(true);
     setError(null);
     try {
-      const selectedArray = Array.from(selected);
-      await api.reels.savePreferences(selectedArray);
+      await api.reels.savePreferences({ customPrompt: prompt.trim() });
       if (onPreferencesSaved) {
-        onPreferencesSaved(selectedArray);
+        onPreferencesSaved(prompt.trim());
       }
       onClose();
     } catch (err) {
-      setError(err?.message || "Não foi possível salvar as preferências.");
+      setError(err?.message || "Não foi possível calibrar o algoritmo.");
     } finally {
       setSaving(false);
     }
   }
+
+  const bottomPadding = Math.max(insets.bottom, Platform.OS === "android" ? 28 : 20);
 
   return (
     <Modal
       visible={visible}
       animationType="slide"
       transparent={true}
-      onRequestClose={onClose}>
-      
+      statusBarTranslucent={true}
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
-        <View style={[styles.modalCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          {}
-          <View style={styles.header}>
-            <View style={styles.headerTitleRow}>
-              <Ionicons name="sparkles" size={22} color="#f59e0b" />
-              <Text style={[styles.title, { color: colors.text }]}>
-                Treine seu Algoritmo
+        {/* Backdrop clickable para fechar */}
+        <Pressable style={StyleSheet.absoluteFillObject} onPress={onClose} />
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.keyboardView}
+        >
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: "#18181b",
+                borderColor: "rgba(255, 255, 255, 0.1)",
+                paddingBottom: bottomPadding + (Platform.OS === "android" ? (keyboardHeight > 0 ? keyboardHeight - insets.bottom : 0) : 0),
+                maxHeight: SCREEN_HEIGHT * 0.88,
+              },
+            ]}
+          >
+            {/* Drag indicator */}
+            <View style={styles.dragIndicator} />
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: 10 }}
+            >
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.headerTitleRow}>
+                  <View style={styles.iconCircle}>
+                    <Ionicons name="sparkles" size={20} color="#f59e0b" />
+                  </View>
+                  <Text style={styles.title}>Treine seu Algoritmo</Text>
+                </View>
+                <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={10}>
+                  <Feather name="x" size={20} color="#a1a1aa" />
+                </Pressable>
+              </View>
+
+              {/* Subtitle */}
+              <Text style={styles.subtitle}>
+                Escreva com suas palavras o que você quer ver nos seus Reels. O algoritmo inteligente vai buscar e priorizar exatamente o que você descrever.
               </Text>
-            </View>
-            <Pressable onPress={onClose} style={styles.closeBtn}>
-              <Feather name="x" size={20} color={colors.muted} />
-            </Pressable>
-          </View>
 
-          <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Escolha os tópicos que você mais gosta. O algoritmo aprenderá com suas curtidas e interações em tempo real.
-          </Text>
+              {error && (
+                <View style={styles.errorBanner}>
+                  <Feather name="alert-circle" size={16} color="#ef4444" />
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              )}
 
-          {error &&
-          <View style={styles.errorBanner}>
-              <Feather name="alert-circle" size={16} color="#ef4444" />
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          }
+              {/* Campo de Escrita / Prompt */}
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  multiline
+                  numberOfLines={4}
+                  value={prompt}
+                  onChangeText={(text) => {
+                    setPrompt(text);
+                    if (error) setError(null);
+                  }}
+                  placeholder="Ex: Memes brasileiros engraçados de 2026, tecnologia e IA, programação em React, curiosidades sobre o universo, carros esportivos..."
+                  placeholderTextColor="#71717a"
+                  textAlignVertical="top"
+                  maxLength={500}
+                />
+                {prompt.length > 0 && (
+                  <Pressable
+                    onPress={() => setPrompt("")}
+                    style={styles.clearInputBtn}
+                    hitSlop={8}
+                  >
+                    <Feather name="x-circle" size={16} color="#71717a" />
+                  </Pressable>
+                )}
+              </View>
 
-          {loading ?
-          <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.accent} />
-            </View> :
+              {/* Sugestões Rápidas de Ideias */}
+              <Text style={styles.ideasLabel}>Sugestões para adicionar:</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.tagsContainer}
+              >
+                {QUICK_IDEAS.map((tag, idx) => (
+                  <Pressable
+                    key={idx}
+                    onPress={() => handleAddTag(tag)}
+                    style={styles.tagChip}
+                  >
+                    <Feather name="plus" size={12} color="#a1a1aa" />
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
 
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={styles.gridContainer}
-            showsVerticalScrollIndicator={false}>
-            
-              {categories.map((cat) => {
-              const isSelected = selected.has(cat.id);
-              const score = currentScores[cat.id];
-
-              return (
+              {/* Botão de Ação */}
+              <View style={styles.footer}>
                 <Pressable
-                  key={cat.id}
-                  onPress={() => toggleCategory(cat.id)}
-                  style={[
-                  styles.categoryCard,
-                  {
-                    backgroundColor: isSelected ? "#2563eb18" : colors.surfaceAlt,
-                    borderColor: isSelected ? "#2563eb" : colors.border
-                  }]
-                  }>
-                  
-                    <Image
-                    source={{ uri: cat.iconUrl || `https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/${cat.id}.png` }}
-                    style={styles.categoryIcon}
-                    resizeMode="contain" />
-                  
-                    <View style={styles.categoryInfo}>
-                      <Text
-                      style={[
-                      styles.categoryLabel,
-                      {
-                        color: isSelected ? "#60a5fa" : colors.text,
-                        fontFamily: isSelected ?
-                        "Poppins_600SemiBold" :
-                        "Poppins_500Medium"
-                      }]
-                      }>
-                      
-                        {cat.label}
+                  onPress={handleSave}
+                  disabled={saving}
+                  style={({ pressed }) => [
+                    styles.submitBtn,
+                    pressed && { opacity: 0.85 },
+                  ]}
+                >
+                  {saving ? (
+                    <ActivityIndicator size="small" color="#ffffff" />
+                  ) : (
+                    <>
+                      <Ionicons name="sparkles" size={18} color="#ffffff" />
+                      <Text style={styles.submitBtnText}>
+                        Calibrar Algoritmo Agora
                       </Text>
-                      {score !== undefined && score > 0 &&
-                    <Text style={[styles.scoreBadge, { color: colors.muted }]}>
-                          Score: {score} pts
-                        </Text>
-                    }
-                    </View>
-                    <View
-                    style={[
-                    styles.checkCircle,
-                    {
-                      backgroundColor: isSelected ? "#2563eb" : "transparent",
-                      borderColor: isSelected ? "#2563eb" : colors.muted
-                    }]
-                    }>
-                    
-                      {isSelected && <Feather name="check" size={13} color="#ffffff" />}
-                    </View>
-                  </Pressable>);
-
-            })}
+                    </>
+                  )}
+                </Pressable>
+              </View>
             </ScrollView>
-          }
-
-          {}
-          <View style={styles.footer}>
-            <Text style={[styles.countText, { color: colors.muted }]}>
-              {selected.size} tópico{selected.size === 1 ? "" : "s"} selecionado{selected.size === 1 ? "" : "s"}
-            </Text>
-
-            <Pressable
-              onPress={handleSave}
-              disabled={saving}
-              style={[
-              styles.saveButton,
-              { opacity: saving ? 0.7 : 1 }]
-              }>
-              
-              {saving ?
-              <ActivityIndicator size="small" color="#ffffff" /> :
-
-              <>
-                  <Ionicons name="rocket-outline" size={18} color="#ffffff" />
-                  <Text style={styles.saveButtonText}>Calibrar Feed de Reels</Text>
-                </>
-              }
-            </Pressable>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
-    </Modal>);
-
+    </Modal>
+  );
 }
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.75)",
-    justifyContent: "flex-end"
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    justifyContent: "flex-end",
+  },
+  keyboardView: {
+    width: "100%",
   },
   modalCard: {
+    width: "100%",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     borderWidth: 1,
-    paddingTop: 20,
     paddingHorizontal: 20,
-    paddingBottom: 36,
-    maxHeight: "85%"
+    paddingTop: 12,
+  },
+  dragIndicator: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignSelf: "center",
+    marginBottom: 14,
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8
+    justifyContent: "space-between",
+    marginBottom: 8,
   },
   headerTitleRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8
+    gap: 10,
   },
-  title: {
-    fontSize: 20,
-    fontFamily: "Poppins_700Bold"
-  },
-  closeBtn: {
+  iconCircle: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "rgba(245, 158, 11, 0.15)",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: "Poppins_700Bold",
+    color: "#ffffff",
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   subtitle: {
     fontSize: 13,
     fontFamily: "Poppins_400Regular",
+    color: "#a1a1aa",
     lineHeight: 19,
-    marginBottom: 16
+    marginBottom: 14,
   },
   errorBanner: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(239, 68, 68, 0.15)",
+    backgroundColor: "rgba(239, 68, 68, 0.12)",
     borderWidth: 1,
     borderColor: "rgba(239, 68, 68, 0.3)",
     padding: 10,
     borderRadius: 12,
     gap: 8,
-    marginBottom: 12
+    marginBottom: 12,
   },
   errorText: {
-    color: "#ef4444",
+    color: "#f87171",
+    fontSize: 12.5,
+    fontFamily: "Poppins_500Medium",
+    flex: 1,
+  },
+  inputContainer: {
+    position: "relative",
+    marginBottom: 14,
+  },
+  textInput: {
+    backgroundColor: "#27272a",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.12)",
+    borderRadius: 16,
+    padding: 14,
+    paddingRight: 36,
+    color: "#ffffff",
+    fontSize: 14,
+    fontFamily: "Poppins_400Regular",
+    minHeight: 100,
+    lineHeight: 20,
+  },
+  clearInputBtn: {
+    position: "absolute",
+    top: 14,
+    right: 12,
+    padding: 4,
+  },
+  ideasLabel: {
     fontSize: 12,
     fontFamily: "Poppins_500Medium",
-    flex: 1
+    color: "#a1a1aa",
+    marginBottom: 8,
   },
-  loadingContainer: {
-    height: 220,
-    alignItems: "center",
-    justifyContent: "center"
+  tagsContainer: {
+    gap: 8,
+    paddingBottom: 4,
   },
-  scroll: {
-    maxHeight: 380
-  },
-  gridContainer: {
-    gap: 10,
-    paddingBottom: 10
-  },
-  categoryCard: {
+  tagChip: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    gap: 12
+    backgroundColor: "rgba(255, 255, 255, 0.07)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 5,
   },
-  categoryIcon: {
-    width: 28,
-    height: 28
-  },
-  categoryInfo: {
-    flex: 1
-  },
-  categoryLabel: {
-    fontSize: 14
-  },
-  scoreBadge: {
-    fontSize: 11,
-    fontFamily: "Poppins_400Regular",
-    marginTop: 2
-  },
-  checkCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center"
+  tagText: {
+    color: "#e4e4e7",
+    fontSize: 12,
+    fontFamily: "Poppins_500Medium",
   },
   footer: {
-    marginTop: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.06)",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    marginTop: 18,
+    marginBottom: 6,
   },
-  countText: {
-    fontSize: 12,
-    fontFamily: "Poppins_500Medium"
-  },
-  saveButton: {
-    flexDirection: "row",
-    alignItems: "center",
+  submitBtn: {
     backgroundColor: "#2563eb",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 24,
-    gap: 8
+    borderRadius: 16,
+    paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    shadowColor: "#2563eb",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  saveButtonText: {
+  submitBtnText: {
     color: "#ffffff",
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 13
-  }
+    fontSize: 15,
+    fontFamily: "Poppins_700Bold",
+  },
 });

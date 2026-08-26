@@ -34,7 +34,11 @@ export const ReelShareCard = React.memo(function ReelShareCard({
     }
     if (videoId) {
       const url = `https://www.youtube.com/shorts/${videoId}`;
-      Linking.openURL(url).catch(() => {});
+      if (Platform.OS === "web" && typeof window !== "undefined") {
+        window.open(url, "_blank");
+      } else {
+        Linking.openURL(url).catch(() => {});
+      }
     }
   };
 
