@@ -51,6 +51,13 @@ export function TelaReels({ user }) {
 
   const flatListRef = useRef(null);
 
+  const displayedReels =
+    activeCategoryFilter === "all"
+      ? reels
+      : reels.filter((r) => r.category === activeCategoryFilter);
+
+  const activeCategoryObj = categories.find((c) => c.id === activeCategoryFilter);
+
   const showToast = useCallback(
     (msg, type = "info") => {
       setToastMessage({ text: msg, type });
@@ -241,13 +248,6 @@ export function TelaReels({ user }) {
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 70
   }).current;
-
-  const displayedReels =
-    activeCategoryFilter === "all"
-      ? reels
-      : reels.filter((r) => r.category === activeCategoryFilter);
-
-  const activeCategoryObj = categories.find((c) => c.id === activeCategoryFilter);
 
   return (
     <View style={styles.container}>
