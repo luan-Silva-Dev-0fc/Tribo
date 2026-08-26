@@ -13,8 +13,8 @@ import {
   Text,
   View,
   Image,
-  TextInput,
-} from "react-native";
+  TextInput } from
+"react-native";
 import { Feather } from "@expo/vector-icons";
 import { api, getUploadUrl } from "../../api";
 import Constants from "expo-constants";
@@ -26,8 +26,8 @@ import {
   EmptyState,
   IconButton,
   Input,
-  VerificationBadge,
-} from "../../components/ui/ui";
+  VerificationBadge } from
+"../../components/ui/ui";
 import { ReportModal } from "../../components/modals/report-modal";
 import { FollowersModal } from "../../components/modals/followers-modal";
 import { FollowRequestsModal } from "../../components/modals/follow-requests-modal";
@@ -41,8 +41,8 @@ import {
   listFrom,
   normalizeUser,
   unwrap,
-  userName,
-} from "../../lib/format";
+  userName } from
+"../../lib/format";
 import { useTheme } from "../../theme";
 import { useUserContext } from "../../context/user-context";
 import { PostCard } from "../../components/feed/PostCard";
@@ -53,8 +53,8 @@ function belongsToUser(post, id) {
     String(post.userId) === String(id) ||
     String(post.authorId) === String(id) ||
     String(post.user?.id) === String(id) ||
-    String(post.author?.id) === String(id)
-  );
+    String(post.author?.id) === String(id));
+
 }
 
 async function downloadUserData(user, data) {
@@ -79,13 +79,13 @@ async function downloadUserData(user, data) {
     const Sharing = require("expo-sharing");
     const fileUri = `${FileSystem.documentDirectory}${filename}`;
     await FileSystem.writeAsStringAsync(fileUri, jsonStr, {
-      encoding: FileSystem.EncodingType?.UTF8 || "utf8",
+      encoding: FileSystem.EncodingType?.UTF8 || "utf8"
     });
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(fileUri, {
         mimeType: "application/json",
         dialogTitle: "Baixar Meus Dados da Tribo",
-        UTI: "public.json",
+        UTI: "public.json"
       });
       return true;
     }
@@ -112,8 +112,8 @@ function SearchUserOptionsModal({ user, visible, onClose, onBlock, onReport }) {
           onPress={() => {
             onClose();
             onBlock(user);
-          }}
-        >
+          }}>
+          
           <View style={[styles.optionIcon, { backgroundColor: "rgba(245, 158, 11, 0.15)" }]}>
             <Feather name="user-x" size={20} color="#f59e0b" />
           </View>
@@ -127,8 +127,8 @@ function SearchUserOptionsModal({ user, visible, onClose, onBlock, onReport }) {
           onPress={() => {
             onClose();
             onReport(user);
-          }}
-        >
+          }}>
+          
           <View style={[styles.optionIcon, { backgroundColor: "rgba(239, 68, 68, 0.15)" }]}>
             <Feather name="flag" size={20} color="#ef4444" />
           </View>
@@ -137,8 +137,8 @@ function SearchUserOptionsModal({ user, visible, onClose, onBlock, onReport }) {
           </Text>
         </Pressable>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 export { SearchScreen } from "../Search";
@@ -152,7 +152,7 @@ export function ProfileScreen({
   onOpenProfile,
   onOpenAppearance,
   onOpenSavedPosts,
-  onOpenArchivedPosts,
+  onOpenArchivedPosts
 }) {
   const { colors } = useTheme();
   const [editing, setEditing] = useState(false);
@@ -173,28 +173,28 @@ export function ProfileScreen({
       const res = await api.users.get(user.id);
       if (res) {
         setProfileData(res);
-        onUpdateUser?.(res); // Keep global state in sync if possible
+        onUpdateUser?.(res);
       }
     } catch (err) {
-      // Ignore
+
     }
 
-    // Fetch user posts
+
     try {
       setLoadingPosts(true);
       const postsRes = await api.users.posts(user.id);
       const allPosts = postsRes?.posts || postsRes?.data || postsRes || [];
       setUserPosts(Array.isArray(allPosts) ? allPosts : []);
     } catch (err) {
-      // Ignore
+
     } finally {
       setLoadingPosts(false);
     }
-  }, [user?.id]); // Removed onUpdateUser to prevent infinite loop
+  }, [user?.id]);
 
   useEffect(() => {
     fetchProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   const fetchDeletionStatus = useCallback(async () => {
@@ -221,7 +221,7 @@ export function ProfileScreen({
         title: "Exclusão Cancelada",
         message: "O pedido de exclusão da conta foi cancelado com sucesso! Sua conta permanece ativa.",
         buttonText: "Entendido",
-        onClose: () => setProfileAlert({ visible: false }),
+        onClose: () => setProfileAlert({ visible: false })
       });
       onRefresh?.();
     } catch (err) {
@@ -231,7 +231,7 @@ export function ProfileScreen({
         title: "Erro ao Cancelar",
         message: errorMessage(err) || "Não foi possível cancelar o agendamento de exclusão.",
         buttonText: "Fechar",
-        onClose: () => setProfileAlert({ visible: false }),
+        onClose: () => setProfileAlert({ visible: false })
       });
     } finally {
       setCancelingDeletion(false);
@@ -254,29 +254,29 @@ export function ProfileScreen({
           name="menu"
           label="Abrir menu de configurações"
           onPress={() => setDrawerVisible(true)}
-          color={colors.text}
-        />
+          color={colors.text} />
+        
       </View>
       <AppLayout
         tagText="★ Tribo"
         title="Seu Perfil"
-        description="Gerencie suas informações e preferências."
-      >
+        description="Gerencie suas informações e preferências.">
+        
         <ScrollView
           contentContainerStyle={styles.profileScroll}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Banner de Exclusão Agendada no Perfil */}
-          {deletionInfo?.isPendingDeletion && (
-            <View
-              style={[
-                styles.deletionBanner,
-                {
-                  backgroundColor: "rgba(239, 68, 68, 0.12)",
-                  borderColor: "rgba(239, 68, 68, 0.3)",
-                },
-              ]}
-            >
+          showsVerticalScrollIndicator={false}>
+          
+          {}
+          {deletionInfo?.isPendingDeletion &&
+          <View
+            style={[
+            styles.deletionBanner,
+            {
+              backgroundColor: "rgba(239, 68, 68, 0.12)",
+              borderColor: "rgba(239, 68, 68, 0.3)"
+            }]
+            }>
+            
               <View style={styles.deletionBannerHeader}>
                 <Feather name="alert-triangle" size={18} color="#ef4444" />
                 <Text style={styles.deletionBannerTitle}>
@@ -287,46 +287,46 @@ export function ProfileScreen({
                 Sua conta está agendada para ser excluída permanentemente. Todos os seus dados serão apagados ao final do prazo.
               </Text>
               <Pressable
-                style={styles.cancelDeletionBtn}
-                onPress={handleCancelDeletion}
-                disabled={cancelingDeletion}
-              >
-                {cancelingDeletion ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <Text style={styles.cancelDeletionBtnText}>Cancelar Exclusão da Conta</Text>
-                )}
+              style={styles.cancelDeletionBtn}
+              onPress={handleCancelDeletion}
+              disabled={cancelingDeletion}>
+              
+                {cancelingDeletion ?
+              <ActivityIndicator size="small" color="#fff" /> :
+
+              <Text style={styles.cancelDeletionBtnText}>Cancelar Exclusão da Conta</Text>
+              }
               </Pressable>
             </View>
-          )}
+          }
 
           <View
             style={[
-              styles.profileCard,
-              {
-                backgroundColor: colors.surface || colors.card,
-                borderColor: colors.border,
-              },
-            ]}
-          >
+            styles.profileCard,
+            {
+              backgroundColor: colors.surface || colors.card,
+              borderColor: colors.border
+            }]
+            }>
+            
             <View style={styles.profileTop}>
               <Pressable
                 onPress={() => setEditing(true)}
                 style={styles.profileAvatarContainer}
-                accessibilityLabel="Editar foto de perfil"
-              >
+                accessibilityLabel="Editar foto de perfil">
+                
                 <Avatar user={user} size={84} />
                 <View
                   style={[
-                    styles.profileAvatarEditBadge,
-                    { backgroundColor: colors.accent, borderColor: colors.card },
-                  ]}
-                >
+                  styles.profileAvatarEditBadge,
+                  { backgroundColor: colors.accent, borderColor: colors.card }]
+                  }>
+                  
                   <Feather name="camera" size={13} color="#fff" />
                 </View>
               </Pressable>
 
-              {/* Estatísticas de Posts / Seguidores / Seguindo */}
+              {}
               <View style={styles.profileStatsRow}>
                 <View style={styles.profileStatItem}>
                   <Text style={[styles.profileStatNumber, { color: colors.text }]}>
@@ -339,17 +339,17 @@ export function ProfileScreen({
 
                 <Pressable
                   style={({ pressed }) => [
-                    styles.profileStatItem,
-                    {
-                      opacity: pressed ? 0.7 : 1,
-                      transform: [{ scale: pressed ? 0.96 : 1 }],
-                    },
-                  ]}
+                  styles.profileStatItem,
+                  {
+                    opacity: pressed ? 0.7 : 1,
+                    transform: [{ scale: pressed ? 0.96 : 1 }]
+                  }]
+                  }
                   onPress={() => {
                     setFollowersTab("followers");
                     setFollowersVisible(true);
-                  }}
-                >
+                  }}>
+                  
                   <Text style={[styles.profileStatNumber, { color: colors.text }]}>
                     {followersCount}
                   </Text>
@@ -360,17 +360,17 @@ export function ProfileScreen({
 
                 <Pressable
                   style={({ pressed }) => [
-                    styles.profileStatItem,
-                    {
-                      opacity: pressed ? 0.7 : 1,
-                      transform: [{ scale: pressed ? 0.96 : 1 }],
-                    },
-                  ]}
+                  styles.profileStatItem,
+                  {
+                    opacity: pressed ? 0.7 : 1,
+                    transform: [{ scale: pressed ? 0.96 : 1 }]
+                  }]
+                  }
                   onPress={() => {
                     setFollowersTab("following");
                     setFollowersVisible(true);
-                  }}
-                >
+                  }}>
+                  
                   <Text style={[styles.profileStatNumber, { color: colors.text }]}>
                     {followingCount}
                   </Text>
@@ -387,64 +387,64 @@ export function ProfileScreen({
                   {userName(user)}
                 </Text>
                 <VerificationBadge user={user} size={18} />
-                {isLoyal && (
-                  <View style={styles.loyalTag}>
+                {isLoyal &&
+                <View style={styles.loyalTag}>
                     <Feather name="star" size={12} color="#f59e0b" />
                     <Text style={styles.loyalTagText}>Fiel</Text>
                   </View>
-                )}
+                }
               </View>
               <Text
                 selectable
                 style={[
-                  styles.profileHandle,
-                  { color: colors.subtext },
-                ]}
-              >
+                styles.profileHandle,
+                { color: colors.subtext }]
+                }>
+                
                 @{user?.username || "tribo"}
               </Text>
 
-              {!!user?.bio && (
-                <Text
-                  selectable
-                  style={[
-                    styles.profileBio,
-                    { color: colors.text },
-                  ]}
-                >
+              {!!user?.bio &&
+              <Text
+                selectable
+                style={[
+                styles.profileBio,
+                { color: colors.text }]
+                }>
+                
                   {user?.bio}
                 </Text>
-              )}
+              }
 
-              {!!user?.website && (
-                <Pressable
-                  onPress={() =>
-                    Linking.openURL(
-                      user?.website.startsWith("http")
-                        ? user?.website
-                        : `https://${user?.website}`,
-                    )
-                  }
-                >
+              {!!user?.website &&
+              <Pressable
+                onPress={() =>
+                Linking.openURL(
+                  user?.website.startsWith("http") ?
+                  user?.website :
+                  `https://${user?.website}`
+                )
+                }>
+                
                   <Text style={[styles.profileWebsite, { color: colors.accent }]}>
                     {user?.website}
                   </Text>
                 </Pressable>
-              )}
+              }
             </View>
 
             <Pressable
               style={({ pressed }) => [
-                styles.profileEditBtn,
-                {
-                  borderColor: colors.border,
-                  backgroundColor: colors.surface,
-                  opacity: pressed ? 0.7 : 1,
-                  transform: [{ scale: pressed ? 0.98 : 1 }],
-                }
-              ]}
-              onPress={() => setEditing(true)}
-            >
+              styles.profileEditBtn,
+              {
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+                opacity: pressed ? 0.7 : 1,
+                transform: [{ scale: pressed ? 0.98 : 1 }]
+              }]
+              }
+              onPress={() => setEditing(true)}>
+              
               <Text style={[styles.profileEditBtnText, { color: colors.text }]}>
                 Editar perfil
               </Text>
@@ -460,34 +460,34 @@ export function ProfileScreen({
             </Text>
           </View>
 
-          {loadingPosts ? (
-            <ActivityIndicator style={{ marginTop: 24 }} size="small" color={colors.primary} />
-          ) : userPosts.length === 0 ? (
-            <EmptyState
-              title="Sem publicações"
-              description="Você ainda não publicou nada na Tribo."
-              icon="inbox"
-            />
-          ) : (
-            <View style={{ marginTop: 8 }}>
-              {userPosts.map((p) => (
-                <PostCard
-                  key={p.id}
-                  post={p}
-                  currentUser={user}
-                  currentUserId={user?.id}
-                />
-              ))}
+          {loadingPosts ?
+          <ActivityIndicator style={{ marginTop: 24 }} size="small" color={colors.primary} /> :
+          userPosts.length === 0 ?
+          <EmptyState
+            title="Sem publicações"
+            description="Você ainda não publicou nada na Tribo."
+            icon="inbox" /> :
+
+
+          <View style={{ marginTop: 8 }}>
+              {userPosts.map((p) =>
+            <PostCard
+              key={p.id}
+              post={p}
+              currentUser={user}
+              currentUserId={user?.id} />
+
+            )}
             </View>
-          )}
+          }
 
           <EditProfile
             user={user}
             visible={editing}
             onClose={() => setEditing(false)}
             onUpdateUser={onUpdateUser}
-            onSaved={onRefresh}
-          />
+            onSaved={onRefresh} />
+          
 
           <Settings
             user={user}
@@ -501,8 +501,8 @@ export function ProfileScreen({
             onOpenAppearance={onOpenAppearance}
             onOpenSavedPosts={onOpenSavedPosts}
             onOpenArchivedPosts={onOpenArchivedPosts}
-            showAlert={setProfileAlert}
-          />
+            showAlert={setProfileAlert} />
+          
 
           <FollowersModal
             visible={followersVisible}
@@ -510,10 +510,10 @@ export function ProfileScreen({
             initialTab={followersTab}
             targetName={userName(user)}
             onClose={() => setFollowersVisible(false)}
-            onOpenProfile={onOpenProfile}
-          />
+            onOpenProfile={onOpenProfile} />
+          
 
-          {/* Menu Drawer Lateral (3 palitos) */}
+          {}
           <SettingsDrawer
             visible={drawerVisible}
             onClose={() => setDrawerVisible(false)}
@@ -542,10 +542,10 @@ export function ProfileScreen({
             onOpenSavedPosts={onOpenSavedPosts}
             onOpenArchivedPosts={onOpenArchivedPosts}
             user={user}
-            onUpdateUser={onUpdateUser}
-          />
+            onUpdateUser={onUpdateUser} />
+          
 
-          {/* Modal de Alerta Padronizado Tribo */}
+          {}
           <TriboAlertModal
             visible={profileAlert.visible}
             type={profileAlert.type}
@@ -557,12 +557,12 @@ export function ProfileScreen({
               setProfileAlert({ visible: false });
             }}
             secondaryButtonText={profileAlert.secondaryButtonText}
-            onSecondaryPress={profileAlert.onSecondaryPress}
-          />
+            onSecondaryPress={profileAlert.onSecondaryPress} />
+          
         </ScrollView>
       </AppLayout>
-    </View>
-  );
+    </View>);
+
 }
 
 const styles = StyleSheet.create({
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
     lineHeight: 18,
-    marginTop: 2,
+    marginTop: 2
   },
   searchField: {
     borderWidth: 1,
@@ -581,14 +581,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: 14,
-    marginTop: 6,
+    marginTop: 6
   },
   searchInput: {
     flex: 1,
     borderWidth: 0,
     minHeight: 48,
     paddingLeft: 10,
-    backgroundColor: "transparent",
+    backgroundColor: "transparent"
   },
   results: { paddingTop: 4, paddingBottom: 110, gap: 12, flexGrow: 1 },
   personRow: {
@@ -597,33 +597,33 @@ const styles = StyleSheet.create({
     padding: 13,
     flexDirection: "row",
     alignItems: "center",
-    gap: 11,
+    gap: 11
   },
   personTrigger: { flex: 1, flexDirection: "row", alignItems: "center", gap: 11 },
   personName: { fontFamily: "Poppins_600SemiBold", fontSize: 13 },
   personHandle: {
     fontFamily: "Poppins_400Regular",
     fontSize: 11,
-    marginTop: 1,
+    marginTop: 1
   },
   personBio: { fontFamily: "Poppins_400Regular", fontSize: 11, marginTop: 4 },
   profileScroll: { paddingTop: 4, paddingBottom: 110, gap: 14, flexGrow: 1 },
   profileCard: {
     borderWidth: 1,
     borderRadius: 24,
-    padding: 18,
+    padding: 18
   },
   profileSectionHeader: {
     paddingHorizontal: 4,
-    marginTop: 6,
+    marginTop: 6
   },
   profileTop: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   profileAvatarContainer: {
-    position: "relative",
+    position: "relative"
   },
   profileAvatarEditBadge: {
     position: "absolute",
@@ -634,50 +634,50 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
+    borderWidth: 2
   },
   profileStatsRow: {
     flexDirection: "row",
     flex: 1,
     justifyContent: "space-around",
     alignItems: "center",
-    marginLeft: 14,
+    marginLeft: 14
   },
   profileStatItem: {
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   profileStatNumber: {
     fontFamily: "Poppins_700Bold",
     fontSize: 18,
-    lineHeight: 24,
+    lineHeight: 24
   },
   profileStatLabel: {
     fontFamily: "Poppins_400Regular",
     fontSize: 11.5,
-    marginTop: 1,
+    marginTop: 1
   },
   nameBlock: {
     marginTop: 16,
-    width: "100%",
+    width: "100%"
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    flexWrap: "wrap",
+    flexWrap: "wrap"
   },
   profileName: { fontFamily: "Poppins_700Bold", fontSize: 23, flexShrink: 1 },
   profileHandle: {
     fontFamily: "Poppins_500Medium",
     fontSize: 13,
-    marginTop: 2,
+    marginTop: 2
   },
   profileBio: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13.5,
     lineHeight: 21,
-    marginTop: 12,
+    marginTop: 12
   },
   loyalTag: {
     flexDirection: "row",
@@ -686,12 +686,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    gap: 4,
+    gap: 4
   },
   loyalTagText: {
     color: "#f59e0b",
     fontSize: 11,
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins_700Bold"
   },
   profileEditBtn: {
     marginTop: 18,
@@ -700,11 +700,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 8,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   profileEditBtnText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   pendingBanner: {
     flexDirection: "row",
@@ -713,29 +713,29 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 20,
     borderWidth: 1,
-    marginBottom: 16,
+    marginBottom: 16
   },
   pendingBannerLeft: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    flex: 1,
+    flex: 1
   },
   pendingBannerIconWrap: {
     width: 34,
     height: 34,
     borderRadius: 17,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   pendingBannerTitle: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   pendingBannerSubtitle: {
     fontFamily: "Poppins_400Regular",
     fontSize: 11,
-    marginTop: 1,
+    marginTop: 1
   },
   modalPage: { flex: 1, borderRadius: 26 },
   modalBar: {
@@ -743,17 +743,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderBottomWidth: 1,
-    padding: 15,
+    padding: 15
   },
   modalTitle: { fontFamily: "Poppins_700Bold", fontSize: 16 },
   editForm: { padding: 20, gap: 16 },
   avatarEditContainer: {
     alignItems: "center",
     marginVertical: 12,
-    gap: 10,
+    gap: 10
   },
   avatarPickerPressable: {
-    position: "relative",
+    position: "relative"
   },
   avatarImageWrapper: {
     width: 92,
@@ -762,12 +762,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     overflow: "hidden",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   avatarImage: {
     width: 92,
     height: 92,
-    borderRadius: 46,
+    borderRadius: 46
   },
   avatarLoadingOverlay: {
     position: "absolute",
@@ -778,13 +778,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.6)",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 46,
+    borderRadius: 46
   },
   avatarLoadingText: {
     color: "#fff",
     fontSize: 10,
     fontFamily: "Poppins_500Medium",
-    marginTop: 4,
+    marginTop: 4
   },
   avatarCameraBadge: {
     position: "absolute",
@@ -795,33 +795,33 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2.5,
+    borderWidth: 2.5
   },
   avatarChangeText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   fieldGroup: {
-    gap: 6,
+    gap: 6
   },
   fieldLabel: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 12,
-    paddingLeft: 4,
+    paddingLeft: 4
   },
   labelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "center"
   },
   counterText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 11,
-    paddingRight: 4,
+    paddingRight: 4
   },
   editButtonsRow: {
     marginTop: 10,
-    gap: 10,
+    gap: 10
   },
   settings: { padding: 20, gap: 12 },
   deletionBanner: {
@@ -829,22 +829,22 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     marginBottom: 16,
-    gap: 8,
+    gap: 8
   },
   deletionBannerHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 8
   },
   deletionBannerTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 14,
-    color: "#ef4444",
+    color: "#ef4444"
   },
   deletionBannerText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 18
   },
   cancelDeletionBtn: {
     alignSelf: "flex-start",
@@ -852,12 +852,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 10,
-    marginTop: 4,
+    marginTop: 4
   },
   cancelDeletionBtnText: {
     color: "#ffffff",
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 12,
+    fontSize: 12
   },
   settingRow: {
     minHeight: 76,
@@ -866,26 +866,26 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 12
   },
   settingIcon: {
     width: 38,
     height: 38,
     borderRadius: 14,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   settingTitle: { fontFamily: "Poppins_600SemiBold", fontSize: 13 },
   settingCaption: {
     fontFamily: "Poppins_400Regular",
     fontSize: 10,
-    marginTop: 2,
+    marginTop: 2
   },
   delete: { alignItems: "center", padding: 12 },
   deleteText: { fontFamily: "Poppins_600SemiBold", fontSize: 12 },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.65)",
+    backgroundColor: "rgba(0, 0, 0, 0.65)"
   },
   optionsSheet: {
     position: "absolute",
@@ -897,7 +897,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 36,
+    paddingBottom: 36
   },
   optionsHandle: {
     width: 36,
@@ -905,30 +905,30 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: "#555",
     alignSelf: "center",
-    marginBottom: 16,
+    marginBottom: 16
   },
   optionsTitle: {
     fontFamily: "Poppins_700Bold",
     fontSize: 16,
     marginBottom: 16,
-    textAlign: "center",
+    textAlign: "center"
   },
   optionItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 14,
-    gap: 14,
+    gap: 14
   },
   optionIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   optionText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 15,
+    fontSize: 15
   },
   feedbackSheet: {
     position: "absolute",
@@ -940,30 +940,30 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingHorizontal: 20,
     paddingTop: 14,
-    paddingBottom: 36,
+    paddingBottom: 36
   },
   feedbackTypesRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginBottom: 16,
+    marginBottom: 16
   },
   feedbackTypeChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 1
   },
   feedbackTypeChipText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 12,
+    fontSize: 12
   },
   ageModalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   ageModalCard: {
     width: "100%",
@@ -976,7 +976,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
     shadowRadius: 20,
-    elevation: 8,
+    elevation: 8
   },
   ageModalIconWrap: {
     width: 56,
@@ -984,25 +984,25 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 16
   },
   ageModalTitle: {
     fontFamily: "Poppins_700Bold",
     fontSize: 17,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 8
   },
   ageModalDescription: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
     textAlign: "center",
     marginBottom: 22,
-    lineHeight: 19,
+    lineHeight: 19
   },
   ageModalButtons: {
     flexDirection: "row",
     gap: 12,
-    width: "100%",
+    width: "100%"
   },
   ageModalBtnCancel: {
     flex: 1,
@@ -1010,55 +1010,50 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   ageModalBtnCancelText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   ageModalBtnConfirm: {
     flex: 1.2,
     height: 44,
     borderRadius: 22,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   ageModalBtnConfirmText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 13,
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
   trendsContainer: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 24,
+    paddingBottom: 24
   },
   trendsHeaderTitle: {
     fontFamily: "Poppins_700Bold",
     fontSize: 18,
-    marginBottom: 12,
+    marginBottom: 12
   },
   trendItem: {
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1
   },
   trendHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 4
   },
   trendRank: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 12,
+    fontSize: 12
   },
   trendTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 15,
-    lineHeight: 20,
-  },
+    lineHeight: 20
+  }
 });
-
-
-
-
-

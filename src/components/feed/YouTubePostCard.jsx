@@ -4,8 +4,8 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
@@ -16,18 +16,18 @@ export const YouTubePostCard = React.memo(function YouTubePostCard({
   videoId,
   youtubeUrl,
   isCentered = false,
-  volume = 1.0, // 0.0 a 1.0
+  volume = 1.0
 }) {
   const { colors } = useTheme();
   const playerRef = useRef(null);
   const containerRef = useRef(null);
   const [calculatedVolume, setCalculatedVolume] = useState(100);
 
-  // Calcula largura e altura proporcional 16:9 baseada na largura do feed
-  const cardWidth = Math.min(SCREEN_WIDTH - 28, 540);
-  const calculatedHeight = Math.round((cardWidth * 9) / 16);
 
-  // Cálculo espacial de volume baseado no scroll
+  const cardWidth = Math.min(SCREEN_WIDTH - 28, 540);
+  const calculatedHeight = Math.round(cardWidth * 9 / 16);
+
+
   const updateSpatialVolume = useCallback(() => {
     if (!isCentered || !containerRef.current) {
       if (playerRef.current && typeof playerRef.current.setVolume === "function") {
@@ -77,15 +77,15 @@ export const YouTubePostCard = React.memo(function YouTubePostCard({
       ref={containerRef}
       collapsable={false}
       style={[
-        styles.container,
-        {
-          backgroundColor: "#000000",
-          borderColor: colors.border || "rgba(255, 255, 255, 0.08)",
-          height: calculatedHeight,
-          width: "100%",
-        },
-      ]}
-    >
+      styles.container,
+      {
+        backgroundColor: "#000000",
+        borderColor: colors.border || "rgba(255, 255, 255, 0.08)",
+        height: calculatedHeight,
+        width: "100%"
+      }]
+      }>
+      
       <YoutubePlayer
         ref={playerRef}
         height={calculatedHeight}
@@ -104,26 +104,26 @@ export const YouTubePostCard = React.memo(function YouTubePostCard({
           allowsFullscreenVideo: true,
           allowsInlineMediaPlayback: true,
           mediaPlaybackRequiresUserAction: false,
-          androidLayerType: Platform.OS === "android" ? "hardware" : undefined,
+          androidLayerType: Platform.OS === "android" ? "hardware" : undefined
         }}
         initialPlayerParams={{
           controls: true,
           showClosedCaptions: false,
           modestbranding: true,
           preventFullScreen: false,
-          rel: false,
-        }}
-      />
+          rel: false
+        }} />
+      
 
-      {/* Badge Flutuante do YouTube no Canto Superior */}
+      {}
       <View pointerEvents="none" style={styles.floatingBadge}>
         <View style={styles.badgePill}>
           <MaterialCommunityIcons name="youtube" size={14} color="#ef4444" />
           <Text style={styles.badgeText}>YouTube</Text>
         </View>
       </View>
-    </View>
-  );
+    </View>);
+
 });
 
 const styles = StyleSheet.create({
@@ -134,13 +134,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     position: "relative",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   floatingBadge: {
     position: "absolute",
     top: 10,
     right: 10,
-    zIndex: 10,
+    zIndex: 10
   },
   badgePill: {
     flexDirection: "row",
@@ -151,11 +151,11 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.12)",
+    borderColor: "rgba(255, 255, 255, 0.12)"
   },
   badgeText: {
     color: "#ffffff",
     fontSize: 10.5,
-    fontFamily: "Poppins_600SemiBold",
-  },
+    fontFamily: "Poppins_600SemiBold"
+  }
 });

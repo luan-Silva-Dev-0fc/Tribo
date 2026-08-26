@@ -9,8 +9,8 @@ import {
   View,
   Modal,
   Platform,
-  StatusBar,
-} from "react-native";
+  StatusBar } from
+"react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { getUserAvatar } from "../../lib/format";
@@ -24,19 +24,19 @@ export function IconButton({ name, onPress, label, color, small = false, style }
       accessibilityLabel={label || name}
       onPress={onPress}
       style={({ pressed }) => [
-        styles.iconButton,
-        small && styles.iconSmall,
-        {
-          backgroundColor: colors.surfaceAlt,
-          opacity: pressed ? 0.7 : 1,
-          transform: [{ scale: pressed ? 0.94 : 1 }],
-        },
-        style,
-      ]}
-    >
+      styles.iconButton,
+      small && styles.iconSmall,
+      {
+        backgroundColor: colors.surfaceAlt,
+        opacity: pressed ? 0.7 : 1,
+        transform: [{ scale: pressed ? 0.94 : 1 }]
+      },
+      style]
+      }>
+      
       <Feather name={name} size={small ? 16 : 20} color={color || colors.text} />
-    </Pressable>
-  );
+    </Pressable>);
+
 }
 
 export function Button({
@@ -48,7 +48,7 @@ export function Button({
   variant = "primary",
   compact = false,
   style,
-  textStyle,
+  textStyle
 }) {
   const { colors } = useTheme();
   const isSecondary = variant === "secondary";
@@ -87,42 +87,42 @@ export function Button({
       disabled={loading || disabled}
       onPress={onPress}
       style={({ pressed }) => [
-        styles.button,
-        compact && styles.buttonCompact,
-        {
-          backgroundColor: bg,
-          borderColor,
-          opacity: loading || disabled ? 0.5 : pressed ? 0.85 : 1,
-          transform: [{ scale: pressed && !disabled && !loading ? 0.98 : 1 }],
-        },
-        style,
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator size="small" color={textColor} />
-      ) : (
-        <>
-          {icon && (
-            <Feather
-              name={icon}
-              size={compact ? 13 : 16}
-              color={textColor}
-            />
-          )}
+      styles.button,
+      compact && styles.buttonCompact,
+      {
+        backgroundColor: bg,
+        borderColor,
+        opacity: loading || disabled ? 0.5 : pressed ? 0.85 : 1,
+        transform: [{ scale: pressed && !disabled && !loading ? 0.98 : 1 }]
+      },
+      style]
+      }>
+      
+      {loading ?
+      <ActivityIndicator size="small" color={textColor} /> :
+
+      <>
+          {icon &&
+        <Feather
+          name={icon}
+          size={compact ? 13 : 16}
+          color={textColor} />
+
+        }
           <Text
-            style={[
-              styles.buttonText,
-              compact && styles.buttonTextCompact,
-              { color: textColor },
-              textStyle,
-            ]}
-          >
+          style={[
+          styles.buttonText,
+          compact && styles.buttonTextCompact,
+          { color: textColor },
+          textStyle]
+          }>
+          
             {title}
           </Text>
         </>
-      )}
-    </Pressable>
-  );
+      }
+    </Pressable>);
+
 }
 
 export function Input({ style, multiline, ...props }) {
@@ -135,75 +135,75 @@ export function Avatar({ user, url, uri, fallback, fallbackUser, size = 42, styl
   const [imgError, setImgError] = React.useState(false);
 
   const safeUser =
-    typeof user === "object" && user !== null
-      ? user?.author || user?.user || user
-      : {};
+  typeof user === "object" && user !== null ?
+  user?.author || user?.user || user :
+  {};
 
   const userAvatar =
-    url || uri || (typeof user === "string" ? user : getUserAvatar(safeUser, fallbackUser));
+  url || uri || (typeof user === "string" ? user : getUserAvatar(safeUser, fallbackUser));
 
   React.useEffect(() => {
     setImgError(false);
   }, [userAvatar]);
 
   const fallbackName =
-    fallback ||
-    safeUser.name ||
-    safeUser.username ||
-    safeUser.firstName ||
-    (typeof user === "string"
-      ? "U"
-      : fallbackUser?.name || fallbackUser?.username || "M");
+  fallback ||
+  safeUser.name ||
+  safeUser.username ||
+  safeUser.firstName || (
+  typeof user === "string" ?
+  "U" :
+  fallbackUser?.name || fallbackUser?.username || "M");
 
   const label = (fallbackName || "M").slice(0, 1).toUpperCase();
 
-  return userAvatar && !imgError ? (
-    <Image
-      source={{ uri: userAvatar }}
-      onError={() => setImgError(true)}
-      style={[
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: colors.line,
-          borderWidth: 1,
-          borderColor: colors.line,
-        },
-        style,
-      ]}
-    />
-  ) : (
-    <View
-      style={[
-        styles.avatar,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: colors.accentSoft,
-          borderWidth: 1,
-          borderColor: colors.line,
-        },
-        style,
-      ]}
-    >
+  return userAvatar && !imgError ?
+  <Image
+    source={{ uri: userAvatar }}
+    onError={() => setImgError(true)}
+    style={[
+    {
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      backgroundColor: colors.line,
+      borderWidth: 1,
+      borderColor: colors.line
+    },
+    style]
+    } /> :
+
+
+  <View
+    style={[
+    styles.avatar,
+    {
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      backgroundColor: colors.accentSoft,
+      borderWidth: 1,
+      borderColor: colors.line
+    },
+    style]
+    }>
+    
       <Text
-        style={{
-          color: colors.accent,
-          fontFamily: "Poppins_700Bold",
-          fontSize: Math.max(12, Math.floor(size * 0.38)),
-        }}
-      >
+      style={{
+        color: colors.accent,
+        fontFamily: "Poppins_700Bold",
+        fontSize: Math.max(12, Math.floor(size * 0.38))
+      }}>
+      
         {label}
       </Text>
-    </View>
-  );
+    </View>;
+
 }
 
 export const BADGE_URLS = {
   BLUE: "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/selo%20de%20verificacao/selo%20azul.png",
-  GOLD: "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/selo%20de%20verificacao/selo%20dourado.png",
+  GOLD: "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/selo%20de%20verificacao/selo%20dourado.png"
 };
 
 export function VerificationBadge({ user, badgeType, size = 15, style }) {
@@ -211,15 +211,15 @@ export function VerificationBadge({ user, badgeType, size = 15, style }) {
   const { colors } = useTheme();
 
   const safeUser =
-    typeof user === "object" && user !== null
-      ? user?.author || user?.user || user
-      : {};
+  typeof user === "object" && user !== null ?
+  user?.author || user?.user || user :
+  {};
   const rawBadge =
-    badgeType ||
-    safeUser?.badge_type ||
-    safeUser?.badgeType ||
-    safeUser?.badge ||
-    (safeUser?.isVerified || safeUser?.verified ? "BLUE" : null);
+  badgeType ||
+  safeUser?.badge_type ||
+  safeUser?.badgeType ||
+  safeUser?.badge || (
+  safeUser?.isVerified || safeUser?.verified ? "BLUE" : null);
 
   if (!rawBadge) return null;
 
@@ -240,28 +240,28 @@ export function VerificationBadge({ user, badgeType, size = 15, style }) {
             width: size,
             height: size,
             marginLeft: 4,
-            alignSelf: "center",
-          }}
-        />
+            alignSelf: "center"
+          }} />
+        
       </Pressable>
 
       <Modal
         visible={modalVisible}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <Pressable 
+        onRequestClose={() => setModalVisible(false)}>
+        
+        <Pressable
           style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", alignItems: "center", padding: 20 }}
-          onPress={() => setModalVisible(false)}
-        >
-          <Pressable 
-            style={{ 
-              width: "100%", 
-              maxWidth: 340, 
-              backgroundColor: colors.background, 
-              borderRadius: 24, 
-              padding: 28, 
+          onPress={() => setModalVisible(false)}>
+          
+          <Pressable
+            style={{
+              width: "100%",
+              maxWidth: 340,
+              backgroundColor: colors.background,
+              borderRadius: 24,
+              padding: 28,
               alignItems: "center",
               shadowColor: isGold ? "#FFD700" : "#000",
               shadowOffset: { width: 0, height: 10 },
@@ -271,11 +271,11 @@ export function VerificationBadge({ user, badgeType, size = 15, style }) {
               borderWidth: isGold ? 1 : 0,
               borderColor: isGold ? "rgba(255, 215, 0, 0.4)" : "transparent"
             }}
-            onPress={(e) => e.stopPropagation()}
-          >
+            onPress={(e) => e.stopPropagation()}>
+            
             <View style={{
-              width: 80, 
-              height: 80, 
+              width: 80,
+              height: 80,
               marginBottom: 20,
               backgroundColor: isGold ? "rgba(255, 215, 0, 0.1)" : "rgba(59, 130, 246, 0.1)",
               borderRadius: 40,
@@ -285,47 +285,47 @@ export function VerificationBadge({ user, badgeType, size = 15, style }) {
               <Image
                 source={{ uri }}
                 style={{ width: 50, height: 50 }}
-                resizeMode="contain"
-              />
+                resizeMode="contain" />
+              
             </View>
             
-            <Text style={{ 
-              fontSize: 22, 
-              fontWeight: "bold", 
-              color: colors.text, 
+            <Text style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              color: colors.text,
               marginBottom: 12,
               textAlign: "center"
             }}>
               {isGold ? "Selo Oficial" : "Conta Verificada"}
             </Text>
             
-            <Text style={{ 
-              fontSize: 15, 
-              color: colors.muted, 
-              textAlign: "center", 
+            <Text style={{
+              fontSize: 15,
+              color: colors.muted,
+              textAlign: "center",
               marginBottom: 28,
               lineHeight: 22
             }}>
-              {isGold 
-                ? "O selo dourado indica pessoas próximas e conhecidas. Usuários com este selo têm maior prioridade em sugestões e recebem novidades em primeira mão."
-                : "O selo azul de verificação confirma que a conta existe e que o e-mail do usuário foi devidamente verificado."}
+              {isGold ?
+              "O selo dourado indica pessoas próximas e conhecidas. Usuários com este selo têm maior prioridade em sugestões e recebem novidades em primeira mão." :
+              "O selo azul de verificação confirma que a conta existe e que o e-mail do usuário foi devidamente verificado."}
             </Text>
 
-            <Pressable 
+            <Pressable
               onPress={() => setModalVisible(false)}
               style={({ pressed }) => [{
                 width: "100%",
                 backgroundColor: isGold ? "#FFD700" : colors.primary,
                 paddingVertical: 14,
                 borderRadius: 12,
-                opacity: pressed ? 0.8 : 1,
-              }]}
-            >
-              <Text style={{ 
-                color: isGold ? "#000" : "#FFF", 
-                fontSize: 16, 
-                fontWeight: "bold", 
-                textAlign: "center" 
+                opacity: pressed ? 0.8 : 1
+              }]}>
+              
+              <Text style={{
+                color: isGold ? "#000" : "#FFF",
+                fontSize: 16,
+                fontWeight: "bold",
+                textAlign: "center"
               }}>
                 Entendi
               </Text>
@@ -333,8 +333,8 @@ export function VerificationBadge({ user, badgeType, size = 15, style }) {
           </Pressable>
         </Pressable>
       </Modal>
-    </>
-  );
+    </>);
+
 }
 
 export function AppHeader({ title, subtitle, onBack, right, style }) {
@@ -342,31 +342,31 @@ export function AppHeader({ title, subtitle, onBack, right, style }) {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(
     insets?.top || 0,
-    Platform.OS === "android" ? (StatusBar.currentHeight || 24) : 0
+    Platform.OS === "android" ? StatusBar.currentHeight || 24 : 0
   );
 
   return (
     <View style={[styles.header, { paddingTop: topInset + 8 }, style]}>
       <View style={styles.headerRow}>
-        {onBack ? (
-          <IconButton name="arrow-left" onPress={onBack} label="Voltar" />
-        ) : (
-          <View style={styles.iconSpacer} />
-        )}
+        {onBack ?
+        <IconButton name="arrow-left" onPress={onBack} label="Voltar" /> :
+
+        <View style={styles.iconSpacer} />
+        }
         <View style={styles.headerCopy}>
           <Text selectable style={[styles.headerTitle, { color: colors.text }]}>
             {title}
           </Text>
-          {subtitle && (
-            <Text selectable style={[styles.headerSubtitle, { color: colors.muted }]}>
+          {subtitle &&
+          <Text selectable style={[styles.headerSubtitle, { color: colors.muted }]}>
               {subtitle}
             </Text>
-          )}
+          }
         </View>
         {right || <View style={styles.iconSpacer} />}
       </View>
-    </View>
-  );
+    </View>);
+
 }
 
 export function EmptyState({ icon = "inbox", children }) {
@@ -386,13 +386,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 8
   },
   buttonCompact: {
     minHeight: 32,
     paddingHorizontal: 12,
     borderRadius: 12,
-    gap: 5,
+    gap: 5
   },
   buttonText: { fontFamily: "Poppins_600SemiBold", fontSize: 13 },
   buttonTextCompact: { fontFamily: "Poppins_600SemiBold", fontSize: 11 },
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   headerSubtitle: { fontFamily: "Poppins_400Regular", fontSize: 11, marginTop: 1 },
   empty: { alignItems: "center", justifyContent: "center", paddingVertical: 64, paddingHorizontal: 28, gap: 14 },
   emptyIcon: { width: 52, height: 52, borderRadius: 18, alignItems: "center", justifyContent: "center" },
-  emptyText: { fontFamily: "Poppins_400Regular", fontSize: 13, textAlign: "center", lineHeight: 21 },
+  emptyText: { fontFamily: "Poppins_400Regular", fontSize: 13, textAlign: "center", lineHeight: 21 }
 });
 
 export { CustomModal } from "../modals/CustomModal";

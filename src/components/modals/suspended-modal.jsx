@@ -11,8 +11,8 @@ export function SuspendedModal({ visible, message, onClose }) {
       visible={visible}
       transparent={true}
       animationType="fade"
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
+      
       <View style={styles.overlay}>
         <View style={[styles.modalContainer, { backgroundColor: colors.background, shadowColor: colors.danger }]}>
           <View style={[styles.iconWrapper, { backgroundColor: "rgba(239, 68, 68, 0.15)" }]}>
@@ -32,19 +32,19 @@ export function SuspendedModal({ visible, message, onClose }) {
             </Text>
           </View>
 
-          <Pressable 
+          <Pressable
             style={({ pressed }) => [
-              styles.button,
-              { backgroundColor: colors.danger, opacity: pressed ? 0.8 : 1 }
-            ]}
-            onPress={onClose}
-          >
+            styles.button,
+            { backgroundColor: colors.danger, opacity: pressed ? 0.8 : 1 }]
+            }
+            onPress={onClose}>
+            
             <Text style={styles.buttonText}>Entendido</Text>
           </Pressable>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.75)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 20
   },
   modalContainer: {
     width: "100%",
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     elevation: 15,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.2,
-    shadowRadius: 20,
+    shadowRadius: 20
   },
   iconWrapper: {
     width: 80,
@@ -72,19 +72,19 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 24
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 12,
-    textAlign: "center",
+    textAlign: "center"
   },
   message: {
     fontSize: 15,
     lineHeight: 22,
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 24
   },
   warningBox: {
     flexDirection: "row",
@@ -92,22 +92,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     marginBottom: 32,
-    gap: 12,
+    gap: 12
   },
   warningText: {
     flex: 1,
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 18
   },
   button: {
     width: "100%",
     paddingVertical: 16,
     borderRadius: 14,
-    alignItems: "center",
+    alignItems: "center"
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
-  },
+    fontWeight: "bold"
+  }
 });

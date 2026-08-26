@@ -5,8 +5,8 @@ import {
   FlatList,
   Pressable,
   ActivityIndicator,
-  StyleSheet,
-} from "react-native";
+  StyleSheet } from
+"react-native";
 import { Feather } from "@expo/vector-icons";
 import { api } from "../../api";
 import { Avatar, IconButton } from "../../components/ui/ui";
@@ -21,7 +21,7 @@ const UserItem = ({
   initialAdded,
   isBanned,
   banRecord,
-  onShowAlert,
+  onShowAlert
 }) => {
   const [loading, setLoading] = useState(false);
   const [isAdded, setIsAdded] = useState(initialAdded);
@@ -29,7 +29,7 @@ const UserItem = ({
   const handlePressAction = async () => {
     if (loading || isAdded) return;
 
-    // Se o usuário estiver banido, bloquear e abrir modal explicativo
+
     if (isBanned) {
       const reasonText = banRecord?.reason || "Comportamento Inadequado";
       const uName = item.username ? `@${item.username}` : userName(item);
@@ -37,7 +37,7 @@ const UserItem = ({
         title: "Usuário Banido",
         message: `🚫 @${item.username || item.name} está banido desta Tribo.\n\nMotivo do banimento: "${reasonText}"\n\nPara adicioná-lo novamente, é necessário desbani-lo primeiro na aba de Membros Banidos nas configurações do grupo.`,
         type: "error",
-        primaryText: "Entendido",
+        primaryText: "Entendido"
       });
       return;
     }
@@ -50,7 +50,7 @@ const UserItem = ({
         onShowAlert?.({
           title: "Erro",
           message: "Não foi possível encontrar o ID deste usuário.",
-          type: "error",
+          type: "error"
         });
         return;
       }
@@ -61,7 +61,7 @@ const UserItem = ({
       onShowAlert?.({
         title: "Erro ao Adicionar",
         message: errorMessage(error),
-        type: "error",
+        type: "error"
       });
     } finally {
       setLoading(false);
@@ -71,37 +71,37 @@ const UserItem = ({
   return (
     <View
       style={[
-        styles.userCard,
-        {
-          backgroundColor: colors.surface,
-          borderColor: isBanned ? "rgba(239, 68, 68, 0.3)" : colors.line,
-          opacity: isBanned ? 0.85 : 1,
-        },
-      ]}
-    >
+      styles.userCard,
+      {
+        backgroundColor: colors.surface,
+        borderColor: isBanned ? "rgba(239, 68, 68, 0.3)" : colors.line,
+        opacity: isBanned ? 0.85 : 1
+      }]
+      }>
+      
       <Avatar
         url={item.avatarUrl || item.avatar_url}
         size={40}
-        fallback={item.username}
-      />
+        fallback={item.username} />
+      
       <View style={styles.userInfo}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             gap: 6,
-            flexWrap: "wrap",
-          }}
-        >
+            flexWrap: "wrap"
+          }}>
+          
           <Text style={[styles.userName, { color: colors.text }]}>
             {userName(item)}
           </Text>
-          {isBanned && (
-            <View style={styles.bannedTag}>
+          {isBanned &&
+          <View style={styles.bannedTag}>
               <Feather name="slash" size={10} color="#ef4444" />
               <Text style={styles.bannedTagText}>Banido deste grupo</Text>
             </View>
-          )}
+          }
         </View>
         <Text style={[styles.userHandle, { color: colors.muted }]}>
           @{item.username}
@@ -111,35 +111,35 @@ const UserItem = ({
         onPress={handlePressAction}
         disabled={loading || isAdded}
         style={({ pressed }) => [
-          styles.inviteBtn,
-          {
-            backgroundColor: isBanned
-              ? "rgba(239, 68, 68, 0.15)"
-              : isAdded
-                ? colors.success || "#10B981"
-                : loading
-                  ? colors.muted
-                  : colors.primary,
-            borderWidth: isBanned ? 1 : 0,
-            borderColor: isBanned ? "#ef4444" : "transparent",
-            opacity: pressed ? 0.8 : 1,
-          },
-        ]}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : isBanned ? (
-          <Text style={[styles.inviteBtnText, { color: "#ef4444" }]}>
+        styles.inviteBtn,
+        {
+          backgroundColor: isBanned ?
+          "rgba(239, 68, 68, 0.15)" :
+          isAdded ?
+          colors.success || "#10B981" :
+          loading ?
+          colors.muted :
+          colors.primary,
+          borderWidth: isBanned ? 1 : 0,
+          borderColor: isBanned ? "#ef4444" : "transparent",
+          opacity: pressed ? 0.8 : 1
+        }]
+        }>
+        
+        {loading ?
+        <ActivityIndicator size="small" color="#fff" /> :
+        isBanned ?
+        <Text style={[styles.inviteBtnText, { color: "#ef4444" }]}>
             Banido
-          </Text>
-        ) : isAdded ? (
-          <Text style={styles.inviteBtnText}>Adicionado</Text>
-        ) : (
-          <Text style={styles.inviteBtnText}>Adicionar</Text>
-        )}
+          </Text> :
+        isAdded ?
+        <Text style={styles.inviteBtnText}>Adicionado</Text> :
+
+        <Text style={styles.inviteBtnText}>Adicionar</Text>
+        }
       </Pressable>
-    </View>
-  );
+    </View>);
+
 };
 
 export function InviteMembersScreen({ groupId, user, onBack }) {
@@ -151,20 +151,20 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
 
   const loadMutuals = async () => {
     try {
-      // 1. Fetch followers
+
       const followersRes = await api.users.followers(user.id);
       const followers = listFrom(followersRes, ["followers", "users", "data"]);
 
-      // 2. Fetch following
+
       const followingRes = await api.users.following(user.id);
       const following = listFrom(followingRes, ["following", "users", "data"]);
 
-      // 3. Fetch group members
+
       let existingMembers = [];
       try {
         const membersRes = await api.groups.members(groupId);
         existingMembers =
-          membersRes.members || membersRes.data || membersRes || [];
+        membersRes.members || membersRes.data || membersRes || [];
         if (!Array.isArray(existingMembers)) {
           existingMembers = [];
         }
@@ -179,7 +179,7 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
       });
       setAddedIds(currentAddedIds);
 
-      // 4. Fetch group banned members
+
       const currentBannedMap = {};
       try {
         const bannedRes = await api.groups.listBanned(groupId);
@@ -197,7 +197,7 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
       }
       setBannedMap(currentBannedMap);
 
-      // 5. Find intersection (Mutual Follow)
+
       const getFollowerId = (f) => {
         const u = f.follower || f.user || f;
         return String(u.id || u._id || u.userId || f.followerId || f.id);
@@ -206,7 +206,7 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
       const getFollowingId = (f) => {
         const u = f.following || f.target || f.user || f;
         return String(
-          u.id || u._id || u.userId || f.followingId || f.targetId || f.id,
+          u.id || u._id || u.userId || f.followingId || f.targetId || f.id
         );
       };
 
@@ -217,25 +217,25 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
         return followerIds.has(targetId);
       });
 
-      // Remapear para objeto de usuário limpo
+
       const usersToDisplay = mutualList.map((item) => {
         const extractedUser =
-          item.following || item.target || item.user || item;
+        item.following || item.target || item.user || item;
         const correctId =
-          extractedUser._id ||
-          extractedUser.userId ||
-          item.followingId ||
-          item.targetId ||
-          extractedUser.id ||
-          item.id;
+        extractedUser._id ||
+        extractedUser.userId ||
+        item.followingId ||
+        item.targetId ||
+        extractedUser.id ||
+        item.id;
 
         return {
           ...extractedUser,
-          id: correctId,
+          id: correctId
         };
       });
 
-      // Filter out duplicate IDs
+
       const uniqueUsers = [];
       const seen = new Set();
       for (const u of usersToDisplay) {
@@ -253,7 +253,7 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
         type: "error",
         title: "Erro ao Carregar",
         message: errorMessage(error),
-        primaryText: "Entendido",
+        primaryText: "Entendido"
       });
     } finally {
       setLoading(false);
@@ -265,7 +265,7 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
     type: "info",
     title: "",
     message: "",
-    primaryText: "Entendido",
+    primaryText: "Entendido"
   });
 
   const showAlert = (cfg) => {
@@ -274,7 +274,7 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
       type: cfg.type || "info",
       title: cfg.title || "",
       message: cfg.message || "",
-      primaryText: cfg.primaryText || "Entendido",
+      primaryText: cfg.primaryText || "Entendido"
     });
   };
 
@@ -292,50 +292,50 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
         <View style={{ width: 42 }} />
       </View>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color={colors.primary} />
-      ) : (
-        <FlatList
-          data={mutuals}
-          keyExtractor={(i) => String(i.id)}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => {
-            const isBanned = Boolean(bannedMap[String(item.id)]);
-            const banRecord = bannedMap[String(item.id)];
-            return (
-              <UserItem
-                item={item}
-                colors={colors}
-                groupId={groupId}
-                initialAdded={!!addedIds[item.id]}
-                isBanned={isBanned}
-                banRecord={banRecord}
-                onShowAlert={showAlert}
-              />
-            );
-          }}
-          ListEmptyComponent={
-            <View style={{ alignItems: "center", marginTop: 40, padding: 24 }}>
+      {loading ?
+      <ActivityIndicator style={{ marginTop: 40 }} color={colors.primary} /> :
+
+      <FlatList
+        data={mutuals}
+        keyExtractor={(i) => String(i.id)}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => {
+          const isBanned = Boolean(bannedMap[String(item.id)]);
+          const banRecord = bannedMap[String(item.id)];
+          return (
+            <UserItem
+              item={item}
+              colors={colors}
+              groupId={groupId}
+              initialAdded={!!addedIds[item.id]}
+              isBanned={isBanned}
+              banRecord={banRecord}
+              onShowAlert={showAlert} />);
+
+
+        }}
+        ListEmptyComponent={
+        <View style={{ alignItems: "center", marginTop: 40, padding: 24 }}>
               <Feather
-                name="users"
-                size={48}
-                color={colors.muted}
-                style={{ marginBottom: 16 }}
-              />
+            name="users"
+            size={48}
+            color={colors.muted}
+            style={{ marginBottom: 16 }} />
+          
               <Text
-                style={{
-                  color: colors.muted,
-                  textAlign: "center",
-                  fontSize: 16,
-                }}
-              >
+            style={{
+              color: colors.muted,
+              textAlign: "center",
+              fontSize: 16
+            }}>
+            
                 Você só pode adicionar pessoas que você segue e que também te
                 seguem de volta (Mutual Follow).
               </Text>
             </View>
-          }
-        />
-      )}
+        } />
+
+      }
 
       <CustomModal
         visible={customAlert.visible}
@@ -343,10 +343,10 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
         title={customAlert.title}
         message={customAlert.message}
         primaryText={customAlert.primaryText}
-        onClose={() => setCustomAlert((prev) => ({ ...prev, visible: false }))}
-      />
-    </View>
-  );
+        onClose={() => setCustomAlert((prev) => ({ ...prev, visible: false }))} />
+      
+    </View>);
+
 }
 
 const styles = StyleSheet.create({
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
-    zIndex: 10,
+    zIndex: 10
   },
   title: { fontSize: 20, fontFamily: "Poppins_700Bold", letterSpacing: -0.5 },
   list: { padding: 16 },
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 1
   },
   userInfo: { flex: 1, marginLeft: 12 },
   userName: { fontSize: 15, fontFamily: "Poppins_600SemiBold" },
@@ -390,12 +390,12 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "rgba(239, 68, 68, 0.25)",
+    borderColor: "rgba(239, 68, 68, 0.25)"
   },
   bannedTagText: {
     color: "#ef4444",
     fontSize: 10.5,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   inviteBtn: {
     paddingHorizontal: 14,
@@ -403,11 +403,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     minWidth: 84,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   inviteBtnText: {
     color: "#ffffff",
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
-  },
+    fontSize: 13
+  }
 });

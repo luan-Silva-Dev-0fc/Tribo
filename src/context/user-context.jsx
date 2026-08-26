@@ -6,7 +6,7 @@ const ADULT_CONTENT_KEY = "@tribo_adult_content_enabled";
 
 const UserContext = createContext({
   isAdultContentEnabled: false,
-  setAdultContentEnabled: async () => {},
+  setAdultContentEnabled: async () => {}
 });
 
 export function UserProvider({ children, user }) {
@@ -45,7 +45,7 @@ export function UserProvider({ children, user }) {
         allow_nsfw_content: value,
         allowNsfwContent: value,
         isAdultContentEnabled: value,
-        is_adult_content_enabled: value,
+        is_adult_content_enabled: value
       }).catch(() => {});
     } catch (err) {
       console.warn("[UserContext] Erro ao salvar preferência NSFW:", err);
@@ -56,12 +56,12 @@ export function UserProvider({ children, user }) {
     <UserContext.Provider
       value={{
         isAdultContentEnabled,
-        setAdultContentEnabled,
-      }}
-    >
+        setAdultContentEnabled
+      }}>
+      
       {children}
-    </UserContext.Provider>
-  );
+    </UserContext.Provider>);
+
 }
 
 export function useUserContext() {
@@ -69,7 +69,7 @@ export function useUserContext() {
   if (!context) {
     return {
       isAdultContentEnabled: false,
-      setAdultContentEnabled: async () => {},
+      setAdultContentEnabled: async () => {}
     };
   }
   return context;

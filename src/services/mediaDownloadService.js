@@ -2,21 +2,21 @@ import { Platform } from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
 
-/**
- * Salva fotos ou vídeos na galeria do usuário de forma segura e multiplataforma
- */
+
+
+
 export async function saveMediaToGallery({ url, type = "image" }) {
   if (!url || typeof url !== "string") {
     throw new Error("URL da mídia inválida.");
   }
 
-  // 1. AMBIENTE WEB (Navegador)
+
   if (Platform.OS === "web" && typeof window !== "undefined" && typeof document !== "undefined") {
     try {
       const isVideo = type === "video" || url.toLowerCase().includes(".mp4");
       const filename = isVideo ? "tribo_video_" + Date.now() + ".mp4" : "tribo_foto_" + Date.now() + ".jpg";
 
-      // Tenta download via fetch blob para forçar download mesmo em cross-origin
+
       try {
         const response = await fetch(url);
         const blob = await response.blob();
@@ -30,7 +30,7 @@ export async function saveMediaToGallery({ url, type = "image" }) {
         window.URL.revokeObjectURL(blobUrl);
         return { success: true, message: isVideo ? "Vídeo baixado com sucesso!" : "Foto baixada com sucesso!" };
       } catch (blobErr) {
-        // Fallback para abertura/download direto
+
         const link = document.createElement("a");
         link.href = url;
         link.target = "_blank";
@@ -45,7 +45,7 @@ export async function saveMediaToGallery({ url, type = "image" }) {
     }
   }
 
-  // 2. AMBIENTE MOBILE (iOS / Android)
+
   try {
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status !== "granted") {
@@ -67,7 +67,7 @@ export async function saveMediaToGallery({ url, type = "image" }) {
     return {
       success: true,
       asset,
-      message: isVideo ? "Vídeo salvo na galeria com sucesso!" : "Foto salva na galeria com sucesso!",
+      message: isVideo ? "Vídeo salvo na galeria com sucesso!" : "Foto salva na galeria com sucesso!"
     };
   } catch (err) {
     throw new Error(err.message || "Erro ao salvar mídia na galeria.");

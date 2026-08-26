@@ -7,8 +7,8 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
-} from "react-native";
+  Image } from
+"react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 import { api } from "../../api";
@@ -18,7 +18,7 @@ export function ReelsOnboardingModal({
   onClose,
   onPreferencesSaved,
   currentCategories = [],
-  currentScores = {},
+  currentScores = {}
 }) {
   const { colors } = useTheme();
   const [categories, setCategories] = useState([]);
@@ -44,19 +44,19 @@ export function ReelsOnboardingModal({
       }
     } catch (err) {
       console.warn("[ReelsModal] Erro ao carregar categorias:", err.message);
-      // Fallback para lista local caso offline
+
       const CDN_URL = "https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/";
       setCategories([
-        { id: "tecnologia", label: "Tecnologia & Programação", iconUrl: `${CDN_URL}tecnologia.png` },
-        { id: "shitpost", label: "Shitposts & Memes", iconUrl: `${CDN_URL}shitpost.png` },
-        { id: "musica", label: "Música & Clips", iconUrl: `${CDN_URL}musica.png` },
-        { id: "jogos", label: "Jogos & Gaming", iconUrl: `${CDN_URL}jogos.png` },
-        { id: "carros", label: "Carros & Automóveis", iconUrl: `${CDN_URL}carros.png` },
-        { id: "esportes", label: "Futebol & Esportes", iconUrl: `${CDN_URL}esportes.png` },
-        { id: "filmes_animes", label: 'Filmes & Animes', iconUrl: `${CDN_URL}filmes_animes.png` },
-        { id: "curiosidades", label: "Curiosidades & Fatos", iconUrl: `${CDN_URL}curiosidades.png` },
-        { id: "lutas", label: "Lutas & Artes Marciais", iconUrl: `${CDN_URL}lutas.png` },
-      ]);
+      { id: "tecnologia", label: "Tecnologia & Programação", iconUrl: `${CDN_URL}tecnologia.png` },
+      { id: "shitpost", label: "Shitposts & Memes", iconUrl: `${CDN_URL}shitpost.png` },
+      { id: "musica", label: "Música & Clips", iconUrl: `${CDN_URL}musica.png` },
+      { id: "jogos", label: "Jogos & Gaming", iconUrl: `${CDN_URL}jogos.png` },
+      { id: "carros", label: "Carros & Automóveis", iconUrl: `${CDN_URL}carros.png` },
+      { id: "esportes", label: "Futebol & Esportes", iconUrl: `${CDN_URL}esportes.png` },
+      { id: "filmes_animes", label: 'Filmes & Animes', iconUrl: `${CDN_URL}filmes_animes.png` },
+      { id: "curiosidades", label: "Curiosidades & Fatos", iconUrl: `${CDN_URL}curiosidades.png` },
+      { id: "lutas", label: "Lutas & Artes Marciais", iconUrl: `${CDN_URL}lutas.png` }]
+      );
     } finally {
       setLoading(false);
     }
@@ -101,11 +101,11 @@ export function ReelsOnboardingModal({
       visible={visible}
       animationType="slide"
       transparent={true}
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
+      
       <View style={styles.overlay}>
         <View style={[styles.modalCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          {/* Header */}
+          {}
           <View style={styles.header}>
             <View style={styles.headerTitleRow}>
               <Ionicons name="sparkles" size={22} color="#f59e0b" />
@@ -122,82 +122,82 @@ export function ReelsOnboardingModal({
             Escolha os tópicos que você mais gosta. O algoritmo aprenderá com suas curtidas e interações em tempo real.
           </Text>
 
-          {error && (
-            <View style={styles.errorBanner}>
+          {error &&
+          <View style={styles.errorBanner}>
               <Feather name="alert-circle" size={16} color="#ef4444" />
               <Text style={styles.errorText}>{error}</Text>
             </View>
-          )}
+          }
 
-          {loading ? (
-            <View style={styles.loadingContainer}>
+          {loading ?
+          <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={colors.accent} />
-            </View>
-          ) : (
-            <ScrollView
-              style={styles.scroll}
-              contentContainerStyle={styles.gridContainer}
-              showsVerticalScrollIndicator={false}
-            >
-              {categories.map((cat) => {
-                const isSelected = selected.has(cat.id);
-                const score = currentScores[cat.id];
+            </View> :
 
-                return (
-                  <Pressable
-                    key={cat.id}
-                    onPress={() => toggleCategory(cat.id)}
-                    style={[
-                      styles.categoryCard,
-                      {
-                        backgroundColor: isSelected ? "#2563eb18" : colors.surfaceAlt,
-                        borderColor: isSelected ? "#2563eb" : colors.border,
-                      },
-                    ]}
-                  >
-                    <Image 
-                      source={{ uri: cat.iconUrl || `https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/${cat.id}.png` }} 
-                      style={styles.categoryIcon} 
-                      resizeMode="contain"
-                    />
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.gridContainer}
+            showsVerticalScrollIndicator={false}>
+            
+              {categories.map((cat) => {
+              const isSelected = selected.has(cat.id);
+              const score = currentScores[cat.id];
+
+              return (
+                <Pressable
+                  key={cat.id}
+                  onPress={() => toggleCategory(cat.id)}
+                  style={[
+                  styles.categoryCard,
+                  {
+                    backgroundColor: isSelected ? "#2563eb18" : colors.surfaceAlt,
+                    borderColor: isSelected ? "#2563eb" : colors.border
+                  }]
+                  }>
+                  
+                    <Image
+                    source={{ uri: cat.iconUrl || `https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/${cat.id}.png` }}
+                    style={styles.categoryIcon}
+                    resizeMode="contain" />
+                  
                     <View style={styles.categoryInfo}>
                       <Text
-                        style={[
-                          styles.categoryLabel,
-                          {
-                            color: isSelected ? "#60a5fa" : colors.text,
-                            fontFamily: isSelected
-                              ? "Poppins_600SemiBold"
-                              : "Poppins_500Medium",
-                          },
-                        ]}
-                      >
+                      style={[
+                      styles.categoryLabel,
+                      {
+                        color: isSelected ? "#60a5fa" : colors.text,
+                        fontFamily: isSelected ?
+                        "Poppins_600SemiBold" :
+                        "Poppins_500Medium"
+                      }]
+                      }>
+                      
                         {cat.label}
                       </Text>
-                      {score !== undefined && score > 0 && (
-                        <Text style={[styles.scoreBadge, { color: colors.muted }]}>
+                      {score !== undefined && score > 0 &&
+                    <Text style={[styles.scoreBadge, { color: colors.muted }]}>
                           Score: {score} pts
                         </Text>
-                      )}
+                    }
                     </View>
                     <View
-                      style={[
-                        styles.checkCircle,
-                        {
-                          backgroundColor: isSelected ? "#2563eb" : "transparent",
-                          borderColor: isSelected ? "#2563eb" : colors.muted,
-                        },
-                      ]}
-                    >
+                    style={[
+                    styles.checkCircle,
+                    {
+                      backgroundColor: isSelected ? "#2563eb" : "transparent",
+                      borderColor: isSelected ? "#2563eb" : colors.muted
+                    }]
+                    }>
+                    
                       {isSelected && <Feather name="check" size={13} color="#ffffff" />}
                     </View>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          )}
+                  </Pressable>);
 
-          {/* Footer Actions */}
+            })}
+            </ScrollView>
+          }
+
+          {}
           <View style={styles.footer}>
             <Text style={[styles.countText, { color: colors.muted }]}>
               {selected.size} tópico{selected.size === 1 ? "" : "s"} selecionado{selected.size === 1 ? "" : "s"}
@@ -207,31 +207,31 @@ export function ReelsOnboardingModal({
               onPress={handleSave}
               disabled={saving}
               style={[
-                styles.saveButton,
-                { opacity: saving ? 0.7 : 1 },
-              ]}
-            >
-              {saving ? (
-                <ActivityIndicator size="small" color="#ffffff" />
-              ) : (
-                <>
+              styles.saveButton,
+              { opacity: saving ? 0.7 : 1 }]
+              }>
+              
+              {saving ?
+              <ActivityIndicator size="small" color="#ffffff" /> :
+
+              <>
                   <Ionicons name="rocket-outline" size={18} color="#ffffff" />
                   <Text style={styles.saveButtonText}>Calibrar Feed de Reels</Text>
                 </>
-              )}
+              }
             </Pressable>
           </View>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.75)",
-    justifyContent: "flex-end",
+    justifyContent: "flex-end"
   },
   modalCard: {
     borderTopLeftRadius: 28,
@@ -240,22 +240,22 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 36,
-    maxHeight: "85%",
+    maxHeight: "85%"
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 8
   },
   headerTitleRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 8
   },
   title: {
     fontSize: 20,
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins_700Bold"
   },
   closeBtn: {
     width: 34,
@@ -263,13 +263,13 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: "rgba(255,255,255,0.08)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   subtitle: {
     fontSize: 13,
     fontFamily: "Poppins_400Regular",
     lineHeight: 19,
-    marginBottom: 16,
+    marginBottom: 16
   },
   errorBanner: {
     flexDirection: "row",
@@ -280,25 +280,25 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 12
   },
   errorText: {
     color: "#ef4444",
     fontSize: 12,
     fontFamily: "Poppins_500Medium",
-    flex: 1,
+    flex: 1
   },
   loadingContainer: {
     height: 220,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   scroll: {
-    maxHeight: 380,
+    maxHeight: 380
   },
   gridContainer: {
     gap: 10,
-    paddingBottom: 10,
+    paddingBottom: 10
   },
   categoryCard: {
     flexDirection: "row",
@@ -306,22 +306,22 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 16,
     borderWidth: 1.5,
-    gap: 12,
+    gap: 12
   },
   categoryIcon: {
     width: 28,
-    height: 28,
+    height: 28
   },
   categoryInfo: {
-    flex: 1,
+    flex: 1
   },
   categoryLabel: {
-    fontSize: 14,
+    fontSize: 14
   },
   scoreBadge: {
     fontSize: 11,
     fontFamily: "Poppins_400Regular",
-    marginTop: 2,
+    marginTop: 2
   },
   checkCircle: {
     width: 22,
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     borderWidth: 2,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   footer: {
     marginTop: 16,
@@ -338,11 +338,11 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(255,255,255,0.06)",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   countText: {
     fontSize: 12,
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "Poppins_500Medium"
   },
   saveButton: {
     flexDirection: "row",
@@ -351,11 +351,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 24,
-    gap: 8,
+    gap: 8
   },
   saveButtonText: {
     color: "#ffffff",
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
-  },
+    fontSize: 13
+  }
 });

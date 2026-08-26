@@ -7,11 +7,11 @@ export function AppearanceScreen({ onBack }) {
   const { colors, preference, setPreference } = useTheme();
 
   const options = [
-    { id: "system", label: "Automático (Acompanhar Sistema)", icon: "smartphone" },
-    { id: "light", label: "Claro (Fundo Branco)", icon: "sun" },
-    { id: "dark", label: "Escuro (Fundo Grafite)", icon: "moon" },
-    { id: "oled", label: "Preto Absoluto (Fundo OLED #000000)", icon: "monitor" },
-  ];
+  { id: "system", label: "Automático (Acompanhar Sistema)", icon: "smartphone" },
+  { id: "light", label: "Claro (Fundo Branco)", icon: "sun" },
+  { id: "dark", label: "Escuro (Fundo Grafite)", icon: "moon" },
+  { id: "oled", label: "Preto Absoluto (Fundo OLED #000000)", icon: "monitor" }];
+
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -30,16 +30,16 @@ export function AppearanceScreen({ onBack }) {
           {options.map((option, index) => {
             const isSelected = preference === option.id;
             const isLast = index === options.length - 1;
-            
+
             return (
               <Pressable
                 key={option.id}
                 style={[
-                  styles.optionRow,
-                  !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border }
-                ]}
-                onPress={() => setPreference(option.id)}
-              >
+                styles.optionRow,
+                !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border }]
+                }
+                onPress={() => setPreference(option.id)}>
+                
                 <View style={styles.optionIcon}>
                   <Feather name={option.icon} size={20} color={isSelected ? colors.accent : colors.subtext} />
                 </View>
@@ -48,24 +48,24 @@ export function AppearanceScreen({ onBack }) {
                 </Text>
                 <View style={styles.radioContainer}>
                   <View style={[
-                    styles.radioOutline, 
-                    { borderColor: isSelected ? colors.accent : colors.border }
-                  ]}>
+                  styles.radioOutline,
+                  { borderColor: isSelected ? colors.accent : colors.border }]
+                  }>
                     {isSelected && <View style={[styles.radioFill, { backgroundColor: colors.accent }]} />}
                   </View>
                 </View>
-              </Pressable>
-            );
+              </Pressable>);
+
           })}
         </View>
       </View>
-    </View>
-  );
+    </View>);
+
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   header: {
     flexDirection: "row",
@@ -73,47 +73,47 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1
   },
   backBtn: {
     width: 40,
     height: 40,
     justifyContent: "center",
-    alignItems: "flex-start",
+    alignItems: "flex-start"
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "bold"
   },
   content: {
-    padding: 16,
+    padding: 16
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: "600",
     marginBottom: 8,
-    marginLeft: 4,
+    marginLeft: 4
   },
   card: {
     borderRadius: 12,
     borderWidth: 1,
-    overflow: "hidden",
+    overflow: "hidden"
   },
   optionRow: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: 16
   },
   optionIcon: {
-    width: 32,
+    width: 32
   },
   optionLabel: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 15
   },
   radioContainer: {
-    marginLeft: 12,
+    marginLeft: 12
   },
   radioOutline: {
     width: 22,
@@ -121,11 +121,11 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     borderWidth: 2,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   radioFill: {
     width: 10,
     height: 10,
-    borderRadius: 5,
-  },
+    borderRadius: 5
+  }
 });

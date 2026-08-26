@@ -1,6 +1,6 @@
-/**
- * Helper seguro para controle de captura e gravação de tela
- */
+
+
+
 let ScreenCapture = null;
 try {
   ScreenCapture = require("expo-screen-capture");

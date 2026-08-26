@@ -7,60 +7,60 @@ export const listFrom = (value, keys = []) => {
 export const userName = (user) => {
   if (!user) return "Membro";
   const target =
-    typeof user === "object"
-      ? user?.follower || user?.following || user?.user || user?.author || user
-      : {};
+  typeof user === "object" ?
+  user?.follower || user?.following || user?.user || user?.author || user :
+  {};
   const name =
-    target?.name ||
-    target?.fullName ||
-    target?.full_name ||
-    [target?.firstName || target?.first_name, target?.lastName || target?.last_name]
-      .filter(Boolean)
-      .join(" ") ||
-    target?.displayName ||
-    target?.display_name ||
-    (target?.username ? (target.username.startsWith("@") ? target.username : `@${target.username}`) : null) ||
-    (typeof target?.email === "string" ? target.email.split("@")[0] : null) ||
-    "Membro";
+  target?.name ||
+  target?.fullName ||
+  target?.full_name ||
+  [target?.firstName || target?.first_name, target?.lastName || target?.last_name].
+  filter(Boolean).
+  join(" ") ||
+  target?.displayName ||
+  target?.display_name || (
+  target?.username ? target.username.startsWith("@") ? target.username : `@${target.username}` : null) || (
+  typeof target?.email === "string" ? target.email.split("@")[0] : null) ||
+  "Membro";
   return name;
 };
 export const errorMessage = (error) =>
-  error?.payload?.message ||
-  error?.response?.data?.message ||
-  error?.data?.message ||
-  error?.message ||
-  "Não foi possível concluir esta ação.";
+error?.payload?.message ||
+error?.response?.data?.message ||
+error?.data?.message ||
+error?.message ||
+"Não foi possível concluir esta ação.";
 
 export const getUserAvatar = (user, fallbackUser = null) => {
   if (!user && !fallbackUser) return null;
   if (typeof user === "string") return user;
 
   const target =
-    typeof user === "object"
-      ? user?.follower || user?.following || user?.author || user?.user || user
-      : {};
+  typeof user === "object" ?
+  user?.follower || user?.following || user?.author || user?.user || user :
+  {};
   const photo =
-    target.avatar_url ||
-    target.avatarUrl ||
-    target.avatar ||
-    target.photo_url ||
-    target.photoUrl ||
-    target.image_url ||
-    target.imageUrl ||
-    target.profile_pic ||
-    target.profilePic ||
-    null;
+  target.avatar_url ||
+  target.avatarUrl ||
+  target.avatar ||
+  target.photo_url ||
+  target.photoUrl ||
+  target.image_url ||
+  target.imageUrl ||
+  target.profile_pic ||
+  target.profilePic ||
+  null;
 
   if (photo) return photo;
 
-  // Se o autor for o usuário logado e não tiver foto específica no payload do post/comentário
+
   if (fallbackUser && typeof fallbackUser === "object") {
     const targetId = target.id ?? target.userId ?? target.authorId ?? target._id;
     const fallbackId = fallbackUser.id ?? fallbackUser._id;
     const isSameUser =
-      (targetId !== undefined && fallbackId !== undefined && String(targetId) === String(fallbackId)) ||
-      (target.username && fallbackUser.username && target.username === fallbackUser.username) ||
-      (target.email && fallbackUser.email && target.email === fallbackUser.email);
+    targetId !== undefined && fallbackId !== undefined && String(targetId) === String(fallbackId) ||
+    target.username && fallbackUser.username && target.username === fallbackUser.username ||
+    target.email && fallbackUser.email && target.email === fallbackUser.email;
 
     if (isSameUser) {
       return (
@@ -71,8 +71,8 @@ export const getUserAvatar = (user, fallbackUser = null) => {
         fallbackUser.photoUrl ||
         fallbackUser.image_url ||
         fallbackUser.imageUrl ||
-        null
-      );
+        null);
+
     }
   }
 
@@ -82,16 +82,16 @@ export const getUserAvatar = (user, fallbackUser = null) => {
 export const getUserBadge = (user) => {
   if (!user && typeof user !== "object") return null;
   const target =
-    typeof user === "object"
-      ? user?.follower || user?.following || user?.author || user?.user || user
-      : {};
+  typeof user === "object" ?
+  user?.follower || user?.following || user?.author || user?.user || user :
+  {};
   const badge =
-    target?.badge_type ||
-    target?.badgeType ||
-    target?.badge ||
-    target?.verified_type ||
-    target?.verifiedType ||
-    (target?.is_verified || target?.isVerified ? "BLUE" : null);
+  target?.badge_type ||
+  target?.badgeType ||
+  target?.badge ||
+  target?.verified_type ||
+  target?.verifiedType || (
+  target?.is_verified || target?.isVerified ? "BLUE" : null);
 
   if (typeof badge === "string") {
     const upper = badge.toUpperCase();
@@ -112,7 +112,7 @@ export const normalizeUser = (user) => {
     avatar_url: avatar,
     avatar: avatar,
     badge_type: badge,
-    badgeType: badge,
+    badgeType: badge
   };
 };
 
@@ -150,5 +150,3 @@ export const formatRelativeTime = (dateInput) => {
 
   return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 };
-
-

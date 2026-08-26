@@ -9,8 +9,8 @@ import {
   Share,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { WebView } from "react-native-webview";
@@ -25,7 +25,7 @@ export const ReelItem = React.memo(function ReelItem({
   onMoreLikeThis,
   onNotInterested,
   onOpenPreferences,
-  containerHeight,
+  containerHeight
 }) {
   const [liked, setLiked] = useState(item.isLiked || false);
   const [likesCount, setLikesCount] = useState(item.likesCount || 0);
@@ -34,14 +34,14 @@ export const ReelItem = React.memo(function ReelItem({
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
-  
+
   const webViewRef = useRef(null);
 
   useEffect(() => {
     if (!isActive) {
       setIsPlaying(false);
       setShowOptions(false);
-      // Inject pause if we scroll away
+
       if (Platform.OS !== "web" && webViewRef.current) {
         webViewRef.current.injectJavaScript(`
           var iframes = document.getElementsByTagName('iframe');
@@ -53,7 +53,7 @@ export const ReelItem = React.memo(function ReelItem({
       }
     } else {
       setIsPlaying(true);
-      // Inject play if we scroll to it and it's already ready
+
       if (isReady && Platform.OS !== "web" && webViewRef.current) {
         webViewRef.current.injectJavaScript(`
           var iframes = document.getElementsByTagName('iframe');
@@ -69,7 +69,7 @@ export const ReelItem = React.memo(function ReelItem({
   function handleVideoTap() {
     const nextPlaying = !isPlaying;
     setIsPlaying(nextPlaying);
-    
+
     if (Platform.OS !== "web" && webViewRef.current) {
       webViewRef.current.injectJavaScript(`
         var msg = '{"event":"command","func":"${nextPlaying ? 'playVideo' : 'pauseVideo'}","args":""}';
@@ -116,32 +116,32 @@ export const ReelItem = React.memo(function ReelItem({
   function handleDoubleTapLike() {
     bigHeartScale.setValue(0.5);
     bigHeartOpacity.setValue(1);
-    
+
     Animated.parallel([
-      Animated.spring(bigHeartScale, {
-        toValue: 1.2,
-        friction: 4,
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
-        Animated.delay(400),
-        Animated.timing(bigHeartOpacity, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        })
-      ])
-    ]).start();
+    Animated.spring(bigHeartScale, {
+      toValue: 1.2,
+      friction: 4,
+      useNativeDriver: true
+    }),
+    Animated.sequence([
+    Animated.delay(400),
+    Animated.timing(bigHeartOpacity, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true
+    })]
+    )]
+    ).start();
 
     if (!liked) {
       Animated.sequence([
-        Animated.timing(heartScale, { toValue: 1.35, duration: 120, useNativeDriver: true }),
-        Animated.spring(heartScale, { toValue: 1, friction: 4, useNativeDriver: true }),
-      ]).start();
+      Animated.timing(heartScale, { toValue: 1.35, duration: 120, useNativeDriver: true }),
+      Animated.spring(heartScale, { toValue: 1, friction: 4, useNativeDriver: true })]
+      ).start();
 
       setLiked(true);
       setLikesCount((prev) => prev + 1);
-      
+
       if (onToggleLike) {
         onToggleLike(item.videoId, item.category);
       }
@@ -149,23 +149,23 @@ export const ReelItem = React.memo(function ReelItem({
   }
 
   async function handleLike() {
-    // Animação de pulsar o coração
+
     Animated.sequence([
-      Animated.timing(heartScale, {
-        toValue: 1.35,
-        duration: 120,
-        useNativeDriver: true,
-      }),
-      Animated.spring(heartScale, {
-        toValue: 1,
-        friction: 4,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(heartScale, {
+      toValue: 1.35,
+      duration: 120,
+      useNativeDriver: true
+    }),
+    Animated.spring(heartScale, {
+      toValue: 1,
+      friction: 4,
+      useNativeDriver: true
+    })]
+    ).start();
 
     const nextLiked = !liked;
     setLiked(nextLiked);
-    setLikesCount((prev) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+    setLikesCount((prev) => nextLiked ? prev + 1 : Math.max(0, prev - 1));
 
     if (onToggleLike) {
       onToggleLike(item.videoId, item.category);
@@ -174,9 +174,9 @@ export const ReelItem = React.memo(function ReelItem({
 
   async function handleMoreLikeThis() {
     Animated.sequence([
-      Animated.timing(moreLikeScale, { toValue: 1.2, duration: 100, useNativeDriver: true }),
-      Animated.spring(moreLikeScale, { toValue: 1, friction: 4, useNativeDriver: true }),
-    ]).start();
+    Animated.timing(moreLikeScale, { toValue: 1.2, duration: 100, useNativeDriver: true }),
+    Animated.spring(moreLikeScale, { toValue: 1, friction: 4, useNativeDriver: true })]
+    ).start();
 
     setMoreLikeActive(true);
     if (onMoreLikeThis) {
@@ -187,9 +187,9 @@ export const ReelItem = React.memo(function ReelItem({
 
   async function handleNotInterested() {
     Animated.sequence([
-      Animated.timing(hideScale, { toValue: 0.8, duration: 100, useNativeDriver: true }),
-      Animated.spring(hideScale, { toValue: 1, friction: 4, useNativeDriver: true }),
-    ]).start();
+    Animated.timing(hideScale, { toValue: 0.8, duration: 100, useNativeDriver: true }),
+    Animated.spring(hideScale, { toValue: 1, friction: 4, useNativeDriver: true })]
+    ).start();
 
     if (onNotInterested) {
       onNotInterested(item.videoId, item.category);
@@ -201,7 +201,7 @@ export const ReelItem = React.memo(function ReelItem({
       const shareUrl = item.videoUrl || `https://www.youtube.com/shorts/${item.videoId}`;
       await Share.share({
         message: `${item.title}\n\nAssista no Tribo: ${shareUrl}`,
-        url: shareUrl,
+        url: shareUrl
       });
     } catch (err) {
       console.warn("Erro ao compartilhar reel:", err.message);
@@ -256,67 +256,67 @@ export const ReelItem = React.memo(function ReelItem({
 
   return (
     <View style={[styles.container, { height: itemHeight }]}>
-      {/* Player de Vídeo ou Placeholder */}
+      {}
       <View style={StyleSheet.absoluteFillObject}>
-        {/* Capa fica visível enquanto o vídeo não carregar ou se não estiver ativo */}
-        {(!isActive || !isReady) && (
-          <Image
-            source={{ uri: `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg` }}
-            style={[StyleSheet.absoluteFillObject, { backgroundColor: "#000000", zIndex: 2 }]}
-            resizeMode="cover"
-          />
-        )}
+        {}
+        {(!isActive || !isReady) &&
+        <Image
+          source={{ uri: `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg` }}
+          style={[StyleSheet.absoluteFillObject, { backgroundColor: "#000000", zIndex: 2 }]}
+          resizeMode="cover" />
 
-        {/* WebView monta se estiver ativo ou se for o próximo/anterior (shouldPreload) */}
+        }
+
+        {}
         {(isActive || shouldPreload) && (
-          Platform.OS === "web" ? (
-            <iframe
-              id={`youtube-iframe-${item.videoId}`}
-              onLoad={() => {
-                setTimeout(() => setIsReady(true), 800);
-              }}
-              src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1`}
-              style={{
-                width: "100%",
-                height: "100%",
-                border: "none",
-                backgroundColor: "#000000",
-                position: "absolute",
-                zIndex: 1,
-              }}
-              title={item.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          ) : (
-            <WebView
-              ref={webViewRef}
-              source={{ html: embedHtml, baseUrl: 'https://lonelycpp.github.io' }}
-              onLoad={() => {
-                setTimeout(() => setIsReady(true), 800);
-              }}
-              style={[StyleSheet.absoluteFillObject, { zIndex: 1 }]}
-              allowsInlineMediaPlayback={true}
-              mediaPlaybackRequiresUserAction={false}
-              javaScriptEnabled={true}
-              domStorageEnabled={true}
-              scrollEnabled={false}
-              bounces={false}
-              androidLayerType="hardware"
-              originWhitelist={["*"]}
-            />
-          )
-        )}
+        Platform.OS === "web" ?
+        <iframe
+          id={`youtube-iframe-${item.videoId}`}
+          onLoad={() => {
+            setTimeout(() => setIsReady(true), 800);
+          }}
+          src={`https://www.youtube.com/embed/${item.videoId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1`}
+          style={{
+            width: "100%",
+            height: "100%",
+            border: "none",
+            backgroundColor: "#000000",
+            position: "absolute",
+            zIndex: 1
+          }}
+          title={item.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen /> :
+
+
+        <WebView
+          ref={webViewRef}
+          source={{ html: embedHtml, baseUrl: 'https://lonelycpp.github.io' }}
+          onLoad={() => {
+            setTimeout(() => setIsReady(true), 800);
+          }}
+          style={[StyleSheet.absoluteFillObject, { zIndex: 1 }]}
+          allowsInlineMediaPlayback={true}
+          mediaPlaybackRequiresUserAction={false}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          scrollEnabled={false}
+          bounces={false}
+          androidLayerType="hardware"
+          originWhitelist={["*"]} />)
+
+
+        }
       </View>
 
-      {/* Escudo invisível para impedir que o WebView capture gestos e permitir Play/Pause estilo TikTok */}
-      <Pressable 
-        style={[StyleSheet.absoluteFillObject, { zIndex: 1, justifyContent: "center", alignItems: "center" }]} 
-        onPress={handleScreenPress}
-      >
-        {!isPlaying && (
-          <Ionicons name="play" size={100} color="rgba(255, 255, 255, 0.85)" style={styles.playIconShadow} />
-        )}
+      {}
+      <Pressable
+        style={[StyleSheet.absoluteFillObject, { zIndex: 1, justifyContent: "center", alignItems: "center" }]}
+        onPress={handleScreenPress}>
+        
+        {!isPlaying &&
+        <Ionicons name="play" size={100} color="rgba(255, 255, 255, 0.85)" style={styles.playIconShadow} />
+        }
         <Animated.View style={{
           position: "absolute",
           opacity: bigHeartOpacity,
@@ -326,27 +326,27 @@ export const ReelItem = React.memo(function ReelItem({
         </Animated.View>
       </Pressable>
 
-      {/* Gradientes para contraste e legibilidade */}
+      {}
       <LinearGradient
         colors={["rgba(0,0,0,0.8)", "transparent"]}
-        style={[styles.topGradient, { pointerEvents: "none" }]}
-      />
+        style={[styles.topGradient, { pointerEvents: "none" }]} />
+      
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.5)", "rgba(0,0,0,0.9)"]}
-        style={[styles.bottomGradient, { pointerEvents: "none" }]}
-      />
+        style={[styles.bottomGradient, { pointerEvents: "none" }]} />
+      
 
-      {/* Marca d'água Estratégica (Top Left) */}
+      {}
       <View style={styles.watermarkContainer} pointerEvents="none">
         <Ionicons name="play-circle" size={16} color="rgba(255,255,255,0.8)" style={{ marginRight: 4 }} />
         <Text style={styles.watermarkText}>Tribo Reels</Text>
       </View>
 
-      {/* Ações Flutuantes Laterais (Direita) - Estilo TikTok */}
+      {}
       <View style={styles.rightActions}>
-        {showOptions && (
-          <>
-            {/* Tópicos/Algoritmo */}
+        {showOptions &&
+        <>
+            {}
             <Pressable onPress={handleMoreLikeThis} style={styles.actionBtn}>
               <Animated.View style={[styles.actionIconContainer, { transform: [{ scale: moreLikeScale }] }]}>
                 <Ionicons name="sparkles" size={30} color={moreLikeActive ? "#f59e0b" : "#ffffff"} />
@@ -354,7 +354,7 @@ export const ReelItem = React.memo(function ReelItem({
               <Text style={styles.actionCount}>{moreLikeActive ? "Anotado!" : "Mais disso"}</Text>
             </Pressable>
 
-            {/* Não tenho interesse */}
+            {}
             <Pressable onPress={handleNotInterested} style={styles.actionBtn}>
               <Animated.View style={[styles.actionIconContainer, { transform: [{ scale: hideScale }] }]}>
                 <Ionicons name="eye-off-outline" size={30} color="#ffffff" />
@@ -362,7 +362,7 @@ export const ReelItem = React.memo(function ReelItem({
               <Text style={styles.actionCount}>Ocultar</Text>
             </Pressable>
 
-            {/* Preferências */}
+            {}
             <Pressable onPress={onOpenPreferences} style={styles.actionBtn}>
               <View style={styles.actionIconContainer}>
                 <Ionicons name="options-outline" size={30} color="#ffffff" />
@@ -370,9 +370,9 @@ export const ReelItem = React.memo(function ReelItem({
               <Text style={styles.actionCount}>Filtros</Text>
             </Pressable>
           </>
-        )}
+        }
 
-        {/* Like */}
+        {}
         <Pressable onPress={handleLike} style={styles.actionBtn}>
           <Animated.View style={[styles.actionIconContainer, { transform: [{ scale: heartScale }] }]}>
             <Ionicons name={liked ? "heart" : "heart"} size={38} color={liked ? "#ef4444" : "#ffffff"} />
@@ -380,7 +380,7 @@ export const ReelItem = React.memo(function ReelItem({
           <Text style={styles.actionCount}>{likesCount > 0 ? likesCount : "Curtir"}</Text>
         </Pressable>
 
-        {/* Compartilhar */}
+        {}
         <Pressable onPress={handleShare} style={styles.actionBtn}>
           <View style={styles.actionIconContainer}>
             <Ionicons name="share-social" size={34} color="#ffffff" />
@@ -388,7 +388,7 @@ export const ReelItem = React.memo(function ReelItem({
           <Text style={styles.actionCount}>Enviar</Text>
         </Pressable>
 
-        {/* Botão de Mais Opções */}
+        {}
         <Pressable onPress={() => setShowOptions(!showOptions)} style={styles.actionBtn}>
           <View style={styles.actionIconContainer}>
             <Ionicons name={showOptions ? "close" : "ellipsis-horizontal"} size={34} color="#ffffff" />
@@ -397,16 +397,16 @@ export const ReelItem = React.memo(function ReelItem({
         </Pressable>
       </View>
 
-      {/* Metadados e Informações Inferiores */}
+      {}
       <View style={styles.bottomInfoContainer}>
-        {/* Categoria Badge */}
+        {}
         <View style={styles.categoryBadgeRow}>
           <View style={styles.categoryBadge}>
-            <Image 
-              source={{ uri: item.categoryIconUrl || `https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/${item.category}.png` }} 
-              style={styles.categoryBadgeIcon} 
-              resizeMode="contain"
-            />
+            <Image
+              source={{ uri: item.categoryIconUrl || `https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/${item.category}.png` }}
+              style={styles.categoryBadgeIcon}
+              resizeMode="contain" />
+            
             <Text style={styles.categoryBadgeText}>{item.categoryLabel || item.category}</Text>
           </View>
 
@@ -416,23 +416,23 @@ export const ReelItem = React.memo(function ReelItem({
           </Pressable>
         </View>
 
-        {/* Canal */}
+        {}
         <Text style={styles.channelName}>
           @{item.channel || item.channelTitle || "YouTube"}
         </Text>
 
-        {/* Título do Shorts */}
+        {}
         <Pressable onPress={() => setIsExpandedTitle(!isExpandedTitle)}>
           <Text
             numberOfLines={isExpandedTitle ? 6 : 2}
-            style={styles.videoTitle}
-          >
+            style={styles.videoTitle}>
+            
             {item.title}
           </Text>
         </Pressable>
       </View>
-    </View>
-  );
+    </View>);
+
 });
 
 const styles = StyleSheet.create({
@@ -440,18 +440,18 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     backgroundColor: "#000000",
     position: "relative",
-    overflow: "hidden",
+    overflow: "hidden"
   },
   mediaWrapper: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "#050505",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   webview: {
     width: "100%",
     height: "100%",
-    backgroundColor: "#000000",
+    backgroundColor: "#000000"
   },
   watermarkContainer: {
     position: "absolute",
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
+    borderColor: "rgba(255,255,255,0.15)"
   },
   watermarkText: {
     color: "rgba(255,255,255,0.9)",
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     textShadowColor: "rgba(0,0,0,0.8)",
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   topGradient: {
     position: "absolute",
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 160,
-    zIndex: 2,
+    zIndex: 2
   },
   bottomGradient: {
     position: "absolute",
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 380,
-    zIndex: 2,
+    zIndex: 2
   },
   rightActions: {
     position: "absolute",
@@ -498,11 +498,11 @@ const styles = StyleSheet.create({
     bottom: 120,
     alignItems: "center",
     gap: 20,
-    zIndex: 10,
+    zIndex: 10
   },
   actionBtn: {
     alignItems: "center",
-    gap: 6,
+    gap: 6
   },
   actionIconContainer: {
     alignItems: "center",
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 5,
-    elevation: 8,
+    elevation: 8
   },
   actionCount: {
     color: "#ffffff",
@@ -520,12 +520,12 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(0, 0, 0, 0.9)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
-    marginTop: 4,
+    marginTop: 4
   },
   playIconShadow: {
     textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 10,
+    textShadowRadius: 10
   },
   bottomInfoContainer: {
     position: "absolute",
@@ -533,12 +533,12 @@ const styles = StyleSheet.create({
     left: 16,
     right: 80,
     zIndex: 10,
-    gap: 10,
+    gap: 10
   },
   categoryBadgeRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 10
   },
   categoryBadge: {
     flexDirection: "row",
@@ -553,17 +553,17 @@ const styles = StyleSheet.create({
     shadowColor: "#3b82f6",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowRadius: 8
   },
   categoryBadgeIcon: {
     width: 16,
-    height: 16,
+    height: 16
   },
   categoryBadgeText: {
     color: "#ffffff",
     fontSize: 12,
     fontFamily: "Poppins_700Bold",
-    letterSpacing: 0.5,
+    letterSpacing: 0.5
   },
   youtubeLinkBtn: {
     flexDirection: "row",
@@ -574,12 +574,12 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 20,
-    gap: 6,
+    gap: 6
   },
   youtubeLinkText: {
     color: "#ffffff",
     fontSize: 12,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   channelName: {
     color: "#ffffff",
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(0, 0, 0, 0.9)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
-    letterSpacing: 0.2,
+    letterSpacing: 0.2
   },
   videoTitle: {
     color: "#f3f4f6",
@@ -597,6 +597,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textShadowColor: "rgba(0, 0, 0, 0.9)",
     textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
-  },
+    textShadowRadius: 6
+  }
 });

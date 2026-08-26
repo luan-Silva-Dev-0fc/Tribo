@@ -20,9 +20,9 @@ export function SavedPostsScreen({ user, onBack, onOpenProfile }) {
     setLoading(true);
     try {
       const data = await api.posts.saved();
-      let list = Array.isArray(data) ? data : (data.posts || []);
-      // Extract the actual post if the backend wraps it
-      list = list.map(item => item.post ? item.post : item);
+      let list = Array.isArray(data) ? data : data.posts || [];
+
+      list = list.map((item) => item.post ? item.post : item);
       setPosts(list);
     } catch (err) {
       console.warn("Erro ao carregar posts salvos", err);
@@ -36,43 +36,42 @@ export function SavedPostsScreen({ user, onBack, onOpenProfile }) {
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <AppHeader
           title="Posts Salvos"
-          onBack={onBack}
-        />
-        {loading ? (
-          <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} />
-        ) : (
-          <FlatList
-            data={posts}
-            keyExtractor={(item, index) => String(item.id || item._id || index)}
-            contentContainerStyle={styles.listContent}
-            ListEmptyComponent={
-              <View style={{ marginTop: 60 }}>
-                <EmptyState 
-                  title="Nada salvo ainda" 
-                  message="Quando você salvar uma publicação, ela aparecerá aqui." 
-                  icon="bookmark" 
-                />
+          onBack={onBack} />
+        
+        {loading ?
+        <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} /> :
+
+        <FlatList
+          data={posts}
+          keyExtractor={(item, index) => String(item.id || item._id || index)}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+          <View style={{ marginTop: 60 }}>
+                <EmptyState
+              title="Nada salvo ainda"
+              message="Quando vocï¿½ salvar uma publicaï¿½ï¿½o, ela aparecerï¿½ aqui."
+              icon="bookmark" />
+            
               </View>
-            }
-            renderItem={({ item }) => (
-              <PostCard
-                post={item}
-                currentUser={user}
-                currentUserId={user?.id}
-                onOpenProfile={onOpenProfile}
-              />
-            )}
-          />
-        )}
+          }
+          renderItem={({ item }) =>
+          <PostCard
+            post={item}
+            currentUser={user}
+            currentUserId={user?.id}
+            onOpenProfile={onOpenProfile} />
+
+          } />
+
+        }
       </View>
-    </AppLayout>
-  );
+    </AppLayout>);
+
 }
 
 const styles = StyleSheet.create({
   listContent: {
     paddingVertical: 16,
-    flexGrow: 1,
-  },
+    flexGrow: 1
+  }
 });
-

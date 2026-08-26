@@ -4,22 +4,22 @@ import { Platform, Share } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api } from "../api";
 
-/**
- * Retorna a chave do AsyncStorage para timestamp de chat limpo.
- */
+
+
+
 function getStorageKey(groupId) {
   return `@tribo_chat_cleared_${groupId}`;
 }
 
-/**
- * Salva o timestamp local da limpeza da conversa.
- */
+
+
+
 export async function clearChatHistory(groupId) {
   try {
     const timestamp = Date.now();
     await AsyncStorage.setItem(getStorageKey(groupId), String(timestamp));
 
-    // Notifica backend se a rota existir
+
     try {
       if (api.groups?.clearChat) {
         await api.groups.clearChat(groupId);
@@ -33,9 +33,9 @@ export async function clearChatHistory(groupId) {
   }
 }
 
-/**
- * Obtém o timestamp da última limpeza de chat para o grupo.
- */
+
+
+
 export async function getClearedChatTimestamp(groupId) {
   try {
     const val = await AsyncStorage.getItem(getStorageKey(groupId));
@@ -45,9 +45,9 @@ export async function getClearedChatTimestamp(groupId) {
   }
 }
 
-/**
- * Filtra as mensagens que foram enviadas antes do timestamp de limpeza.
- */
+
+
+
 export function filterClearedMessages(messages, clearedTimestamp) {
   if (!clearedTimestamp || !Array.isArray(messages)) return messages;
   return messages.filter((msg) => {
@@ -57,9 +57,9 @@ export function filterClearedMessages(messages, clearedTimestamp) {
   });
 }
 
-/**
- * Formata data no padrão brasileiro DD/MM/AAAA às HH:MM
- */
+
+
+
 function formatFullDate(date) {
   try {
     const d = new Date(date);
@@ -75,9 +75,9 @@ function formatFullDate(date) {
   }
 }
 
-/**
- * Formata data curta [DD/MM/AAAA HH:MM]
- */
+
+
+
 function formatShortDate(date) {
   try {
     const d = new Date(date);
@@ -93,13 +93,13 @@ function formatShortDate(date) {
   }
 }
 
-/**
- * Exporta o histórico da conversa como um arquivo .txt formatado.
- */
+
+
+
 export async function exportChatHistory({
   groupName = "Grupo Tribo",
   messages = [],
-  onAlert,
+  onAlert
 }) {
   try {
     if (!messages || messages.length === 0) {
@@ -107,13 +107,13 @@ export async function exportChatHistory({
         onAlert({
           title: "Exportar Conversa",
           message: "Não há mensagens para exportar neste grupo.",
-          type: "info",
+          type: "info"
         });
       }
       return;
     }
 
-    // Ordena as mensagens cronologicamente (da mais antiga para a mais recente)
+
     const sorted = [...messages].sort((a, b) => {
       const timeA = new Date(a.createdAt || a.created_at || 0).getTime();
       const timeB = new Date(b.createdAt || b.created_at || 0).getTime();
@@ -126,35 +126,35 @@ export async function exportChatHistory({
     sorted.forEach((item) => {
       const isDeleted = item.is_deleted || item.deleted_for_everyone;
       const dateStr = formatShortDate(
-        item.createdAt || item.created_at || new Date(),
+        item.createdAt || item.created_at || new Date()
       );
       const authorName =
-        item.user?.name ||
-        item.sender?.name ||
-        item.author?.name ||
-        item.user?.username ||
-        item.sender?.username ||
-        "Usuário";
+      item.user?.name ||
+      item.sender?.name ||
+      item.author?.name ||
+      item.user?.username ||
+      item.sender?.username ||
+      "Usuário";
 
       let body = "";
       if (isDeleted) {
         body = "[Mensagem apagada]";
       } else if (
-        item.media_type === "STICKER" ||
-        item.mediaType === "STICKER" ||
-        item.type === "STICKER" ||
-        item.sticker_id ||
-        item.stickerId
-      ) {
+      item.media_type === "STICKER" ||
+      item.mediaType === "STICKER" ||
+      item.type === "STICKER" ||
+      item.sticker_id ||
+      item.stickerId)
+      {
         body = "[Figurinha]";
       } else if (item.audio_url || item.audioUrl) {
         body = "[Mensagem de voz]";
       } else if (
-        item.media_type === "VIDEO" ||
-        item.mediaType === "VIDEO" ||
-        (typeof item.media_url === "string" &&
-          (item.media_url.endsWith(".mp4") || item.media_url.includes("video")))
-      ) {
+      item.media_type === "VIDEO" ||
+      item.mediaType === "VIDEO" ||
+      typeof item.media_url === "string" && (
+      item.media_url.endsWith(".mp4") || item.media_url.includes("video")))
+      {
         body = item.content ? `[Vídeo] ${item.content}` : "[Vídeo]";
       } else if (item.media_url || item.mediaUrl || item.imageUrl) {
         body = item.content ? `[Foto] ${item.content}` : "[Foto]";
@@ -165,11 +165,11 @@ export async function exportChatHistory({
       fileContent += `[${dateStr}] ${authorName}: ${body}\n`;
     });
 
-    // Se estiver na Web, faz download direto via Blob
+
     if (Platform.OS === "web") {
       try {
         const blob = new Blob([fileContent], {
-          type: "text/plain;charset=utf-8",
+          type: "text/plain;charset=utf-8"
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -184,13 +184,13 @@ export async function exportChatHistory({
       } catch (e) {}
     }
 
-    // No Mobile (Android / iOS): Salva no FileSystem e compartilha
+
     const safeName = groupName.replace(/[^a-zA-Z0-9_-]/g, "_");
     const filename = `Historico_${safeName}_${Date.now()}.txt`;
     const fileUri = `${FileSystem.cacheDirectory}${filename}`;
 
     await FileSystem.writeAsStringAsync(fileUri, fileContent, {
-      encoding: FileSystem?.EncodingType?.UTF8 || "utf8",
+      encoding: FileSystem?.EncodingType?.UTF8 || "utf8"
     });
 
     const isAvailable = await Sharing.isAvailableAsync();
@@ -198,12 +198,12 @@ export async function exportChatHistory({
       await Sharing.shareAsync(fileUri, {
         mimeType: "text/plain",
         UTI: "public.plain-text",
-        dialogTitle: `Exportar Histórico: ${groupName}`,
+        dialogTitle: `Exportar Histórico: ${groupName}`
       });
     } else {
       await Share.share({
         title: `Histórico de Mensagens - ${groupName}`,
-        message: fileContent,
+        message: fileContent
       });
     }
   } catch (err) {
@@ -212,7 +212,7 @@ export async function exportChatHistory({
       onAlert({
         title: "Erro na Exportação",
         message: "Não foi possível exportar a conversa. Tente novamente.",
-        type: "error",
+        type: "error"
       });
     }
   }

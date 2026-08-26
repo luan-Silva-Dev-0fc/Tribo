@@ -10,7 +10,7 @@ export function ScreenWrapper({
   headerRight,
   style,
   cardStyle,
-  contentStyle,
+  contentStyle
 }) {
   return (
     <AppLayout
@@ -20,11 +20,11 @@ export function ScreenWrapper({
       headerRight={headerRight}
       style={style}
       cardStyle={cardStyle}
-      contentStyle={contentStyle}
-    >
+      contentStyle={contentStyle}>
+      
       {children}
-    </AppLayout>
-  );
+    </AppLayout>);
+
 }
 
 export default ScreenWrapper;

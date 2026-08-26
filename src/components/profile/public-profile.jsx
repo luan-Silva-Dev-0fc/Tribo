@@ -10,8 +10,8 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -31,9 +31,9 @@ const ownerOf = (post = {}) => post.user || post.author || {};
 
 function belongsToUser(post, id) {
   const owner = ownerOf(post);
-  return [post.userId, post.authorId, owner.id, owner.userId]
-    .filter((value) => value !== undefined && value !== null)
-    .some((value) => String(value) === String(id));
+  return [post.userId, post.authorId, owner.id, owner.userId].
+  filter((value) => value !== undefined && value !== null).
+  some((value) => String(value) === String(id));
 }
 
 function ProfileOptionsModal({ user, visible, onClose, onBlock, onReport }) {
@@ -53,8 +53,8 @@ function ProfileOptionsModal({ user, visible, onClose, onBlock, onReport }) {
           onPress={() => {
             onClose();
             onBlock();
-          }}
-        >
+          }}>
+          
           <View style={[styles.optionIcon, { backgroundColor: "rgba(245, 158, 11, 0.15)" }]}>
             <Feather name="user-x" size={20} color="#f59e0b" />
           </View>
@@ -68,8 +68,8 @@ function ProfileOptionsModal({ user, visible, onClose, onBlock, onReport }) {
           onPress={() => {
             onClose();
             onReport();
-          }}
-        >
+          }}>
+          
           <View style={[styles.optionIcon, { backgroundColor: "rgba(239, 68, 68, 0.15)" }]}>
             <Feather name="flag" size={20} color="#ef4444" />
           </View>
@@ -78,8 +78,8 @@ function ProfileOptionsModal({ user, visible, onClose, onBlock, onReport }) {
           </Text>
         </Pressable>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 function InlineVideo({ url, onOpenMedia, item, styles }) {
@@ -93,25 +93,25 @@ function InlineVideo({ url, onOpenMedia, item, styles }) {
     <Pressable
       onPress={() => onOpenMedia?.({ url, type: "video", post: item })}
       style={({ pressed }) => [
-        styles.imageWrapper,
-        { opacity: pressed ? 0.92 : 1, transform: [{ scale: pressed ? 0.995 : 1 }] },
-      ]}
-    >
+      styles.imageWrapper,
+      { opacity: pressed ? 0.92 : 1, transform: [{ scale: pressed ? 0.995 : 1 }] }]
+      }>
+      
       <VideoView
         player={player}
         style={[
-          styles.image, 
-          { backgroundColor: "#000000", height: undefined, minHeight: 220, maxHeight: 500, marginTop: 12 }
-        ]}
+        styles.image,
+        { backgroundColor: "#000000", height: undefined, minHeight: 220, maxHeight: 500, marginTop: 12 }]
+        }
         contentFit="contain"
-        nativeControls={false}
-      />
+        nativeControls={false} />
+      
       <View style={styles.expandPill}>
         <Feather name="maximize-2" size={13} color="#FFFFFF" style={{ marginRight: 4 }} />
         <Text style={styles.expandPillText}>Tela cheia</Text>
       </View>
-    </Pressable>
-  );
+    </Pressable>);
+
 }
 
 function ProfilePostCard({ item, onOpenMedia }) {
@@ -133,7 +133,7 @@ function ProfilePostCard({ item, onOpenMedia }) {
   const isVideo = Boolean(
     item.videoUrl ||
     item.video_url ||
-    (typeof mediaUrl === "string" && (mediaUrl.endsWith(".mp4") || mediaUrl.endsWith(".webm") || mediaUrl.includes("video")))
+    typeof mediaUrl === "string" && (mediaUrl.endsWith(".mp4") || mediaUrl.endsWith(".webm") || mediaUrl.includes("video"))
   );
 
   useEffect(() => {
@@ -155,50 +155,50 @@ function ProfilePostCard({ item, onOpenMedia }) {
   return (
     <View
       style={[
-        styles.post,
-        {
-          backgroundColor: colors.surface,
-          borderColor: colors.line,
-        },
-      ]}
-    >
-      {!!item.content && (
-        <Text style={[styles.postText, { color: colors.text }]}>
+      styles.post,
+      {
+        backgroundColor: colors.surface,
+        borderColor: colors.line
+      }]
+      }>
+      
+      {!!item.content &&
+      <Text style={[styles.postText, { color: colors.text }]}>
           {item.content}
         </Text>
-      )}
+      }
 
       {!!mediaUrl && (
-        isImageHidden ? (
-          <Pressable
-            onPress={() => setRevealedTemporarily(true)}
-            style={({ pressed }) => [
-              styles.nsfwContainer,
-              {
-                backgroundColor: colors.cardSecondary || colors.surfaceAlt || colors.surface,
-                borderColor: colors.border || colors.line,
-                opacity: pressed ? 0.9 : 1,
-              },
-            ]}
-          >
+      isImageHidden ?
+      <Pressable
+        onPress={() => setRevealedTemporarily(true)}
+        style={({ pressed }) => [
+        styles.nsfwContainer,
+        {
+          backgroundColor: colors.cardSecondary || colors.surfaceAlt || colors.surface,
+          borderColor: colors.border || colors.line,
+          opacity: pressed ? 0.9 : 1
+        }]
+        }>
+        
             <View
-              style={[
-                styles.nsfwBadge,
-                {
-                  backgroundColor: colors.danger || "#F4212E",
-                },
-              ]}
-            >
+          style={[
+          styles.nsfwBadge,
+          {
+            backgroundColor: colors.danger || "#F4212E"
+          }]
+          }>
+          
               <Text style={styles.nsfwBadgeText}>+18</Text>
             </View>
             <View style={styles.nsfwContent}>
               <View style={styles.nsfwHeaderRow}>
                 <Feather
-                  name="alert-triangle"
-                  size={16}
-                  color={colors.danger || "#F4212E"}
-                  style={{ marginRight: 6 }}
-                />
+              name="alert-triangle"
+              size={16}
+              color={colors.danger || "#F4212E"}
+              style={{ marginRight: 6 }} />
+            
                 <Text style={[styles.nsfwTitle, { color: colors.text }]}>
                   Conteúdo Sensível (+18) - Oculto por padrão
                 </Text>
@@ -207,93 +207,93 @@ function ProfilePostCard({ item, onOpenMedia }) {
                 Esta publicação contém mídia classificada como sensível.
               </Text>
               <View
-                style={[
-                  styles.nsfwRevealBtn,
-                  {
-                    backgroundColor: colors.card || colors.surface,
-                    borderColor: colors.border || colors.line,
-                  },
-                ]}
-              >
+            style={[
+            styles.nsfwRevealBtn,
+            {
+              backgroundColor: colors.card || colors.surface,
+              borderColor: colors.border || colors.line
+            }]
+            }>
+            
                 <Feather
-                  name="eye"
-                  size={14}
-                  color={colors.text}
-                  style={{ marginRight: 6 }}
-                />
+              name="eye"
+              size={14}
+              color={colors.text}
+              style={{ marginRight: 6 }} />
+            
                 <Text style={[styles.nsfwRevealText, { color: colors.text }]}>
                   Toque para visualizar
                 </Text>
               </View>
             </View>
-          </Pressable>
-        ) : isVideo ? (
-          <InlineVideo url={mediaUrl} onOpenMedia={onOpenMedia} item={item} styles={styles} />
-        ) : (
-          <Pressable
-            onPress={() =>
-              onOpenMedia?.({
-                url: mediaUrl,
-                type: "image",
-                post: item,
-              })
-            }
-            style={({ pressed }) => [
-              styles.imageWrapper,
-              { opacity: pressed ? 0.92 : 1, transform: [{ scale: pressed ? 0.995 : 1 }] },
-            ]}
-          >
+          </Pressable> :
+      isVideo ?
+      <InlineVideo url={mediaUrl} onOpenMedia={onOpenMedia} item={item} styles={styles} /> :
+
+      <Pressable
+        onPress={() =>
+        onOpenMedia?.({
+          url: mediaUrl,
+          type: "image",
+          post: item
+        })
+        }
+        style={({ pressed }) => [
+        styles.imageWrapper,
+        { opacity: pressed ? 0.92 : 1, transform: [{ scale: pressed ? 0.995 : 1 }] }]
+        }>
+        
             <Image
-              source={{ uri: mediaUrl }}
-              style={[
-                styles.image, 
-                { 
-                  backgroundColor: colors.surfaceAlt,
-                  height: imageAspect ? undefined : 220,
-                  aspectRatio: imageAspect || undefined,
-                  maxHeight: 500,
-                  marginTop: 12
-                }
-              ]}
-              resizeMode={imageAspect ? "contain" : "cover"}
-            />
+          source={{ uri: mediaUrl }}
+          style={[
+          styles.image,
+          {
+            backgroundColor: colors.surfaceAlt,
+            height: imageAspect ? undefined : 220,
+            aspectRatio: imageAspect || undefined,
+            maxHeight: 500,
+            marginTop: 12
+          }]
+          }
+          resizeMode={imageAspect ? "contain" : "cover"} />
+        
             <View style={styles.expandPill}>
               <Feather
-                name="maximize-2"
-                size={13}
-                color="#FFFFFF"
-                style={{ marginRight: 4 }}
-              />
+            name="maximize-2"
+            size={13}
+            color="#FFFFFF"
+            style={{ marginRight: 4 }} />
+          
               <Text style={styles.expandPillText}>
                 Tela cheia
               </Text>
             </View>
 
-            {isNSFW && !isAdultContentEnabled && revealedTemporarily && (
-              <Pressable
-                onPress={(e) => {
-                  e.stopPropagation?.();
-                  setRevealedTemporarily(false);
-                }}
-                style={[
-                  styles.nsfwHideBadge,
-                  {
-                    backgroundColor: "rgba(0, 0, 0, 0.75)",
-                  },
-                ]}
-              >
+            {isNSFW && !isAdultContentEnabled && revealedTemporarily &&
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation?.();
+            setRevealedTemporarily(false);
+          }}
+          style={[
+          styles.nsfwHideBadge,
+          {
+            backgroundColor: "rgba(0, 0, 0, 0.75)"
+          }]
+          }>
+          
                 <Feather name="eye-off" size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
                 <Text style={styles.nsfwHideBadgeText}>Ocultar (+18)</Text>
               </Pressable>
-            )}
-          </Pressable>
-        )
-      )}
-    </View>
-  );
+        }
+          </Pressable>)
+
+      }
+    </View>);
+
 }
 
-/** A profile sheet is used so opening a profile never changes the current tab. */
+
 export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenProfile, onOpenChat }) {
   const { colors } = useTheme();
   const [profile, setProfile] = useState(user);
@@ -309,50 +309,50 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
   const [followersModalVisible, setFollowersModalVisible] = useState(false);
   const [followersModalTab, setFollowersModalTab] = useState("followers");
   const [fullscreenMedia, setFullscreenMedia] = useState(null);
-  
+
   const targetUserId =
-    (typeof user === "string" ? user : user?.id || user?.user_id || user?.userId || user?.author_id || user?.authorId) || null;
+  (typeof user === "string" ? user : user?.id || user?.user_id || user?.userId || user?.author_id || user?.authorId) || null;
 
   const visible = Boolean(targetUserId);
   const isOwnProfile = String(profile?.id || targetUserId) === String(currentUserId);
 
   const isFollowing =
-    profile?.isFollowing ||
-    profile?.is_following ||
-    profile?.followStatus === "following" ||
-    profile?.followStatus === "ACCEPTED" ||
-    profile?.follow_status === "following" ||
-    profile?.follow_status === "ACCEPTED";
+  profile?.isFollowing ||
+  profile?.is_following ||
+  profile?.followStatus === "following" ||
+  profile?.followStatus === "ACCEPTED" ||
+  profile?.follow_status === "following" ||
+  profile?.follow_status === "ACCEPTED";
 
   const isPending =
-    profile?.isPending ||
-    profile?.is_pending ||
-    profile?.followStatus === "pending" ||
-    profile?.followStatus === "PENDING" ||
-    profile?.follow_status === "pending" ||
-    profile?.follow_status === "PENDING";
+  profile?.isPending ||
+  profile?.is_pending ||
+  profile?.followStatus === "pending" ||
+  profile?.followStatus === "PENDING" ||
+  profile?.follow_status === "pending" ||
+  profile?.follow_status === "PENDING";
 
-  const followStatus = isOwnProfile
-    ? "SELF"
-    : isFollowing
-    ? "ACCEPTED"
-    : isPending
-    ? "PENDING"
-    : "NONE";
+  const followStatus = isOwnProfile ?
+  "SELF" :
+  isFollowing ?
+  "ACCEPTED" :
+  isPending ?
+  "PENDING" :
+  "NONE";
 
   const isPrivate = Boolean(profile?.is_private ?? profile?.isPrivate ?? false);
-  
-  // Regra de visibilidade do conteúdo
+
+
   const canViewContent =
-    isOwnProfile ||
-    profile?.can_view_content === true ||
-    profile?.canViewContent === true ||
-    (!isPrivate && profile?.can_view_content !== false) ||
-    followStatus === "ACCEPTED";
+  isOwnProfile ||
+  profile?.can_view_content === true ||
+  profile?.canViewContent === true ||
+  !isPrivate && profile?.can_view_content !== false ||
+  followStatus === "ACCEPTED";
 
   const load = useCallback(async () => {
     const uid =
-      (typeof user === "string" ? user : user?.id || user?.user_id || user?.userId || user?.author_id || user?.authorId) || null;
+    (typeof user === "string" ? user : user?.id || user?.user_id || user?.userId || user?.author_id || user?.authorId) || null;
 
     if (!uid) return;
     setLoading(true);
@@ -367,20 +367,20 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
       const normalized = normalizeUser(rawUser) || {};
 
       const isUserFollowing =
-        rawUser?.is_following === true ||
-        rawUser?.isFollowing === true ||
-        rawUser?.follow_status === "following" ||
-        rawUser?.followStatus === "following" ||
-        rawUser?.follow_status === "ACCEPTED" ||
-        rawUser?.followStatus === "ACCEPTED";
+      rawUser?.is_following === true ||
+      rawUser?.isFollowing === true ||
+      rawUser?.follow_status === "following" ||
+      rawUser?.followStatus === "following" ||
+      rawUser?.follow_status === "ACCEPTED" ||
+      rawUser?.followStatus === "ACCEPTED";
 
       const isUserPending =
-        rawUser?.is_pending === true ||
-        rawUser?.isPending === true ||
-        rawUser?.follow_status === "pending" ||
-        rawUser?.followStatus === "pending" ||
-        rawUser?.follow_status === "PENDING" ||
-        rawUser?.followStatus === "PENDING";
+      rawUser?.is_pending === true ||
+      rawUser?.isPending === true ||
+      rawUser?.follow_status === "pending" ||
+      rawUser?.followStatus === "pending" ||
+      rawUser?.follow_status === "PENDING" ||
+      rawUser?.followStatus === "PENDING";
 
       const nextProfile = {
         ...(typeof user === "object" ? user : {}),
@@ -399,17 +399,17 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
         is_pending: isUserPending,
         isPending: isUserPending,
         is_private: Boolean(rawUser?.is_private ?? rawUser?.isPrivate ?? false),
-        can_view_content: rawUser?.can_view_content ?? rawUser?.canViewContent ?? null,
+        can_view_content: rawUser?.can_view_content ?? rawUser?.canViewContent ?? null
       };
 
       setProfile(nextProfile);
 
       const canView =
-        String(nextProfile?.id || uid) === String(currentUserId) ||
-        nextProfile?.can_view_content === true ||
-        nextProfile?.canViewContent === true ||
-        (!(nextProfile?.is_private ?? nextProfile?.isPrivate) && nextProfile?.can_view_content !== false) ||
-        nextProfile?.follow_status === "ACCEPTED";
+      String(nextProfile?.id || uid) === String(currentUserId) ||
+      nextProfile?.can_view_content === true ||
+      nextProfile?.canViewContent === true ||
+      !(nextProfile?.is_private ?? nextProfile?.isPrivate) && nextProfile?.can_view_content !== false ||
+      nextProfile?.follow_status === "ACCEPTED";
 
       if (canView) {
         const postsResponse = await api.users.posts(nextProfile.id || uid).catch(() => null);
@@ -451,14 +451,14 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
       const isNowFollowing = status === "ACCEPTED" || followStatus === "ACCEPTED";
       const isNowPending = status === "PENDING" || followStatus === "PENDING";
 
-      // Atualiza os contadores na tela instantaneamente com os dados exatos do banco
+
       setProfile((prev) => {
         const nextFollowers =
-          followersCount !== undefined
-            ? followersCount
-            : isNowFollowing
-            ? Number(prev?.followers_count || prev?.followersCount || 0) + 1
-            : Math.max(0, Number(prev?.followers_count || prev?.followersCount || 1) - 1);
+        followersCount !== undefined ?
+        followersCount :
+        isNowFollowing ?
+        Number(prev?.followers_count || prev?.followersCount || 0) + 1 :
+        Math.max(0, Number(prev?.followers_count || prev?.followersCount || 1) - 1);
 
         return {
           ...prev,
@@ -474,27 +474,27 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
           followersCount: nextFollowers,
           followers_count: nextFollowers,
           followingCount: followingCount !== undefined ? followingCount : prev?.followingCount ?? prev?.following_count,
-          following_count: followingCount !== undefined ? followingCount : prev?.following_count ?? prev?.followingCount,
+          following_count: followingCount !== undefined ? followingCount : prev?.following_count ?? prev?.followingCount
         };
       });
 
       if (isNowPending) {
         Alert.alert(
           "Solicitação enviada",
-          `Sua solicitação para seguir @${handle} foi enviada com sucesso.`,
+          `Sua solicitação para seguir @${handle} foi enviada com sucesso.`
         );
       } else if (isNowFollowing) {
-        // Carrega as publicações se agora tem acesso
+
         const postsResponse = await api.posts.list().catch(() => null);
         if (postsResponse) {
           setPosts(
             listFrom(postsResponse, ["posts"]).filter((post) =>
-              belongsToUser(post, profile.id),
-            ),
+            belongsToUser(post, profile.id)
+            )
           );
         }
       } else {
-        // Deixou de seguir
+
         if (isPrivate) {
           setPosts([]);
         }
@@ -521,29 +521,29 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
       postItem.is_liked ||
       likesList.some(
         (item) =>
-          item.userId === effectiveUserId ||
-          item.user_id === effectiveUserId ||
-          item.user?.id === effectiveUserId,
-      ),
+        item.userId === effectiveUserId ||
+        item.user_id === effectiveUserId ||
+        item.user?.id === effectiveUserId
+      )
     );
 
     setPosts((prev) =>
-      prev.map((p) => {
-        if (p.id === postItem.id) {
-          const currentCount = p.likesCount ?? p.likes_count ?? (p.likes?.length || 0);
-          return {
-            ...p,
-            isLiked: !isCurrentlyLiked,
-            is_liked: !isCurrentlyLiked,
-            likesCount: isCurrentlyLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
-            likes_count: isCurrentlyLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
-            likes: isCurrentlyLiked
-              ? likesList.filter((l) => (l.userId || l.user_id || l.user?.id) !== effectiveUserId)
-              : [...likesList, { userId: effectiveUserId }],
-          };
-        }
-        return p;
-      }),
+    prev.map((p) => {
+      if (p.id === postItem.id) {
+        const currentCount = p.likesCount ?? p.likes_count ?? (p.likes?.length || 0);
+        return {
+          ...p,
+          isLiked: !isCurrentlyLiked,
+          is_liked: !isCurrentlyLiked,
+          likesCount: isCurrentlyLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+          likes_count: isCurrentlyLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+          likes: isCurrentlyLiked ?
+          likesList.filter((l) => (l.userId || l.user_id || l.user?.id) !== effectiveUserId) :
+          [...likesList, { userId: effectiveUserId }]
+        };
+      }
+      return p;
+    })
     );
 
     try {
@@ -553,7 +553,7 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
         await api.likes.create({ postId: postItem.id });
       }
     } catch (error) {
-      setPosts((prev) => prev.map((p) => (p.id === postItem.id ? postItem : p)));
+      setPosts((prev) => prev.map((p) => p.id === postItem.id ? postItem : p));
       Alert.alert("Curtida não atualizada", errorMessage(error));
     }
   };
@@ -564,25 +564,25 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
       "Bloquear perfil",
       `Tem certeza que deseja bloquear @${handle}? Você não verá mais conteúdos nem o perfil desta pessoa.`,
       [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Bloquear",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setWorking(true);
-              await api.users.block(profile.id);
-              Alert.alert("Usuário bloqueado", `@${handle} foi bloqueado com sucesso.`);
-              onBlocked?.(profile.id);
-              onClose();
-            } catch (error) {
-              Alert.alert("Não foi possível bloquear", errorMessage(error));
-            } finally {
-              setWorking(false);
-            }
-          },
-        },
-      ],
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Bloquear",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setWorking(true);
+            await api.users.block(profile.id);
+            Alert.alert("Usuário bloqueado", `@${handle} foi bloqueado com sucesso.`);
+            onBlocked?.(profile.id);
+            onClose();
+          } catch (error) {
+            Alert.alert("Não foi possível bloquear", errorMessage(error));
+          } finally {
+            setWorking(false);
+          }
+        }
+      }]
+
     );
   };
 
@@ -592,11 +592,11 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
   };
 
   const followersCount =
-    profile?.followers_count ?? profile?.followersCount ?? 0;
+  profile?.followers_count ?? profile?.followersCount ?? 0;
   const followingCount =
-    profile?.following_count ?? profile?.followingCount ?? 0;
+  profile?.following_count ?? profile?.followingCount ?? 0;
   const postsCount =
-    profile?.posts_count ?? profile?.postsCount ?? posts.length;
+  profile?.posts_count ?? profile?.postsCount ?? posts.length;
 
   const insets = useSafeAreaInsets();
   const topInset = Math.max(
@@ -609,46 +609,46 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
       <View style={[styles.page, { backgroundColor: colors.background }]}>
         <View
           style={[
-            styles.bar,
-            {
-              paddingTop: topInset,
-              height: 58 + topInset,
-              backgroundColor: colors.surface,
-              borderColor: colors.line,
-            },
-          ]}
-        >
+          styles.bar,
+          {
+            paddingTop: topInset,
+            height: 58 + topInset,
+            backgroundColor: colors.surface,
+            borderColor: colors.line
+          }]
+          }>
+          
           <IconButton name="x" onPress={onClose} label="Fechar perfil" />
           <Text style={[styles.title, { color: colors.text }]}>Perfil</Text>
-          {!isOwnProfile ? (
-            <IconButton
-              name="more-horizontal"
-              onPress={() => setOptionsVisible(true)}
-              label="Ações do perfil"
-            />
-          ) : (
-            <View style={styles.spacer} />
-          )}
+          {!isOwnProfile ?
+          <IconButton
+            name="more-horizontal"
+            onPress={() => setOptionsVisible(true)}
+            label="Ações do perfil" /> :
+
+
+          <View style={styles.spacer} />
+          }
         </View>
 
-        {loading && !profile ? (
-          <View style={styles.center}><ActivityIndicator size="large" color={colors.accent} /></View>
-        ) : (
-          <FlatList
-            data={canViewContent ? posts : []}
-            keyExtractor={(item, index) => String(item.id || index)}
-            contentContainerStyle={[
-              styles.content,
-              { paddingBottom: Math.max(insets.bottom + 24, 40) },
-            ]}
-            refreshing={loading}
-            onRefresh={load}
-            ListHeaderComponent={
-              <View style={[styles.profileCard, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        {loading && !profile ?
+        <View style={styles.center}><ActivityIndicator size="large" color={colors.accent} /></View> :
+
+        <FlatList
+          data={canViewContent ? posts : []}
+          keyExtractor={(item, index) => String(item.id || index)}
+          contentContainerStyle={[
+          styles.content,
+          { paddingBottom: Math.max(insets.bottom + 24, 40) }]
+          }
+          refreshing={loading}
+          onRefresh={load}
+          ListHeaderComponent={
+          <View style={[styles.profileCard, { backgroundColor: colors.surface, borderColor: colors.line }]}>
                 <View style={styles.headerTopRow}>
                   <Avatar user={profile || user} size={82} />
                   
-                  {/* Estatísticas de Posts / Seguidores / Seguindo */}
+                  {}
                   <View style={styles.statsContainer}>
                     <View style={styles.statItem}>
                       <Text style={[styles.statNumber, { color: colors.text }]}>
@@ -660,22 +660,22 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
                     </View>
 
                     <Pressable
-                      style={({ pressed }) => [
-                        styles.statItem,
-                        {
-                          opacity: pressed && canViewContent ? 0.7 : 1,
-                          transform: [
-                            { scale: pressed && canViewContent ? 0.96 : 1 },
-                          ],
-                        },
-                      ]}
-                      onPress={() => {
-                        if (canViewContent) {
-                          setFollowersModalTab("followers");
-                          setFollowersModalVisible(true);
-                        }
-                      }}
-                    >
+                  style={({ pressed }) => [
+                  styles.statItem,
+                  {
+                    opacity: pressed && canViewContent ? 0.7 : 1,
+                    transform: [
+                    { scale: pressed && canViewContent ? 0.96 : 1 }]
+
+                  }]
+                  }
+                  onPress={() => {
+                    if (canViewContent) {
+                      setFollowersModalTab("followers");
+                      setFollowersModalVisible(true);
+                    }
+                  }}>
+                  
                       <Text style={[styles.statNumber, { color: colors.text }]}>
                         {followersCount}
                       </Text>
@@ -685,22 +685,22 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
                     </Pressable>
 
                     <Pressable
-                      style={({ pressed }) => [
-                        styles.statItem,
-                        {
-                          opacity: pressed && canViewContent ? 0.7 : 1,
-                          transform: [
-                            { scale: pressed && canViewContent ? 0.96 : 1 },
-                          ],
-                        },
-                      ]}
-                      onPress={() => {
-                        if (canViewContent) {
-                          setFollowersModalTab("following");
-                          setFollowersModalVisible(true);
-                        }
-                      }}
-                    >
+                  style={({ pressed }) => [
+                  styles.statItem,
+                  {
+                    opacity: pressed && canViewContent ? 0.7 : 1,
+                    transform: [
+                    { scale: pressed && canViewContent ? 0.96 : 1 }]
+
+                  }]
+                  }
+                  onPress={() => {
+                    if (canViewContent) {
+                      setFollowersModalTab("following");
+                      setFollowersModalVisible(true);
+                    }
+                  }}>
+                  
                       <Text style={[styles.statNumber, { color: colors.text }]}>
                         {followingCount}
                       </Text>
@@ -711,7 +711,7 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
                   </View>
                 </View>
 
-                {/* Nome, Badge e Handle */}
+                {}
                 <View style={styles.nameBlock}>
                   <View style={styles.nameRow}>
                     <Text style={[styles.name, { color: colors.text }]}>
@@ -720,242 +720,242 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
                     <VerificationBadge user={profile ?? user} size={18} />
                   </View>
                   <Text
-                    style={[
-                      styles.handle,
-                      {
-                        color:
-                          colors.mode === "dark" ? "#C6C6C2" : "#555550",
-                      },
-                    ]}
-                  >
+                style={[
+                styles.handle,
+                {
+                  color:
+                  colors.mode === "dark" ? "#C6C6C2" : "#555550"
+                }]
+                }>
+                
                     @{profile?.username || "tribo"}
                   </Text>
 
-                  {/* Biografia: Oculta se null ou vazia */}
-                  {!!(profile?.bio && profile.bio.trim()) && (
-                    <Text style={[styles.bio, { color: colors.text }]}>
+                  {}
+                  {!!(profile?.bio && profile.bio.trim()) &&
+              <Text style={[styles.bio, { color: colors.text }]}>
                       {profile.bio.trim()}
                     </Text>
-                  )}
+              }
                 </View>
 
-                {/* Botões de Ação */}
-                {!isOwnProfile && (
-                  <View style={styles.actions}>
-                    {fetchingProfile ? (
-                      <View style={[styles.followBtn, { backgroundColor: colors.surfaceAlt, borderColor: colors.line }]}>
+                {}
+                {!isOwnProfile &&
+            <View style={styles.actions}>
+                    {fetchingProfile ?
+              <View style={[styles.followBtn, { backgroundColor: colors.surfaceAlt, borderColor: colors.line }]}>
                          <ActivityIndicator size="small" color={colors.muted} />
-                      </View>
-                    ) : (
-                      <Pressable
-                        onPress={handleFollowAction}
-                        disabled={followWorking}
-                        style={({ pressed }) => [
-                          isPending
-                            ? styles.pendingBtn
-                            : isFollowing
-                            ? styles.followingBtn
-                            : styles.followBtn,
-                          isPending
-                            ? {
-                                backgroundColor: colors.surfaceAlt,
-                                borderColor: colors.line,
-                              }
-                            : isFollowing
-                            ? {
-                                backgroundColor:
-                                  colors.mode === "dark"
-                                    ? "rgba(181, 167, 255, 0.16)"
-                                    : "rgba(111, 86, 232, 0.12)",
-                                borderColor:
-                                  colors.mode === "dark"
-                                    ? "rgba(181, 167, 255, 0.38)"
-                                    : "rgba(111, 86, 232, 0.32)",
-                              }
-                            : {
-                                backgroundColor: colors.accent,
-                                borderColor: colors.accent,
-                              },
-                          {
-                            opacity: followWorking ? 0.7 : pressed ? 0.88 : 1,
-                            transform: [
-                              { scale: pressed && !followWorking ? 0.975 : 1 },
-                            ],
-                          },
-                        ]}
-                      >
-                        {followWorking ? (
-                          <ActivityIndicator
-                            size="small"
-                            color={isPending ? colors.muted : isFollowing ? colors.accent : "#ffffff"}
-                          />
-                        ) : isPending ? (
-                          <>
+                      </View> :
+
+              <Pressable
+                onPress={handleFollowAction}
+                disabled={followWorking}
+                style={({ pressed }) => [
+                isPending ?
+                styles.pendingBtn :
+                isFollowing ?
+                styles.followingBtn :
+                styles.followBtn,
+                isPending ?
+                {
+                  backgroundColor: colors.surfaceAlt,
+                  borderColor: colors.line
+                } :
+                isFollowing ?
+                {
+                  backgroundColor:
+                  colors.mode === "dark" ?
+                  "rgba(181, 167, 255, 0.16)" :
+                  "rgba(111, 86, 232, 0.12)",
+                  borderColor:
+                  colors.mode === "dark" ?
+                  "rgba(181, 167, 255, 0.38)" :
+                  "rgba(111, 86, 232, 0.32)"
+                } :
+                {
+                  backgroundColor: colors.accent,
+                  borderColor: colors.accent
+                },
+                {
+                  opacity: followWorking ? 0.7 : pressed ? 0.88 : 1,
+                  transform: [
+                  { scale: pressed && !followWorking ? 0.975 : 1 }]
+
+                }]
+                }>
+                
+                        {followWorking ?
+                <ActivityIndicator
+                  size="small"
+                  color={isPending ? colors.muted : isFollowing ? colors.accent : "#ffffff"} /> :
+
+                isPending ?
+                <>
                             <Feather
-                              name="clock"
-                              size={16}
-                              color={colors.muted}
-                              style={{ marginRight: 6 }}
-                            />
+                    name="clock"
+                    size={16}
+                    color={colors.muted}
+                    style={{ marginRight: 6 }} />
+                  
                             <Text
-                              style={[
-                                styles.pendingBtnText,
-                                { color: colors.muted },
-                              ]}
-                            >
+                    style={[
+                    styles.pendingBtnText,
+                    { color: colors.muted }]
+                    }>
+                    
                               Solicitado
                             </Text>
-                          </>
-                        ) : isFollowing ? (
-                          <>
+                          </> :
+                isFollowing ?
+                <>
                             <Feather
-                              name="check"
-                              size={16}
-                              color={colors.accent}
-                              style={{ marginRight: 6 }}
-                            />
+                    name="check"
+                    size={16}
+                    color={colors.accent}
+                    style={{ marginRight: 6 }} />
+                  
                             <Text
-                              style={[
-                                styles.followingBtnText,
-                                { color: colors.accent },
-                              ]}
-                            >
+                    style={[
+                    styles.followingBtnText,
+                    { color: colors.accent }]
+                    }>
+                    
                               Seguindo
                             </Text>
-                          </>
-                        ) : (
-                          <>
+                          </> :
+
+                <>
                             <Feather
-                              name="user-plus"
-                              size={16}
-                              color="#ffffff"
-                              style={{ marginRight: 6 }}
-                            />
+                    name="user-plus"
+                    size={16}
+                    color="#ffffff"
+                    style={{ marginRight: 6 }} />
+                  
                             <Text style={styles.followBtnText}>Seguir</Text>
                           </>
-                        )}
+                }
                       </Pressable>
-                    )}
+              }
 
-                {onOpenChat && (
-                      <Pressable
-                        onPress={() => {
-                          onClose();
-                          onOpenChat(profile || user);
-                        }}
-                        accessibilityLabel="Enviar mensagem"
-                        style={({ pressed }) => [
-                          styles.optionsIconBtn,
-                          {
-                            backgroundColor: colors.surfaceAlt,
-                            borderColor: colors.line,
-                            opacity: pressed ? 0.75 : 1,
-                            transform: [{ scale: pressed ? 0.94 : 1 }],
-                            marginRight: 8,
-                          },
-                        ]}
-                      >
+                {onOpenChat &&
+              <Pressable
+                onPress={() => {
+                  onClose();
+                  onOpenChat(profile || user);
+                }}
+                accessibilityLabel="Enviar mensagem"
+                style={({ pressed }) => [
+                styles.optionsIconBtn,
+                {
+                  backgroundColor: colors.surfaceAlt,
+                  borderColor: colors.line,
+                  opacity: pressed ? 0.75 : 1,
+                  transform: [{ scale: pressed ? 0.94 : 1 }],
+                  marginRight: 8
+                }]
+                }>
+                
                         <Feather
-                          name="message-circle"
-                          size={20}
-                          color={colors.text}
-                        />
+                  name="message-circle"
+                  size={20}
+                  color={colors.text} />
+                
                       </Pressable>
-                    )}
+              }
 
                     <Pressable
-                      onPress={() => setOptionsVisible(true)}
-                      accessibilityLabel="Opções do perfil"
-                      style={({ pressed }) => [
-                        styles.optionsIconBtn,
-                        {
-                          backgroundColor: colors.surfaceAlt,
-                          borderColor: colors.line,
-                          opacity: pressed ? 0.75 : 1,
-                          transform: [{ scale: pressed ? 0.94 : 1 }],
-                        },
-                      ]}
-                    >
+                onPress={() => setOptionsVisible(true)}
+                accessibilityLabel="Opções do perfil"
+                style={({ pressed }) => [
+                styles.optionsIconBtn,
+                {
+                  backgroundColor: colors.surfaceAlt,
+                  borderColor: colors.line,
+                  opacity: pressed ? 0.75 : 1,
+                  transform: [{ scale: pressed ? 0.94 : 1 }]
+                }]
+                }>
+                
                       <Feather
-                        name="more-horizontal"
-                        size={20}
-                        color={colors.text}
-                      />
+                  name="more-horizontal"
+                  size={20}
+                  color={colors.text} />
+                
                     </Pressable>
                   </View>
-                )}
+            }
 
-                {canViewContent && (
-                  <Text style={[styles.postsTitle, { color: colors.text }]}>
+                {canViewContent &&
+            <Text style={[styles.postsTitle, { color: colors.text }]}>
                     Publicações
                   </Text>
-                )}
-              </View>
             }
-            renderItem={({ item }) => (
-              <PostCard
-                post={item}
-                currentUser={user}
-                currentUserId={currentUserId}
-                onLike={() => handleToggleLike(item)}
-                onComment={() => setCommentPost(item)}
-                onRepost={() => setRepostModalPost(item)}
-                onOpenMedia={(media) => setFullscreenMedia(media)}
-                onOpenProfile={onOpenProfile}
-              />
-            )}
-            ListEmptyComponent={
-              !loading && (
-                canViewContent ? (
-                  <View style={styles.emptyContainer}>
+              </View>
+          }
+          renderItem={({ item }) =>
+          <PostCard
+            post={item}
+            currentUser={user}
+            currentUserId={currentUserId}
+            onLike={() => handleToggleLike(item)}
+            onComment={() => setCommentPost(item)}
+            onRepost={() => setRepostModalPost(item)}
+            onOpenMedia={(media) => setFullscreenMedia(media)}
+            onOpenProfile={onOpenProfile} />
+
+          }
+          ListEmptyComponent={
+          !loading && (
+          canViewContent ?
+          <View style={styles.emptyContainer}>
                     <EmptyState icon="message-circle">
                       Este perfil ainda não tem publicações.
                     </EmptyState>
-                  </View>
-                ) : (
-                  <View
-                    style={[
-                      styles.privateBox,
-                      {
-                        backgroundColor: colors.surface,
-                        borderColor: colors.line,
-                      },
-                    ]}
-                  >
+                  </View> :
+
+          <View
+            style={[
+            styles.privateBox,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.line
+            }]
+            }>
+            
                     <View
-                      style={[
-                        styles.privateIconCircle,
-                        { backgroundColor: colors.accentSoft },
-                      ]}
-                    >
+              style={[
+              styles.privateIconCircle,
+              { backgroundColor: colors.accentSoft }]
+              }>
+              
                       <Feather name="lock" size={28} color={colors.accent} />
                     </View>
                     <Text style={[styles.privateTitle, { color: colors.text }]}>
                       Conta Privada
                     </Text>
                     <Text
-                      style={[
-                        styles.privateSubtitle,
-                        { color: colors.muted },
-                      ]}
-                    >
+              style={[
+              styles.privateSubtitle,
+              { color: colors.muted }]
+              }>
+              
                       Este perfil e privado. Siga este perfil para ver suas
                       fotos e publicacoes.
                     </Text>
-                  </View>
-                )
-              )
-            }
-          />
-        )}
+                  </View>)
+
+
+          } />
+
+        }
 
         <ProfileOptionsModal
           user={profile || user}
           visible={optionsVisible}
           onClose={() => setOptionsVisible(false)}
           onBlock={block}
-          onReport={() => setReportModal(true)}
-        />
+          onReport={() => setReportModal(true)} />
+        
 
         <ReportModal
           visible={reportModal}
@@ -964,8 +964,8 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
           authorId={profile?.id || user?.id}
           targetName={`@${profile?.username || userName(profile ?? user)}`}
           onClose={() => setReportModal(false)}
-          onSuccess={handleReportSuccess}
-        />
+          onSuccess={handleReportSuccess} />
+        
 
         <FollowersModal
           visible={followersModalVisible}
@@ -976,15 +976,15 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
           onOpenProfile={(selectedUser) => {
             setFollowersModalVisible(false);
             onOpenProfile?.(selectedUser);
-          }}
-        />
+          }} />
+        
 
         <Comments
           post={commentPost}
           onClose={() => setCommentPost(null)}
           onOpenProfile={onOpenProfile}
-          currentUser={user}
-        />
+          currentUser={user} />
+        
 
         <RepostModal
           visible={Boolean(repostModalPost)}
@@ -994,19 +994,19 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
           onSuccess={(newPost) => {
             setPosts((prev) => [newPost, ...prev]);
             setRepostModalPost(null);
-          }}
-        />
+          }} />
+        
 
         <MediaViewerModal
           visible={Boolean(fullscreenMedia)}
           mediaUrl={fullscreenMedia?.url}
           mediaType={fullscreenMedia?.type || "image"}
           post={fullscreenMedia?.post}
-          onClose={() => setFullscreenMedia(null)}
-        />
+          onClose={() => setFullscreenMedia(null)} />
+        
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
@@ -1017,7 +1017,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     borderBottomWidth: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 16
   },
   title: { fontFamily: "Poppins_700Bold", fontSize: 16.5, textAlign: "center" },
   spacer: { width: 42, height: 42 },
@@ -1027,65 +1027,65 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 26,
     padding: 20,
-    marginBottom: 4,
+    marginBottom: 4
   },
   headerTopRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   statsContainer: {
     flexDirection: "row",
     flex: 1,
     justifyContent: "space-around",
     alignItems: "center",
-    marginLeft: 14,
+    marginLeft: 14
   },
   statItem: {
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   statNumber: {
     fontFamily: "Poppins_700Bold",
     fontSize: 18,
-    lineHeight: 24,
+    lineHeight: 24
   },
   statLabel: {
     fontFamily: "Poppins_400Regular",
     fontSize: 11.5,
-    marginTop: 1,
+    marginTop: 1
   },
   nameBlock: {
     marginTop: 16,
-    width: "100%",
+    width: "100%"
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    flexWrap: "wrap",
+    flexWrap: "wrap"
   },
   name: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 23,
+    fontSize: 23
   },
   handle: {
     fontFamily: "Poppins_500Medium",
     fontSize: 13,
-    marginTop: 2,
+    marginTop: 2
   },
   bio: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13.5,
     lineHeight: 21,
-    marginTop: 12,
+    marginTop: 12
   },
   actions: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     marginTop: 18,
-    width: "100%",
+    width: "100%"
   },
   followBtn: {
     flex: 1,
@@ -1095,12 +1095,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 16
   },
   followBtnText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 14,
-    color: "#ffffff",
+    color: "#ffffff"
   },
   followingBtn: {
     flex: 1,
@@ -1110,11 +1110,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 16
   },
   followingBtnText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 14,
+    fontSize: 14
   },
   pendingBtn: {
     flex: 1,
@@ -1124,11 +1124,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 16
   },
   pendingBtnText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 14,
+    fontSize: 14
   },
   optionsIconBtn: {
     width: 44,
@@ -1136,7 +1136,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   postsTitle: { fontFamily: "Poppins_700Bold", fontSize: 16, marginTop: 22 },
   post: { borderWidth: 1, borderRadius: 20, padding: 16 },
@@ -1147,7 +1147,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 48,
-    minHeight: 220,
+    minHeight: 220
   },
   privateBox: {
     alignItems: "center",
@@ -1156,7 +1156,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     marginTop: 14,
-    gap: 10,
+    gap: 10
   },
   privateIconCircle: {
     width: 60,
@@ -1164,22 +1164,22 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 4,
+    marginBottom: 4
   },
   privateTitle: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 17,
+    fontSize: 17
   },
   privateSubtitle: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
     textAlign: "center",
     lineHeight: 20,
-    maxWidth: 260,
+    maxWidth: 260
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.65)",
+    backgroundColor: "rgba(0, 0, 0, 0.65)"
   },
   optionsSheet: {
     position: "absolute",
@@ -1191,7 +1191,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 36,
+    paddingBottom: 36
   },
   optionsHandle: {
     width: 36,
@@ -1199,34 +1199,34 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: "#555",
     alignSelf: "center",
-    marginBottom: 16,
+    marginBottom: 16
   },
   optionsTitle: {
     fontFamily: "Poppins_700Bold",
     fontSize: 16,
     marginBottom: 16,
-    textAlign: "center",
+    textAlign: "center"
   },
   optionItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 14,
-    gap: 14,
+    gap: 14
   },
   optionIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   optionText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 15,
+    fontSize: 15
   },
   imageWrapper: {
     position: "relative",
-    width: "100%",
+    width: "100%"
   },
   nsfwContainer: {
     marginTop: 12,
@@ -1234,7 +1234,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     overflow: "hidden",
-    position: "relative",
+    position: "relative"
   },
   nsfwBadge: {
     position: "absolute",
@@ -1242,30 +1242,30 @@ const styles = StyleSheet.create({
     right: 12,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: 6
   },
   nsfwBadgeText: {
     color: "#FFFFFF",
     fontSize: 11,
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins_700Bold"
   },
   nsfwContent: {
     alignItems: "flex-start",
-    paddingRight: 40,
+    paddingRight: 40
   },
   nsfwHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 4
   },
   nsfwTitle: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   nsfwHint: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
-    marginBottom: 12,
+    marginBottom: 12
   },
   nsfwRevealBtn: {
     flexDirection: "row",
@@ -1273,11 +1273,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 1
   },
   nsfwRevealText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 12,
+    fontSize: 12
   },
   nsfwHideBadge: {
     position: "absolute",
@@ -1287,12 +1287,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 14,
+    borderRadius: 14
   },
   nsfwHideBadgeText: {
     color: "#FFFFFF",
     fontSize: 11,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   expandPill: {
     position: "absolute",
@@ -1305,11 +1305,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.15)",
+    borderColor: "rgba(255, 255, 255, 0.15)"
   },
   expandPillText: {
     color: "#FFFFFF",
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 11,
-  },
+    fontSize: 11
+  }
 });

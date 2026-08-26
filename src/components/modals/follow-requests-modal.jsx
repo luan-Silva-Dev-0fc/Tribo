@@ -7,8 +7,8 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { api } from "../../api";
@@ -17,16 +17,16 @@ import {
   formatRelativeTime,
   getUserAvatar,
   listFrom,
-  userName,
-} from "../../lib/format";
+  userName } from
+"../../lib/format";
 import { useTheme } from "../../theme";
 import {
   Avatar,
   Button,
   EmptyState,
   IconButton,
-  VerificationBadge,
-} from "../ui/ui";
+  VerificationBadge } from
+"../ui/ui";
 import { CustomModal } from "./CustomModal";
 
 export function FollowRequestsModal({
@@ -34,7 +34,7 @@ export function FollowRequestsModal({
   onClose,
   onOpenProfile,
   onOpenPost,
-  onRequestHandled,
+  onRequestHandled
 }) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -47,32 +47,32 @@ export function FollowRequestsModal({
     visible: false,
     type: "info",
     title: "",
-    message: "",
+    message: ""
   });
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [reqRes, notRes] = await Promise.all([
-        api.users.followRequests().catch(() => null),
-        api.notifications.list().catch(() => null),
-      ]);
+      api.users.followRequests().catch(() => null),
+      api.notifications.list().catch(() => null)]
+      );
       if (reqRes) setRequests(listFrom(reqRes, ["requests", "users", "data"]));
       if (notRes) {
         const rawNotif =
-          listFrom(notRes, ["notifications", "data"]) || notRes || [];
-        // Filtra dados de teste e notificações órfãs
-        const filtered = Array.isArray(rawNotif)
-          ? rawNotif.filter((n) => {
-              const msg = (n?.message || n?.text || "").trim().toLowerCase();
-              return (
-                msg &&
-                msg !== "test" &&
-                msg !== "test success" &&
-                msg !== "undefined"
-              );
-            })
-          : [];
+        listFrom(notRes, ["notifications", "data"]) || notRes || [];
+
+        const filtered = Array.isArray(rawNotif) ?
+        rawNotif.filter((n) => {
+          const msg = (n?.message || n?.text || "").trim().toLowerCase();
+          return (
+            msg &&
+            msg !== "test" &&
+            msg !== "test success" &&
+            msg !== "undefined");
+
+        }) :
+        [];
         setNotifications(filtered);
       }
     } catch (error) {
@@ -94,11 +94,11 @@ export function FollowRequestsModal({
       setActionLoadingId(item.id);
       await api.users.acceptRequest(requestId);
       setRequests((prev) =>
-        prev.filter(
-          (r) =>
-            String(r.id) !== String(item.id) &&
-            String(r.requestId) !== String(requestId),
-        ),
+      prev.filter(
+        (r) =>
+        String(r.id) !== String(item.id) &&
+        String(r.requestId) !== String(requestId)
+      )
       );
       onRequestHandled?.();
     } catch (error) {
@@ -106,7 +106,7 @@ export function FollowRequestsModal({
         visible: true,
         type: "error",
         title: "Erro",
-        message: errorMessage(error),
+        message: errorMessage(error)
       });
     } finally {
       setActionLoadingId(null);
@@ -119,11 +119,11 @@ export function FollowRequestsModal({
       setActionLoadingId(item.id);
       await api.users.rejectRequest(requestId);
       setRequests((prev) =>
-        prev.filter(
-          (r) =>
-            String(r.id) !== String(item.id) &&
-            String(r.requestId) !== String(requestId),
-        ),
+      prev.filter(
+        (r) =>
+        String(r.id) !== String(item.id) &&
+        String(r.requestId) !== String(requestId)
+      )
       );
       onRequestHandled?.();
     } catch (error) {
@@ -131,7 +131,7 @@ export function FollowRequestsModal({
         visible: true,
         type: "error",
         title: "Erro",
-        message: errorMessage(error),
+        message: errorMessage(error)
       });
     } finally {
       setActionLoadingId(null);
@@ -141,15 +141,15 @@ export function FollowRequestsModal({
   const parseNotification = (item) => {
     const actor = item.actor || item.sender || item.user || item.follower || {};
     const rawName =
-      item.actor_name ||
-      item.actorName ||
-      item.user_name ||
-      item.userName ||
-      userName(actor) ||
-      "Usuário";
+    item.actor_name ||
+    item.actorName ||
+    item.user_name ||
+    item.userName ||
+    userName(actor) ||
+    "Usuário";
     const name = rawName.startsWith("@") ? rawName : `@${rawName}`;
     const avatarUrl =
-      item.actor_avatar || item.actorAvatar || getUserAvatar(actor);
+    item.actor_avatar || item.actorAvatar || getUserAvatar(actor);
     const rawMsg = (item.message || item.text || item.content || "").trim();
     const type = (item.type || "").toUpperCase();
     const lowerMsg = rawMsg.toLowerCase();
@@ -175,10 +175,10 @@ export function FollowRequestsModal({
         actionLabel = "comentou na sua publicação";
       }
     } else if (
-      type === "FOLLOW" ||
-      lowerMsg.includes("seguir") ||
-      lowerMsg.includes("seguiu")
-    ) {
+    type === "FOLLOW" ||
+    lowerMsg.includes("seguir") ||
+    lowerMsg.includes("seguiu"))
+    {
       icon = "user-plus";
       iconBg = "#8b5cf6";
       notifType = "follow";
@@ -192,12 +192,12 @@ export function FollowRequestsModal({
 
     const timeAgo = formatRelativeTime(item.created_at || item.createdAt);
     const postMedia =
-      item.post_media ||
-      item.postMedia ||
-      item.media_url ||
-      item.thumbnail_url ||
-      item.post?.media_url ||
-      null;
+    item.post_media ||
+    item.postMedia ||
+    item.media_url ||
+    item.thumbnail_url ||
+    item.post?.media_url ||
+    null;
 
     return {
       actor,
@@ -208,7 +208,7 @@ export function FollowRequestsModal({
       actionLabel,
       notifType,
       timeAgo,
-      postMedia,
+      postMedia
     };
   };
 
@@ -224,9 +224,9 @@ export function FollowRequestsModal({
         onOpenProfile?.(parsed.actor);
       }
     } else if (
-      parsed.actor &&
-      (parsed.actor.id || parsed.actor._id || parsed.actor.username)
-    ) {
+    parsed.actor && (
+    parsed.actor.id || parsed.actor._id || parsed.actor.username))
+    {
       onClose();
       onOpenProfile?.(parsed.actor);
     }
@@ -237,35 +237,35 @@ export function FollowRequestsModal({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={[styles.page, { backgroundColor: "#000000" }]}>
-        {/* Cabeçalho com Safe Area Top */}
+        {}
         <View
           style={[
-            styles.bar,
-            {
-              paddingTop: Math.max(insets.top, 16),
-              paddingBottom: 14,
-              paddingHorizontal: 16,
-              backgroundColor: "#000000",
-              borderBottomColor: "#27272a",
-              borderBottomWidth: 1,
-            },
-          ]}
-        >
+          styles.bar,
+          {
+            paddingTop: Math.max(insets.top, 16),
+            paddingBottom: 14,
+            paddingHorizontal: 16,
+            backgroundColor: "#000000",
+            borderBottomColor: "#27272a",
+            borderBottomWidth: 1
+          }]
+          }>
+          
           <Pressable
             onPress={onClose}
             style={({ pressed }) => [
-              {
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                backgroundColor: "#18181b",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: pressed ? 0.7 : 1,
-              },
-            ]}
-            accessibilityLabel="Fechar notificações"
-          >
+            {
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              backgroundColor: "#18181b",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: pressed ? 0.7 : 1
+            }]
+            }
+            accessibilityLabel="Fechar notificações">
+            
             <Feather name="x" size={20} color="#FFFFFF" />
           </Pressable>
 
@@ -274,23 +274,23 @@ export function FollowRequestsModal({
           <View style={{ width: 36 }} />
         </View>
 
-        {/* Abas Superiores Modernas */}
+        {}
         <View style={styles.tabContainer}>
           <Pressable
             onPress={() => setActiveTab("notifications")}
             style={[
-              styles.tabItem,
-              activeTab === "notifications" && styles.tabItemActive,
-            ]}
-          >
+            styles.tabItem,
+            activeTab === "notifications" && styles.tabItemActive]
+            }>
+            
             <Text
               style={[
-                styles.tabText,
-                activeTab === "notifications"
-                  ? styles.tabTextActive
-                  : styles.tabTextInactive,
-              ]}
-            >
+              styles.tabText,
+              activeTab === "notifications" ?
+              styles.tabTextActive :
+              styles.tabTextInactive]
+              }>
+              
               Atividades
             </Text>
           </Pressable>
@@ -298,71 +298,71 @@ export function FollowRequestsModal({
           <Pressable
             onPress={() => setActiveTab("requests")}
             style={[
-              styles.tabItem,
-              activeTab === "requests" && styles.tabItemActive,
-            ]}
-          >
+            styles.tabItem,
+            activeTab === "requests" && styles.tabItemActive]
+            }>
+            
             <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-            >
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              
               <Text
                 style={[
-                  styles.tabText,
-                  activeTab === "requests"
-                    ? styles.tabTextActive
-                    : styles.tabTextInactive,
-                ]}
-              >
+                styles.tabText,
+                activeTab === "requests" ?
+                styles.tabTextActive :
+                styles.tabTextInactive]
+                }>
+                
                 Solicitações
               </Text>
-              {requests.length > 0 && (
-                <View style={styles.countBadge}>
+              {requests.length > 0 &&
+              <View style={styles.countBadge}>
                   <Text style={styles.countBadgeText}>{requests.length}</Text>
                 </View>
-              )}
+              }
             </View>
           </Pressable>
         </View>
 
-        {loading && requests.length === 0 && notifications.length === 0 ? (
-          <View style={styles.center}>
+        {loading && requests.length === 0 && notifications.length === 0 ?
+        <View style={styles.center}>
             <ActivityIndicator size="large" color="#0284c7" />
-          </View>
-        ) : activeTab === "requests" ? (
-          <FlatList
-            data={requests}
-            keyExtractor={(item, index) =>
-              String(item.id || item.requestId || index)
-            }
-            contentContainerStyle={styles.listContent}
-            refreshing={loading}
-            onRefresh={loadData}
-            ListEmptyComponent={
-              <EmptyState
-                title="Nenhuma solicitação"
-                message="Você não tem novas solicitações de seguidores."
-                icon="users"
-              />
-            }
-            renderItem={({ item }) => {
-              const isWorking = actionLoadingId === item.id;
-              const u = item?.follower || item?.user || item;
-              const realName = userName(u);
-              const rawHandle = u?.username || item?.username || "";
-              const handle = rawHandle ? rawHandle.replace(/^@/, "") : "";
+          </View> :
+        activeTab === "requests" ?
+        <FlatList
+          data={requests}
+          keyExtractor={(item, index) =>
+          String(item.id || item.requestId || index)
+          }
+          contentContainerStyle={styles.listContent}
+          refreshing={loading}
+          onRefresh={loadData}
+          ListEmptyComponent={
+          <EmptyState
+            title="Nenhuma solicitação"
+            message="Você não tem novas solicitações de seguidores."
+            icon="users" />
 
-              return (
-                <View style={styles.requestCard}>
+          }
+          renderItem={({ item }) => {
+            const isWorking = actionLoadingId === item.id;
+            const u = item?.follower || item?.user || item;
+            const realName = userName(u);
+            const rawHandle = u?.username || item?.username || "";
+            const handle = rawHandle ? rawHandle.replace(/^@/, "") : "";
+
+            return (
+              <View style={styles.requestCard}>
                   <Pressable
-                    style={({ pressed }) => [
-                      styles.userSection,
-                      { opacity: pressed ? 0.8 : 1 },
-                    ]}
-                    onPress={() => {
-                      onClose();
-                      onOpenProfile?.(u);
-                    }}
-                  >
+                  style={({ pressed }) => [
+                  styles.userSection,
+                  { opacity: pressed ? 0.8 : 1 }]
+                  }
+                  onPress={() => {
+                    onClose();
+                    onOpenProfile?.(u);
+                  }}>
+                  
                     <Avatar user={u} size={46} />
                     <View style={styles.userInfo}>
                       <View style={styles.nameRow}>
@@ -374,84 +374,84 @@ export function FollowRequestsModal({
                       <Text numberOfLines={1} style={styles.userHandle}>
                         @{handle || "tribo"}
                       </Text>
-                      {!!(u?.bio || item?.bio) && (
-                        <Text numberOfLines={1} style={styles.bioText}>
+                      {!!(u?.bio || item?.bio) &&
+                    <Text numberOfLines={1} style={styles.bioText}>
                           {u?.bio || item?.bio}
                         </Text>
-                      )}
+                    }
                     </View>
                   </Pressable>
 
                   <View style={styles.actionsRow}>
                     <Button
-                      title="Aceitar"
-                      icon="check"
-                      variant="accent"
-                      onPress={() => handleAccept(item)}
-                      loading={isWorking}
-                      disabled={isWorking}
-                      style={styles.actionBtn}
-                    />
+                    title="Aceitar"
+                    icon="check"
+                    variant="accent"
+                    onPress={() => handleAccept(item)}
+                    loading={isWorking}
+                    disabled={isWorking}
+                    style={styles.actionBtn} />
+                  
                     <Button
-                      title="Recusar"
-                      icon="x"
-                      variant="secondary"
-                      onPress={() => handleReject(item)}
-                      disabled={isWorking}
-                      style={styles.actionBtn}
-                    />
+                    title="Recusar"
+                    icon="x"
+                    variant="secondary"
+                    onPress={() => handleReject(item)}
+                    disabled={isWorking}
+                    style={styles.actionBtn} />
+                  
                   </View>
-                </View>
-              );
-            }}
-          />
-        ) : (
-          <FlatList
-            data={notifications}
-            keyExtractor={(item, index) => String(item.id || index)}
-            contentContainerStyle={styles.listContent}
-            refreshing={loading}
-            onRefresh={loadData}
-            ListEmptyComponent={
-              <EmptyState
-                title="Nenhuma atividade"
-                message="Quando as pessoas interagirem com você, as notificações aparecerão aqui."
-                icon="bell"
-              />
-            }
-            renderItem={({ item }) => {
-              const parsed = parseNotification(item);
+                </View>);
 
-              return (
-                <Pressable
-                  onPress={() => handlePressNotification(item, parsed)}
-                  style={({ pressed }) => [
-                    styles.notificationCard,
-                    {
-                      backgroundColor:
-                        item.is_read || item.isRead ? "#000000" : "#121214",
-                      opacity: pressed ? 0.75 : 1,
-                    },
-                  ]}
-                >
-                  {/* Avatar com Badge de Ação */}
+          }} /> :
+
+
+        <FlatList
+          data={notifications}
+          keyExtractor={(item, index) => String(item.id || index)}
+          contentContainerStyle={styles.listContent}
+          refreshing={loading}
+          onRefresh={loadData}
+          ListEmptyComponent={
+          <EmptyState
+            title="Nenhuma atividade"
+            message="Quando as pessoas interagirem com você, as notificações aparecerão aqui."
+            icon="bell" />
+
+          }
+          renderItem={({ item }) => {
+            const parsed = parseNotification(item);
+
+            return (
+              <Pressable
+                onPress={() => handlePressNotification(item, parsed)}
+                style={({ pressed }) => [
+                styles.notificationCard,
+                {
+                  backgroundColor:
+                  item.is_read || item.isRead ? "#000000" : "#121214",
+                  opacity: pressed ? 0.75 : 1
+                }]
+                }>
+                
+                  {}
                   <View style={styles.avatarContainer}>
                     <Avatar
-                      url={parsed.avatarUrl}
-                      fallback={parsed.name}
-                      size={46}
-                    />
+                    url={parsed.avatarUrl}
+                    fallback={parsed.name}
+                    size={46} />
+                  
                     <View
-                      style={[
-                        styles.actionBadge,
-                        { backgroundColor: parsed.iconBg },
-                      ]}
-                    >
+                    style={[
+                    styles.actionBadge,
+                    { backgroundColor: parsed.iconBg }]
+                    }>
+                    
                       <Feather name={parsed.icon} size={10} color="#FFFFFF" />
                     </View>
                   </View>
 
-                  {/* Conteúdo de Texto e Tempo */}
+                  {}
                   <View style={styles.notificationContent}>
                     <Text style={styles.notificationText}>
                       <Text style={styles.actorName}>{parsed.name} </Text>
@@ -464,32 +464,32 @@ export function FollowRequestsModal({
                     </Text>
                   </View>
 
-                  {/* Miniatura do Post OU Botão de Perfil */}
-                  {parsed.postMedia ? (
-                    <Image
-                      source={{ uri: parsed.postMedia }}
-                      style={styles.postThumbnail}
-                      resizeMode="cover"
-                    />
-                  ) : parsed.notifType === "follow" ? (
-                    <Pressable
-                      onPress={() => {
-                        onClose();
-                        onOpenProfile?.(parsed.actor);
-                      }}
-                      style={({ pressed }) => [
-                        styles.profileBtn,
-                        { opacity: pressed ? 0.7 : 1 },
-                      ]}
-                    >
+                  {}
+                  {parsed.postMedia ?
+                <Image
+                  source={{ uri: parsed.postMedia }}
+                  style={styles.postThumbnail}
+                  resizeMode="cover" /> :
+
+                parsed.notifType === "follow" ?
+                <Pressable
+                  onPress={() => {
+                    onClose();
+                    onOpenProfile?.(parsed.actor);
+                  }}
+                  style={({ pressed }) => [
+                  styles.profileBtn,
+                  { opacity: pressed ? 0.7 : 1 }]
+                  }>
+                  
                       <Text style={styles.profileBtnText}>Perfil</Text>
-                    </Pressable>
-                  ) : null}
-                </Pressable>
-              );
-            }}
-          />
-        )}
+                    </Pressable> :
+                null}
+                </Pressable>);
+
+          }} />
+
+        }
       </View>
 
       <CustomModal
@@ -497,10 +497,10 @@ export function FollowRequestsModal({
         type={modalAlert.type}
         title={modalAlert.title}
         message={modalAlert.message}
-        onClose={() => setModalAlert({ ...modalAlert, visible: false })}
-      />
-    </Modal>
-  );
+        onClose={() => setModalAlert({ ...modalAlert, visible: false })} />
+      
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
@@ -508,18 +508,18 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   title: {
     fontFamily: "Poppins_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
   tabContainer: {
     flexDirection: "row",
     backgroundColor: "#000000",
     borderBottomWidth: 1,
-    borderBottomColor: "#27272a",
+    borderBottomColor: "#27272a"
   },
   tabItem: {
     flex: 1,
@@ -527,37 +527,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderBottomWidth: 2,
-    borderBottomColor: "transparent",
+    borderBottomColor: "transparent"
   },
   tabItemActive: {
-    borderBottomColor: "#FFFFFF",
+    borderBottomColor: "#FFFFFF"
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 14
   },
   tabTextActive: {
     color: "#FFFFFF",
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   tabTextInactive: {
     color: "#A1A1AA",
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "Poppins_400Regular"
   },
   countBadge: {
     backgroundColor: "#ef4444",
     paddingHorizontal: 6,
     paddingVertical: 1,
-    borderRadius: 10,
+    borderRadius: 10
   },
   countBadgeText: {
     color: "#FFFFFF",
     fontSize: 11,
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins_700Bold"
   },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   listContent: {
     paddingVertical: 6,
-    flexGrow: 1,
+    flexGrow: 1
   },
   notificationCard: {
     flexDirection: "row",
@@ -565,11 +565,11 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255, 255, 255, 0.07)",
+    borderBottomColor: "rgba(255, 255, 255, 0.07)"
   },
   avatarContainer: {
     position: "relative",
-    marginRight: 12,
+    marginRight: 12
   },
   actionBadge: {
     position: "absolute",
@@ -581,34 +581,34 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#000000",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   notificationContent: {
     flex: 1,
-    marginRight: 10,
+    marginRight: 10
   },
   notificationText: {
     fontSize: 13.5,
-    lineHeight: 19,
+    lineHeight: 19
   },
   actorName: {
     fontFamily: "Poppins_600SemiBold",
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
   actionText: {
     fontFamily: "Poppins_400Regular",
-    color: "#E4E4E7",
+    color: "#E4E4E7"
   },
   timeText: {
     fontFamily: "Poppins_400Regular",
     color: "#A1A1AA",
-    fontSize: 12,
+    fontSize: 12
   },
   postThumbnail: {
     width: 44,
     height: 44,
     borderRadius: 8,
-    backgroundColor: "#18181b",
+    backgroundColor: "#18181b"
   },
   profileBtn: {
     paddingHorizontal: 14,
@@ -616,12 +616,12 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#18181b",
     borderWidth: 1,
-    borderColor: "#27272a",
+    borderColor: "#27272a"
   },
   profileBtnText: {
     color: "#FFFFFF",
     fontSize: 12,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   requestCard: {
     marginHorizontal: 16,
@@ -631,43 +631,43 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.08)",
     backgroundColor: "#121214",
-    gap: 12,
+    gap: 12
   },
   userSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 12
   },
   userInfo: {
-    flex: 1,
+    flex: 1
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 6
   },
   userName: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 14,
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
   userHandle: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
     color: "#A1A1AA",
-    marginTop: 1,
+    marginTop: 1
   },
   bioText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
     color: "#E4E4E7",
-    marginTop: 3,
+    marginTop: 3
   },
   actionsRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: 10
   },
   actionBtn: {
-    flex: 1,
-  },
+    flex: 1
+  }
 });

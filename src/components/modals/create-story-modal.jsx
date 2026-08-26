@@ -10,8 +10,8 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { api } from "../../api";
@@ -36,7 +36,7 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
       mediaTypes: ["images", "videos"],
       allowsEditing: true,
       aspect: [9, 16],
-      quality: 0.85,
+      quality: 0.85
     });
 
     if (!result.canceled && result.assets && result.assets[0]) {
@@ -55,7 +55,7 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
       mediaTypes: ["images", "videos"],
       allowsEditing: true,
       aspect: [9, 16],
-      quality: 0.85,
+      quality: 0.85
     });
 
     if (!result.canceled && result.assets && result.assets[0]) {
@@ -87,7 +87,7 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
         form.append("file", {
           uri: media.uri,
           name: fileName,
-          type: mimeType,
+          type: mimeType
         });
       }
 
@@ -111,108 +111,108 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.overlay}
-      >
+        style={styles.overlay}>
+        
         <View
           style={[
-            styles.container,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          {/* Header */}
+          styles.container,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border
+          }]
+          }>
+          
+          {}
           <View style={[styles.header, { borderBottomColor: colors.line }]}>
             <IconButton name="x" color={colors.text} onPress={handleClose} label="Fechar" />
             <Text style={[styles.headerTitle, { color: colors.text }]}>Novo Story</Text>
             <View style={{ width: 40 }} />
           </View>
 
-          {/* Media Preview or Picker Choices */}
-          {media ? (
-            <View style={styles.previewContainer}>
+          {}
+          {media ?
+          <View style={styles.previewContainer}>
               <Image source={{ uri: media.uri }} style={styles.previewMedia} resizeMode="cover" />
 
-              {/* Caption Overlay */}
+              {}
               <View
-                style={[
-                  styles.captionBar,
-                  {
-                    backgroundColor:
-                      colors.mode === "light"
-                        ? "rgba(255, 255, 255, 0.9)"
-                        : "rgba(18, 18, 18, 0.75)",
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
+              style={[
+              styles.captionBar,
+              {
+                backgroundColor:
+                colors.mode === "light" ?
+                "rgba(255, 255, 255, 0.9)" :
+                "rgba(18, 18, 18, 0.75)",
+                borderColor: colors.border
+              }]
+              }>
+              
                 <TextInput
-                  placeholder="Adicionar legenda..."
-                  placeholderTextColor={colors.muted}
-                  value={caption}
-                  onChangeText={setCaption}
-                  maxLength={200}
-                  style={[
-                    styles.captionInput,
-                    { color: colors.mode === "light" ? "#0F1419" : "#FFFFFF" },
-                  ]}
-                  editable={!uploading}
-                />
+                placeholder="Adicionar legenda..."
+                placeholderTextColor={colors.muted}
+                value={caption}
+                onChangeText={setCaption}
+                maxLength={200}
+                style={[
+                styles.captionInput,
+                { color: colors.mode === "light" ? "#0F1419" : "#FFFFFF" }]
+                }
+                editable={!uploading} />
+              
               </View>
 
-              {/* Bottom Actions */}
+              {}
               <View style={styles.bottomBar}>
                 <Pressable
-                  style={[
-                    styles.changeMediaBtn,
-                    {
-                      backgroundColor:
-                        colors.mode === "light"
-                          ? "rgba(255, 255, 255, 0.9)"
-                          : "rgba(24, 24, 24, 0.75)",
-                      borderColor: colors.border,
-                    },
-                  ]}
-                  onPress={() => !uploading && setMedia(null)}
-                >
+                style={[
+                styles.changeMediaBtn,
+                {
+                  backgroundColor:
+                  colors.mode === "light" ?
+                  "rgba(255, 255, 255, 0.9)" :
+                  "rgba(24, 24, 24, 0.75)",
+                  borderColor: colors.border
+                }]
+                }
+                onPress={() => !uploading && setMedia(null)}>
+                
                   <Feather
-                    name="refresh-cw"
-                    size={18}
-                    color={colors.mode === "light" ? "#0F1419" : "#FFFFFF"}
-                  />
+                  name="refresh-cw"
+                  size={18}
+                  color={colors.mode === "light" ? "#0F1419" : "#FFFFFF"} />
+                
                   <Text
-                    style={[
-                      styles.changeMediaText,
-                      { color: colors.mode === "light" ? "#0F1419" : "#FFFFFF" },
-                    ]}
-                  >
+                  style={[
+                  styles.changeMediaText,
+                  { color: colors.mode === "light" ? "#0F1419" : "#FFFFFF" }]
+                  }>
+                  
                     Trocar
                   </Text>
                 </Pressable>
 
                 <Pressable
-                  style={[
-                    styles.publishBtn,
-                    { backgroundColor: colors.primary || colors.accent },
-                    uploading && { opacity: 0.7 },
-                  ]}
-                  onPress={handleUpload}
-                  disabled={uploading}
-                >
-                  {uploading ? (
-                    <ActivityIndicator size="small" color="#ffffff" />
-                  ) : (
-                    <>
+                style={[
+                styles.publishBtn,
+                { backgroundColor: colors.primary || colors.accent },
+                uploading && { opacity: 0.7 }]
+                }
+                onPress={handleUpload}
+                disabled={uploading}>
+                
+                  {uploading ?
+                <ActivityIndicator size="small" color="#ffffff" /> :
+
+                <>
                       <Text style={styles.publishBtnText}>Publicar</Text>
                       <Feather name="send" size={16} color="#ffffff" style={{ marginLeft: 6 }} />
                     </>
-                  )}
+                }
                 </Pressable>
               </View>
-            </View>
-          ) : (
-            <View style={styles.pickerContainer}>
+            </View> :
+
+          <View style={styles.pickerContainer}>
               <View style={styles.pickerGraphic}>
                 <View style={[styles.iconCircle, { backgroundColor: colors.accentSoft }]}>
                   <Feather name="camera" size={40} color={colors.primary || colors.accent} />
@@ -228,11 +228,11 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
               <View style={styles.pickerButtons}>
                 <Pressable style={styles.pickerOption} onPress={takePhoto}>
                   <View
-                    style={[
-                      styles.pickerOptionIcon,
-                      { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
-                    ]}
-                  >
+                  style={[
+                  styles.pickerOptionIcon,
+                  { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]
+                  }>
+                  
                     <Feather name="camera" size={24} color={colors.text} />
                   </View>
                   <Text style={[styles.pickerOptionText, { color: colors.text }]}>Câmera</Text>
@@ -240,29 +240,29 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
 
                 <Pressable style={styles.pickerOption} onPress={pickMedia}>
                   <View
-                    style={[
-                      styles.pickerOptionIcon,
-                      { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
-                    ]}
-                  >
+                  style={[
+                  styles.pickerOptionIcon,
+                  { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]
+                  }>
+                  
                     <Feather name="image" size={24} color={colors.text} />
                   </View>
                   <Text style={[styles.pickerOptionText, { color: colors.text }]}>Galeria</Text>
                 </Pressable>
               </View>
             </View>
-          )}
+          }
         </View>
       </KeyboardAvoidingView>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.65)",
-    justifyContent: "flex-end",
+    justifyContent: "flex-end"
   },
   container: {
     flex: 1,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     overflow: "hidden",
     marginTop: Platform.OS === "ios" ? 44 : 20,
-    borderTopWidth: 1,
+    borderTopWidth: 1
   },
   header: {
     height: 58,
@@ -279,21 +279,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    zIndex: 10,
+    zIndex: 10
   },
   headerTitle: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 16,
+    fontSize: 16
   },
   previewContainer: {
     flex: 1,
     position: "relative",
-    padding: 12,
+    padding: 12
   },
   previewMedia: {
     width: "100%",
     height: "100%",
-    borderRadius: 24,
+    borderRadius: 24
   },
   captionBar: {
     position: "absolute",
@@ -303,12 +303,12 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 18,
     paddingVertical: 12,
-    borderWidth: 1,
+    borderWidth: 1
   },
   captionInput: {
     fontFamily: "Poppins_400Regular",
     fontSize: 15,
-    minHeight: 24,
+    minHeight: 24
   },
   bottomBar: {
     position: "absolute",
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     right: 24,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   changeMediaBtn: {
     flexDirection: "row",
@@ -326,11 +326,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 28,
     borderWidth: 1,
-    gap: 8,
+    gap: 8
   },
   changeMediaText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   publishBtn: {
     flexDirection: "row",
@@ -342,22 +342,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
-    elevation: 4,
+    elevation: 4
   },
   publishBtnText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 14,
-    color: "#ffffff",
+    color: "#ffffff"
   },
   pickerContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 24,
+    paddingHorizontal: 24
   },
   pickerGraphic: {
     alignItems: "center",
-    marginBottom: 48,
+    marginBottom: 48
   },
   iconCircle: {
     width: 88,
@@ -365,27 +365,27 @@ const styles = StyleSheet.create({
     borderRadius: 44,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 20
   },
   pickerHeading: {
     fontFamily: "Poppins_700Bold",
     fontSize: 20,
-    textAlign: "center",
+    textAlign: "center"
   },
   pickerSubheading: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
     textAlign: "center",
     marginTop: 6,
-    maxWidth: 280,
+    maxWidth: 280
   },
   pickerButtons: {
     flexDirection: "row",
-    gap: 28,
+    gap: 28
   },
   pickerOption: {
     alignItems: "center",
-    gap: 10,
+    gap: 10
   },
   pickerOptionIcon: {
     width: 72,
@@ -393,10 +393,10 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
+    borderWidth: 1
   },
   pickerOptionText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13.5,
-  },
+    fontSize: 13.5
+  }
 });

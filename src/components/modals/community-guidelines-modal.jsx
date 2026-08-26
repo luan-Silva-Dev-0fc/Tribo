@@ -5,8 +5,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../theme";
@@ -47,66 +47,66 @@ export function CommunityGuidelinesModal({ onAccepted }) {
   if (loadingStorage || !visible) return null;
 
   const guidelinesList = [
-    {
-      icon: "users",
-      title: "Respeito Mútuo",
-      description:
-        "Não toleramos discurso de ódio, assédio, discriminação ou qualquer forma de bullying.",
-    },
-    {
-      icon: "eye-off",
-      title: "Conteúdo Seguro",
-      description:
-        "Conteúdos adultos (+18) só são permitidos se a opção for ativada. Shitposts e memes são liberados, respeitando as regras digitais do ECA Digital (Lei nº 15.211/2025).",
-    },
-    {
-      icon: "check-circle",
-      title: "Autenticidade",
-      description:
-        "Não publique spam, fake news, golpes ou mídias de terceiros sem autorização.",
-    },
-    {
-      icon: "activity",
-      title: "Moderação Ativa",
-      description:
-        "Mídias enviadas passam por moderação automática (Sightengine). Violações graves podem levar ao banimento da conta.",
-    },
-  ];
+  {
+    icon: "users",
+    title: "Respeito Mútuo",
+    description:
+    "Não toleramos discurso de ódio, assédio, discriminação ou qualquer forma de bullying."
+  },
+  {
+    icon: "eye-off",
+    title: "Conteúdo Seguro",
+    description:
+    "Conteúdos adultos (+18) só são permitidos se a opção for ativada. Shitposts e memes são liberados, respeitando as regras digitais do ECA Digital (Lei nº 15.211/2025)."
+  },
+  {
+    icon: "check-circle",
+    title: "Autenticidade",
+    description:
+    "Não publique spam, fake news, golpes ou mídias de terceiros sem autorização."
+  },
+  {
+    icon: "activity",
+    title: "Moderação Ativa",
+    description:
+    "Mídias enviadas passam por moderação automática (Sightengine). Violações graves podem levar ao banimento da conta."
+  }];
+
 
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      statusBarTranslucent
-    >
+      statusBarTranslucent>
+      
       <View style={styles.overlay}>
         <View
           style={[
-            styles.card,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          {/* Header Icon */}
+          styles.card,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border
+          }]
+          }>
+          
+          {}
           <View
             style={[
-              styles.iconWrapper,
-              {
-                backgroundColor: colors.accentSoft || "rgba(29, 155, 240, 0.15)",
-              },
-            ]}
-          >
+            styles.iconWrapper,
+            {
+              backgroundColor: colors.accentSoft || "rgba(29, 155, 240, 0.15)"
+            }]
+            }>
+            
             <Feather
               name="shield"
               size={28}
-              color={colors.primary || colors.accent}
-            />
+              color={colors.primary || colors.accent} />
+            
           </View>
 
-          {/* Header Texts */}
+          {}
           <Text style={[styles.title, { color: colors.text }]}>
             Bem-vindo à Tribo: Diretrizes da Comunidade
           </Text>
@@ -114,36 +114,36 @@ export function CommunityGuidelinesModal({ onAccepted }) {
             Para manter nossa comunidade segura e agradável para todos, siga nossas regras:
           </Text>
 
-          {/* Guidelines Topics */}
+          {}
           <ScrollView
             style={styles.topicsScroll}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.topicsContent}
-          >
-            {guidelinesList.map((item, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.topicRow,
-                  {
-                    backgroundColor: colors.surfaceAlt || colors.background,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
+            contentContainerStyle={styles.topicsContent}>
+            
+            {guidelinesList.map((item, index) =>
+            <View
+              key={index}
+              style={[
+              styles.topicRow,
+              {
+                backgroundColor: colors.surfaceAlt || colors.background,
+                borderColor: colors.border
+              }]
+              }>
+              
                 <View
-                  style={[
-                    styles.topicIconContainer,
-                    {
-                      backgroundColor: colors.card,
-                    },
-                  ]}
-                >
+                style={[
+                styles.topicIconContainer,
+                {
+                  backgroundColor: colors.card
+                }]
+                }>
+                
                   <Feather
-                    name={item.icon}
-                    size={18}
-                    color={colors.primary || colors.accent}
-                  />
+                  name={item.icon}
+                  size={18}
+                  color={colors.primary || colors.accent} />
+                
                 </View>
                 <View style={styles.topicTextContainer}>
                   <Text style={[styles.topicTitle, { color: colors.text }]}>
@@ -154,32 +154,32 @@ export function CommunityGuidelinesModal({ onAccepted }) {
                   </Text>
                 </View>
               </View>
-            ))}
+            )}
           </ScrollView>
 
-          {/* Accept Button */}
+          {}
           <Pressable
             style={({ pressed }) => [
-              styles.acceptButton,
-              {
-                backgroundColor: colors.primary || colors.accent,
-                opacity: pressed ? 0.85 : 1,
-              },
-            ]}
-            onPress={handleAccept}
-          >
+            styles.acceptButton,
+            {
+              backgroundColor: colors.primary || colors.accent,
+              opacity: pressed ? 0.85 : 1
+            }]
+            }
+            onPress={handleAccept}>
+            
             <Feather
               name="check"
               size={18}
               color="#FFFFFF"
-              style={{ marginRight: 8 }}
-            />
+              style={{ marginRight: 8 }} />
+            
             <Text style={styles.acceptButtonText}>Entendi e Aceito</Text>
           </Pressable>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 32,
+    paddingVertical: 32
   },
   card: {
     width: "100%",
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
     shadowRadius: 20,
-    elevation: 10,
+    elevation: 10
   },
   iconWrapper: {
     width: 60,
@@ -211,28 +211,28 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 16
   },
   title: {
     fontFamily: "Poppins_700Bold",
     fontSize: 17,
     textAlign: "center",
     marginBottom: 6,
-    lineHeight: 24,
+    lineHeight: 24
   },
   subtitle: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
     textAlign: "center",
     marginBottom: 18,
-    lineHeight: 18,
+    lineHeight: 18
   },
   topicsScroll: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 20
   },
   topicsContent: {
-    gap: 10,
+    gap: 10
   },
   topicRow: {
     flexDirection: "row",
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 18,
     borderWidth: 1,
-    gap: 12,
+    gap: 12
   },
   topicIconContainer: {
     width: 36,
@@ -248,20 +248,20 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 2,
+    marginTop: 2
   },
   topicTextContainer: {
-    flex: 1,
+    flex: 1
   },
   topicTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 13.5,
-    marginBottom: 3,
+    marginBottom: 3
   },
   topicDescription: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
-    lineHeight: 17,
+    lineHeight: 17
   },
   acceptButton: {
     width: "100%",
@@ -269,13 +269,13 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   acceptButtonText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 14,
-    color: "#FFFFFF",
-  },
+    color: "#FFFFFF"
+  }
 });
 
 export default CommunityGuidelinesModal;

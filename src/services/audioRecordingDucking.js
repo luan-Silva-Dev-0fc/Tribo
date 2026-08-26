@@ -6,9 +6,9 @@ const recordingListeners = new Set();
 const scrollListeners = new Set();
 let isRecordingActive = false;
 
-/**
- * Define se a gravação de áudio de voz está ativa
- */
+
+
+
 export function setAudioRecordingActive(active) {
   const nextVal = Boolean(active);
   if (isRecordingActive === nextVal) return;
@@ -34,13 +34,13 @@ export function subscribeAudioRecording(listener) {
   };
 }
 
-/**
- * Notifica os stickers visíveis quando a lista de mensagens sofre rolagem (Scroll)
- */
+
+
+
 let lastScrollNotify = 0;
 export function notifyChatScroll() {
   const now = Date.now();
-  if (now - lastScrollNotify < 16) return; // ~60fps throttle
+  if (now - lastScrollNotify < 16) return;
   lastScrollNotify = now;
   scrollListeners.forEach((listener) => {
     try {
@@ -56,9 +56,9 @@ export function subscribeChatScroll(listener) {
   };
 }
 
-/**
- * Configuração global do modo de áudio permitindo gravação e reprodução simultâneas sem interrupção (MixWithOthers / DuckOthers)
- */
+
+
+
 export async function setOptimizedAudioMode(forRecording = false) {
   try {
     await Audio.setAudioModeAsync({
@@ -68,7 +68,7 @@ export async function setOptimizedAudioMode(forRecording = false) {
       interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
       interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
       shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: false,
+      playThroughEarpieceAndroid: false
     });
   } catch (e) {
     console.warn("Aviso ao configurar modo de áudio:", e?.message);
@@ -84,7 +84,7 @@ export async function setLiveVoiceAudioMode(active = true) {
       interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
       interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
       shouldDuckAndroid: false,
-      playThroughEarpieceAndroid: false,
+      playThroughEarpieceAndroid: false
     });
   } catch (e) {
     console.warn("Aviso ao configurar modo de áudio ao vivo:", e?.message);
@@ -95,14 +95,14 @@ export async function initGlobalAudioMode() {
   return setOptimizedAudioMode(false);
 }
 
-/**
- * Hook de Áudio Espacial e Ducking Suave para Figurinhas de Vídeo
- * - Loop Contínuo: reprodução contínua e infinita (player.loop = true, player.play()).
- * - NUNCA PAUSA: ao gravar áudio, o vídeo e a fala continuam rodando sem travamento.
- * - Proximidade do Centro: volume máximo (1.0) no centro da tela, fade out suave nas bordas e 0 fora da tela.
- * - Ducking na Gravação: volume multiplicado por 0.18 quando gravando voz.
- * - Equação: volume = proximityFactor * (isRecording ? 0.18 : 1.0)
- */
+
+
+
+
+
+
+
+
 export function useStickerSpatialAudio(player, containerRef) {
   const proximityRef = useRef(1.0);
   const isRecordingRef = useRef(isRecordingActive);
@@ -147,10 +147,10 @@ export function useStickerSpatialAudio(player, containerRef) {
         const maxDistance = screenHeight * 0.45;
 
         let proximityFactor = 0;
-        // Se estiver dentro da área visível vertical da tela
+
         if (y + height > 0 && y < screenHeight) {
           proximityFactor = Math.max(0, 1 - distanceFromCenter / maxDistance);
-          // Curva suave de aproximação
+
           proximityFactor = Math.pow(proximityFactor, 2);
         }
 
@@ -169,23 +169,23 @@ export function useStickerSpatialAudio(player, containerRef) {
     isMountedRef.current = true;
     if (!player) return;
 
-    // 1. Garante reprodução contínua em loop infinito sem pausa
+
     try {
       player.loop = true;
       Promise.resolve(player.play()).catch(() => {});
     } catch (e) {}
 
-    // 2. Medições iniciais
+
     measureAndApply();
     const t1 = setTimeout(measureAndApply, 100);
     const t2 = setTimeout(measureAndApply, 350);
 
-    // 3. Ouvir rolagem do chat para recalcular áudio espacial
+
     const unsubscribeScroll = subscribeChatScroll(() => {
       measureAndApply();
     });
 
-    // 4. Ouvir gravação de áudio para aplicar ducking gradual sem pausar o player
+
     const unsubscribeRecording = subscribeAudioRecording((isRec) => {
       if (!isMountedRef.current) return;
       isRecordingRef.current = isRec;

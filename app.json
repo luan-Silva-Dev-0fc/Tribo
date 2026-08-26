@@ -18,7 +18,6 @@
       }
     },
     "androidNavigationBar": {
-      "visible": "always",
       "barStyle": "dark-content",
       "backgroundColor": "#00000000"
     },
@@ -29,7 +28,6 @@
       "expo-secure-store",
       "expo-font",
       "expo-web-browser",
-      "@react-native-google-signin/google-signin",
       "expo-video",
       [
         "expo-av",

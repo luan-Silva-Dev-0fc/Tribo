@@ -3,9 +3,9 @@ import { api } from "../api";
 
 const STORAGE_KEY = "tribo.user_stickers.v1";
 
-/**
- * Retorna todas as figurinhas salvas no inventário (mesclando API e cache local)
- */
+
+
+
 export async function getSavedStickers(packName = null) {
   let localList = [];
   try {
@@ -15,12 +15,12 @@ export async function getSavedStickers(packName = null) {
 
   try {
     const res = await api.stickers.listMyInventory(packName);
-    const remoteList = Array.isArray(res)
-      ? res
-      : res?.stickers || res?.data?.stickers || res?.data || [];
+    const remoteList = Array.isArray(res) ?
+    res :
+    res?.stickers || res?.data?.stickers || res?.data || [];
 
     if (Array.isArray(remoteList) && remoteList.length > 0) {
-      // Mescla sem duplicatas (por video_url ou id)
+
       const map = new Map();
       remoteList.forEach((s) => {
         const key = s.video_url || s.videoUrl || s.id;
@@ -36,7 +36,7 @@ export async function getSavedStickers(packName = null) {
       return filterByPack(merged, packName);
     }
   } catch (e) {
-    // Se a API falhar ou estiver offline, usa o cache local
+
   }
 
   return filterByPack(localList, packName);
@@ -49,9 +49,9 @@ function filterByPack(list, packName) {
   );
 }
 
-/**
- * Salva uma figurinha no inventário pessoal
- */
+
+
+
 export async function saveStickerToInventory(sticker) {
   if (!sticker) return false;
   const videoUrl = sticker.video_url || sticker.videoUrl || sticker.media_url || sticker.url;
@@ -66,15 +66,15 @@ export async function saveStickerToInventory(sticker) {
     pack_name: sticker.pack_name || sticker.packName || "Gerais",
     author_name: sticker.author_name || sticker.authorName || "Tribo",
     description: sticker.description || null,
-    saved_at: new Date().toISOString(),
+    saved_at: new Date().toISOString()
   };
 
-  // 1. Salva no cache local imediatamente
+
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     const list = raw ? JSON.parse(raw) : [];
     const exists = list.some(
-      (s) => (s.id === stickerId || s.video_url === videoUrl)
+      (s) => s.id === stickerId || s.video_url === videoUrl
     );
     if (!exists) {
       list.unshift(cleanSticker);
@@ -82,7 +82,7 @@ export async function saveStickerToInventory(sticker) {
     }
   } catch (e) {}
 
-  // 2. Persiste no backend
+
   try {
     await api.stickers.favorite(stickerId, cleanSticker);
   } catch (e) {
@@ -92,9 +92,9 @@ export async function saveStickerToInventory(sticker) {
   return true;
 }
 
-/**
- * Remove uma figurinha do inventário pessoal
- */
+
+
+
 export async function removeStickerFromInventory(stickerId, videoUrl) {
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -115,17 +115,17 @@ export async function removeStickerFromInventory(stickerId, videoUrl) {
   return true;
 }
 
-/**
- * Verifica se uma figurinha já está salva
- */
+
+
+
 export async function isStickerInInventory(stickerId, videoUrl) {
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     const list = JSON.parse(raw);
     return list.some(
-      (s) => (stickerId && (s.id === stickerId || s.sticker_id === stickerId)) ||
-             (videoUrl && s.video_url === videoUrl)
+      (s) => stickerId && (s.id === stickerId || s.sticker_id === stickerId) ||
+      videoUrl && s.video_url === videoUrl
     );
   } catch (e) {
     return false;

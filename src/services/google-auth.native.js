@@ -1,13 +1,13 @@
 import {
   GoogleSignin,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
+  statusCodes } from
+"@react-native-google-signin/google-signin";
 import { api, session } from "../api";
 import { supabase } from "../lib/supabase";
 import { unwrap } from "../lib/format";
 
 export const GOOGLE_WEB_CLIENT_ID =
-  "182013147973-obbsctpkrptmnf1bco7kua29i24bvviq.apps.googleusercontent.com";
+"182013147973-obbsctpkrptmnf1bco7kua29i24bvviq.apps.googleusercontent.com";
 
 let isConfigured = false;
 
@@ -16,7 +16,7 @@ export function configureGoogleSignIn() {
   try {
     GoogleSignin.configure({
       webClientId: GOOGLE_WEB_CLIENT_ID,
-      offlineAccess: false,
+      offlineAccess: false
     });
     isConfigured = true;
   } catch (err) {
@@ -24,20 +24,20 @@ export function configureGoogleSignIn() {
   }
 }
 
-/**
- * Executa o fluxo de autenticação nativa com o Google no Android / iOS.
- * Suporta login direto e retorno de dados para auto-preenchimento no cadastro.
- */
+
+
+
+
 export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
   try {
     configureGoogleSignIn();
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
-    // Força a tela de seleção de conta deslogando a sessão anterior do aparelho
+
     try {
       await GoogleSignin.signOut();
     } catch (e) {
-      // Ignora erro se não houver usuário logado no GoogleSignin local
+
     }
 
     const response = await GoogleSignin.signIn();
@@ -48,15 +48,15 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
       idToken,
       email: googleUser.email || response?.data?.user?.email || "",
       fullName:
-        googleUser.name ||
-        [googleUser.givenName, googleUser.familyName]
-          .filter(Boolean)
-          .join(" ") ||
-        "",
+      googleUser.name ||
+      [googleUser.givenName, googleUser.familyName].
+      filter(Boolean).
+      join(" ") ||
+      "",
       givenName: googleUser.givenName || "",
       familyName: googleUser.familyName || "",
       avatarUrl: googleUser.photo || "",
-      isGoogleProvider: true,
+      isGoogleProvider: true
     };
 
     if (!idToken && !profileData.email) {
@@ -68,21 +68,21 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
     let authenticatedUser = null;
     let token = null;
 
-    // 1. Tenta autenticar diretamente com a API da Tribo
+
     try {
       if (idToken) {
         const backendRes = await api.auth.google(idToken);
         token =
-          backendRes?.token ||
-          backendRes?.data?.token ||
-          backendRes?.accessToken;
+        backendRes?.token ||
+        backendRes?.data?.token ||
+        backendRes?.accessToken;
         if (token) {
           await session.save(token);
         }
         authenticatedUser =
-          unwrap(backendRes, "user") ||
-          backendRes?.user ||
-          backendRes?.data?.user;
+        unwrap(backendRes, "user") ||
+        backendRes?.user ||
+        backendRes?.data?.user;
       }
     } catch (backendError) {
       console.warn(
@@ -90,14 +90,14 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
         backendError?.message
       );
 
-      // 2. Tenta via Supabase signInWithIdToken
+
       if (idToken && supabase?.auth?.signInWithIdToken) {
         try {
           const { data: supaData, error: supaError } =
-            await supabase.auth.signInWithIdToken({
-              provider: "google",
-              token: idToken,
-            });
+          await supabase.auth.signInWithIdToken({
+            provider: "google",
+            token: idToken
+          });
 
           if (!supaError && supaData?.user) {
             token = supaData?.session?.access_token;
@@ -118,11 +118,11 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
         idToken,
         user: authenticatedUser,
         token,
-        googleProfile: profileData,
+        googleProfile: profileData
       };
     }
 
-    // Se não logou diretamente (usuário novo que precisa cadastrar/completar perfil):
+
     if (onNewUser) {
       onNewUser(profileData);
     }
@@ -131,7 +131,7 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
       idToken,
       user: authenticatedUser,
       token,
-      googleProfile: profileData,
+      googleProfile: profileData
     };
   } catch (error) {
     if (error?.code === statusCodes?.SIGN_IN_CANCELLED) {

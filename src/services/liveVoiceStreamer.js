@@ -2,9 +2,9 @@ import { Platform } from "react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system/legacy";
 
-/**
- * Gerenciador de Streaming Real de Voz ao Vivo (Microfone -> WebSockets)
- */
+
+
+
 class LiveVoiceStreamer {
   constructor() {
     this.isStreaming = false;
@@ -13,22 +13,22 @@ class LiveVoiceStreamer {
     this.nativeRecordingLoop = null;
   }
 
-  /**
-   * Inicia o streaming contínuo do microfone para o WebSocket
-   */
+
+
+
   async startStreaming({ groupId, user, socket, onChunkSent, onError }) {
     if (this.isStreaming) return;
     this.isStreaming = true;
 
     try {
       if (Platform.OS === "web" && typeof navigator !== "undefined" && navigator.mediaDevices) {
-        // --- AMBIENTE WEB: MediaRecorder com chunks a cada 600ms ---
+
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
-            autoGainControl: true,
-          },
+            autoGainControl: true
+          }
         });
         this.mediaStream = stream;
 
@@ -56,7 +56,7 @@ class LiveVoiceStreamer {
                     user,
                     audioBase64: base64Data,
                     mimeType: event.data.type || "audio/webm",
-                    timestamp: Date.now(),
+                    timestamp: Date.now()
                   });
                   onChunkSent?.();
                 }
@@ -68,16 +68,16 @@ class LiveVoiceStreamer {
           }
         };
 
-        // Dispara chunks contínuos a cada 600ms
+
         recorder.start(600);
         console.log("[LIVE VOICE STREAMER] Transmissão Web iniciada com chunks a cada 600ms.");
       } else {
-        // --- AMBIENTE MOBILE NATIVO (iOS / Android) via expo-av loop ---
+
         await Audio.requestPermissionsAsync();
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: true,
           playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
+          staysActiveInBackground: true
         });
 
         const recordChunkLoop = async () => {
@@ -91,7 +91,7 @@ class LiveVoiceStreamer {
                 audioEncoder: Audio.AndroidAudioEncoder.AAC,
                 sampleRate: 22050,
                 numberOfChannels: 1,
-                bitRate: 32000,
+                bitRate: 32000
               },
               ios: {
                 extension: ".m4a",
@@ -101,9 +101,9 @@ class LiveVoiceStreamer {
                 bitRate: 32000,
                 linearPCMBitDepth: 16,
                 linearPCMIsBigEndian: false,
-                linearPCMIsFloat: false,
+                linearPCMIsFloat: false
               },
-              web: {},
+              web: {}
             });
 
             await recording.startAsync();
@@ -118,7 +118,7 @@ class LiveVoiceStreamer {
             const uri = recording.getURI();
             if (uri && this.isStreaming) {
               const base64 = await FileSystem.readAsStringAsync(uri, {
-                encoding: FileSystem.EncodingType.Base64,
+                encoding: FileSystem.EncodingType.Base64
               });
               if (socket && base64) {
                 socket.emit("group-live-voice-chunk", {
@@ -126,7 +126,7 @@ class LiveVoiceStreamer {
                   user,
                   audioBase64: "data:audio/m4a;base64," + base64,
                   mimeType: "audio/m4a",
-                  timestamp: Date.now(),
+                  timestamp: Date.now()
                 });
                 onChunkSent?.();
               }
@@ -150,9 +150,9 @@ class LiveVoiceStreamer {
     }
   }
 
-  /**
-   * Encerra a captura de áudio do microfone
-   */
+
+
+
   stopStreaming() {
     this.isStreaming = false;
 
@@ -180,20 +180,20 @@ class LiveVoiceStreamer {
     console.log("[LIVE VOICE STREAMER] Transmissão de microfone encerrada.");
   }
 
-  /**
-   * Reproduz um chunk de áudio recebido via WebSocket
-   */
+
+
+
   async playChunk(payload, currentUserId) {
     if (!payload?.audioBase64) return;
-    // Não reproduzir o próprio eco
+
     if (currentUserId && String(payload.user?.id) === String(currentUserId)) {
       return;
     }
 
     try {
-      const soundUri = payload.audioBase64.startsWith("data:")
-        ? payload.audioBase64
-        : "data:" + (payload.mimeType || "audio/webm") + ";base64," + payload.audioBase64;
+      const soundUri = payload.audioBase64.startsWith("data:") ?
+      payload.audioBase64 :
+      "data:" + (payload.mimeType || "audio/webm") + ";base64," + payload.audioBase64;
 
       if (Platform.OS === "web" && typeof window !== "undefined") {
         const audioEl = new window.Audio(soundUri);
@@ -211,7 +211,7 @@ class LiveVoiceStreamer {
         });
       }
     } catch (e) {
-      // Ignora pequenos erros de decodificação de fragmentos
+
     }
   }
 }

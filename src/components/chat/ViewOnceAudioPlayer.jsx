@@ -4,8 +4,8 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system/legacy";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -14,7 +14,7 @@ import { useTheme } from "../../theme";
 export function ViewOnceAudioPlayer({
   item,
   isMe,
-  onExpire,
+  onExpire
 }) {
   const { colors } = useTheme();
   const [sound, setSound] = useState(null);
@@ -24,7 +24,7 @@ export function ViewOnceAudioPlayer({
   const [duration, setDuration] = useState(1);
   const [playsCount, setPlaysCount] = useState(item?.plays_count || item?.playsCount || 0);
   const [isExpired, setIsExpired] = useState(
-    Boolean(item?.is_expired || item?.isExpired || (item?.plays_count >= 2))
+    Boolean(item?.is_expired || item?.isExpired || item?.plays_count >= 2)
   );
 
   const audioUrl = item.audio_url || item.audioUrl || item.media_url || item.url;
@@ -65,7 +65,7 @@ export function ViewOnceAudioPlayer({
       setLoading(true);
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
+        playsInSilentModeIOS: true
       });
 
       const { sound: newSound } = await Audio.Sound.createAsync(
@@ -98,7 +98,7 @@ export function ViewOnceAudioPlayer({
 
       if (nextCount >= 2) {
         setIsExpired(true);
-        // Exclui do armazenamento local / cache se aplicável
+
         if (typeof audioUrl === "string" && audioUrl.startsWith("file://")) {
           try {
             await FileSystem.deleteAsync(audioUrl, { idempotent: true });
@@ -120,17 +120,17 @@ export function ViewOnceAudioPlayer({
 
   return (
     <View style={[styles.container, isMe ? styles.alignRight : styles.alignLeft]}>
-      {isExpired ? (
-        /* Áudio Expirado */
-        <View
-          style={[
-            styles.expiredBox,
-            {
-              backgroundColor: colors.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)",
-              borderColor: colors.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)",
-            },
-          ]}
-        >
+      {isExpired ?
+
+      <View
+        style={[
+        styles.expiredBox,
+        {
+          backgroundColor: colors.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)",
+          borderColor: colors.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)"
+        }]
+        }>
+        
           <View style={[styles.expiredIcon, { backgroundColor: colors.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" }]}>
             <MaterialCommunityIcons name="numeric-2-circle-outline" size={20} color={colors.muted} />
           </View>
@@ -143,19 +143,19 @@ export function ViewOnceAudioPlayer({
             </Text>
           </View>
           <Feather name="check" size={15} color={colors.muted} style={{ opacity: 0.8 }} />
-        </View>
-      ) : (
-        /* Card Ativo com Limite de 2 Reproduções */
-        <View
-          style={[
-            styles.activeCard,
-            {
-              backgroundColor: colors.mode === "dark" ? "#111827" : "#0f172a",
-              borderColor: "#8b5cf6",
-            },
-          ]}
-        >
-          {/* Header com Badge de Áudio e Contador de Reproduções Restantes */}
+        </View> :
+
+
+      <View
+        style={[
+        styles.activeCard,
+        {
+          backgroundColor: colors.mode === "dark" ? "#111827" : "#0f172a",
+          borderColor: "#8b5cf6"
+        }]
+        }>
+        
+          {}
           <View style={styles.headerRow}>
             <View style={styles.viewOncePill}>
               <MaterialCommunityIcons name="numeric-2-circle" size={18} color="#a78bfa" />
@@ -168,7 +168,7 @@ export function ViewOnceAudioPlayer({
             </View>
           </View>
 
-          {/* Banner de Aviso Oficial */}
+          {}
           <View style={styles.warningBanner}>
             <Ionicons name="warning-outline" size={16} color="#f59e0b" style={{ marginTop: 1 }} />
             <Text style={styles.warningBannerText}>
@@ -176,36 +176,36 @@ export function ViewOnceAudioPlayer({
             </Text>
           </View>
 
-          {/* Player Controls */}
+          {}
           <View style={styles.playerRow}>
             <Pressable
-              onPress={togglePlay}
-              disabled={loading}
-              style={styles.playBtn}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#ffffff" />
-              ) : (
-                <Feather
-                  name={isPlaying ? "pause" : "play"}
-                  size={18}
-                  color="#ffffff"
-                  style={{ marginLeft: isPlaying ? 0 : 2 }}
-                />
-              )}
+            onPress={togglePlay}
+            disabled={loading}
+            style={styles.playBtn}>
+            
+              {loading ?
+            <ActivityIndicator size="small" color="#ffffff" /> :
+
+            <Feather
+              name={isPlaying ? "pause" : "play"}
+              size={18}
+              color="#ffffff"
+              style={{ marginLeft: isPlaying ? 0 : 2 }} />
+
+            }
             </Pressable>
 
-            {/* Progress Bar */}
+            {}
             <View style={styles.progressContainer}>
               <View style={styles.progressBarBg}>
                 <View
-                  style={[
-                    styles.progressBarFill,
-                    {
-                      width: `${Math.min(100, Math.max(0, (position / (duration || 1)) * 100))}%`,
-                    },
-                  ]}
-                />
+                style={[
+                styles.progressBarFill,
+                {
+                  width: `${Math.min(100, Math.max(0, position / (duration || 1) * 100))}%`
+                }]
+                } />
+              
               </View>
               <View style={styles.timeRow}>
                 <Text style={styles.timeText}>{formatTime(position)}</Text>
@@ -214,21 +214,21 @@ export function ViewOnceAudioPlayer({
             </View>
           </View>
         </View>
-      )}
-    </View>
-  );
+      }
+    </View>);
+
 }
 
 const styles = StyleSheet.create({
   container: {
     marginVertical: 6,
-    maxWidth: "88%",
+    maxWidth: "88%"
   },
   alignRight: {
-    alignSelf: "flex-end",
+    alignSelf: "flex-end"
   },
   alignLeft: {
-    alignSelf: "flex-start",
+    alignSelf: "flex-start"
   },
   activeCard: {
     width: 280,
@@ -239,13 +239,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 4
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 10
   },
   viewOncePill: {
     flexDirection: "row",
@@ -254,23 +254,23 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(167, 139, 250, 0.15)",
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 12,
+    borderRadius: 12
   },
   viewOncePillText: {
     color: "#a78bfa",
     fontSize: 11,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   counterPill: {
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 10,
+    borderRadius: 10
   },
   counterText: {
     color: "#e2e8f0",
     fontSize: 10.5,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   warningBanner: {
     flexDirection: "row",
@@ -281,19 +281,19 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "rgba(245, 158, 11, 0.3)",
+    borderColor: "rgba(245, 158, 11, 0.3)"
   },
   warningBannerText: {
     flex: 1,
     color: "#fef3c7",
     fontSize: 11,
     fontFamily: "Poppins_400Regular",
-    lineHeight: 15,
+    lineHeight: 15
   },
   playerRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 10
   },
   playBtn: {
     width: 38,
@@ -301,31 +301,31 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     backgroundColor: "#8b5cf6",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   progressContainer: {
     flex: 1,
-    gap: 4,
+    gap: 4
   },
   progressBarBg: {
     height: 5,
     borderRadius: 2.5,
     backgroundColor: "rgba(255, 255, 255, 0.15)",
-    overflow: "hidden",
+    overflow: "hidden"
   },
   progressBarFill: {
     height: "100%",
     backgroundColor: "#a78bfa",
-    borderRadius: 2.5,
+    borderRadius: 2.5
   },
   timeRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   timeText: {
     color: "#94a3b8",
     fontSize: 10,
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "Poppins_400Regular"
   },
   expiredBox: {
     flexDirection: "row",
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     gap: 10,
-    opacity: 0.75,
+    opacity: 0.75
   },
   expiredIcon: {
     width: 34,
@@ -343,14 +343,14 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: "rgba(0,0,0,0.06)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   expiredTitle: {
     fontSize: 13,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   expiredSubtitle: {
     fontSize: 11,
-    fontFamily: "Poppins_400Regular",
-  },
+    fontFamily: "Poppins_400Regular"
+  }
 });

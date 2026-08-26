@@ -7,15 +7,15 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { api } from "../../api";
 import { Avatar, IconButton, EmptyState } from "../../components/ui/ui";
 import { errorMessage } from "../../lib/format";
 import { useTheme } from "../../theme";
 
-// Exporting CreateTribeScreen to not break existing imports (if any) while we migrate
+
 export { CreateTribeScreen } from "./CreateTribeScreen";
 export { GroupDetailsScreen } from "./GroupDetailsScreen";
 export { GroupSettingsScreen } from "./GroupSettingsScreen";
@@ -42,9 +42,9 @@ export function TribosListScreen({ onOpenTribe, onCreateTribe, onBack }) {
     loadTribos();
   }, [loadTribos]);
 
-  const filteredTribos = tribos.filter(t => 
-    t.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    t.rules?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTribos = tribos.filter((t) =>
+  t.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  t.rules?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -63,8 +63,8 @@ export function TribosListScreen({ onOpenTribe, onCreateTribe, onBack }) {
             placeholder="Buscar tribo..."
             placeholderTextColor={colors.muted}
             value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
+            onChangeText={setSearchQuery} />
+          
         </View>
       </View>
 
@@ -75,15 +75,15 @@ export function TribosListScreen({ onOpenTribe, onCreateTribe, onBack }) {
         refreshing={loading}
         onRefresh={loadTribos}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <Pressable
-            style={({ pressed }) => [
-              styles.card, 
-              { backgroundColor: colors.surface },
-              pressed && { transform: [{ scale: 0.98 }] }
-            ]}
-            onPress={() => onOpenTribe(item.id)}
-          >
+        renderItem={({ item }) =>
+        <Pressable
+          style={({ pressed }) => [
+          styles.card,
+          { backgroundColor: colors.surface },
+          pressed && { transform: [{ scale: 0.98 }] }]
+          }
+          onPress={() => onOpenTribe(item.id)}>
+          
             <Avatar url={item.avatarUrl || item.avatar_url} size={56} fallback={item.name} />
             <View style={styles.info}>
               <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
@@ -101,17 +101,17 @@ export function TribosListScreen({ onOpenTribe, onCreateTribe, onBack }) {
               <Feather name="arrow-right" size={18} color={colors.primary || "#3b82f6"} />
             </View>
           </Pressable>
-        )}
+        }
         ListEmptyComponent={
-          !loading && (
-            <EmptyState icon="users">
+        !loading &&
+        <EmptyState icon="users">
               {searchQuery ? "Nenhuma tribo encontrada com essa busca." : "Você ainda não participa de nenhuma tribo."}
             </EmptyState>
-          )
-        }
-      />
-    </View>
-  );
+
+        } />
+      
+    </View>);
+
 }
 
 const styles = StyleSheet.create({
@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
-    zIndex: 10,
+    zIndex: 10
   },
   title: { fontSize: 20, fontFamily: "Poppins_700Bold", letterSpacing: -0.5 },
   searchContainer: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 8,
+    paddingBottom: 8
   },
   searchBar: {
     flexDirection: "row",
@@ -146,13 +146,13 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 16,
     borderWidth: 1,
-    gap: 10,
+    gap: 10
   },
   searchInput: {
     flex: 1,
     fontFamily: "Poppins_400Regular",
     fontSize: 14,
-    marginTop: 2,
+    marginTop: 2
   },
   list: { padding: 16, paddingTop: 8, gap: 16 },
   card: {
@@ -164,29 +164,29 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
     shadowRadius: 10,
-    elevation: 3,
+    elevation: 3
   },
   info: {
     flex: 1,
     marginLeft: 16,
-    marginRight: 12,
+    marginRight: 12
   },
   name: { fontSize: 17, fontFamily: "Poppins_700Bold", marginBottom: 2 },
   rules: { fontSize: 13, fontFamily: "Poppins_400Regular", marginBottom: 6 },
   memberBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 4
   },
   memberBadgeText: {
     fontSize: 11,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   actionBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   }
 });

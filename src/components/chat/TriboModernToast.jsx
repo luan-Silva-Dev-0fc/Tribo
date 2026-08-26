@@ -5,9 +5,9 @@ import { Ionicons } from "@expo/vector-icons";
 export function TriboModernToast({
   visible,
   message,
-  type = "success", // 'success' | 'error' | 'info'
+  type = "success",
   onHide,
-  duration = 3000,
+  duration = 3000
 }) {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-20)).current;
@@ -15,18 +15,18 @@ export function TriboModernToast({
   useEffect(() => {
     if (visible) {
       Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 220,
-          useNativeDriver: true,
-        }),
-        Animated.spring(translateY, {
-          toValue: 0,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true
+      }),
+      Animated.spring(translateY, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true
+      })]
+      ).start();
 
       const timer = setTimeout(() => {
         hide();
@@ -40,17 +40,17 @@ export function TriboModernToast({
 
   const hide = () => {
     Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: -20,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 180,
+      useNativeDriver: true
+    }),
+    Animated.timing(translateY, {
+      toValue: -20,
+      duration: 180,
+      useNativeDriver: true
+    })]
+    ).start(() => {
       onHide?.();
     });
   };
@@ -60,37 +60,37 @@ export function TriboModernToast({
   const isSuccess = type === "success";
   const isError = type === "error";
 
-  const iconName = isSuccess
-    ? "checkmark-circle"
-    : isError
-    ? "alert-circle"
-    : "information-circle";
+  const iconName = isSuccess ?
+  "checkmark-circle" :
+  isError ?
+  "alert-circle" :
+  "information-circle";
 
   const iconColor = isSuccess ? "#22c55e" : isError ? "#ef4444" : "#38bdf8";
-  const borderColor = isSuccess
-    ? "rgba(34, 197, 94, 0.3)"
-    : isError
-    ? "rgba(239, 68, 68, 0.3)"
-    : "rgba(56, 189, 248, 0.3)";
+  const borderColor = isSuccess ?
+  "rgba(34, 197, 94, 0.3)" :
+  isError ?
+  "rgba(239, 68, 68, 0.3)" :
+  "rgba(56, 189, 248, 0.3)";
 
   return (
     <Animated.View
       pointerEvents="none"
       style={[
-        styles.container,
-        {
-          opacity,
-          transform: [{ translateY }],
-          borderColor,
-        },
-      ]}
-    >
+      styles.container,
+      {
+        opacity,
+        transform: [{ translateY }],
+        borderColor
+      }]
+      }>
+      
       <Ionicons name={iconName} size={20} color={iconColor} style={{ marginRight: 8 }} />
       <Text style={styles.text} numberOfLines={2}>
         {message}
       </Text>
-    </Animated.View>
-  );
+    </Animated.View>);
+
 }
 
 const styles = StyleSheet.create({
@@ -111,11 +111,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 10,
-    elevation: 6,
+    elevation: 6
   },
   text: {
     color: "#ffffff",
     fontSize: 13,
-    fontFamily: "Poppins_600SemiBold",
-  },
+    fontFamily: "Poppins_600SemiBold"
+  }
 });

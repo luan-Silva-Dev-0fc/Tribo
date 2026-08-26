@@ -4,9 +4,9 @@ import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
 export function ConfirmDeleteModal({
   visible,
-  mode = "me", // 'me' | 'everyone'
+  mode = "me",
   onConfirm,
-  onCancel,
+  onCancel
 }) {
   const isEveryone = mode === "everyone";
 
@@ -15,18 +15,18 @@ export function ConfirmDeleteModal({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onCancel}
-    >
+      onRequestClose={onCancel}>
+      
       <Pressable style={styles.overlay} onPress={onCancel}>
         <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
-          {/* Ícone de Lixeira com Brilho Vermelho */}
+          {}
           <View style={styles.iconOuter}>
             <View style={styles.iconInner}>
               <MaterialCommunityIcons
                 name={isEveryone ? "trash-can" : "trash-can-outline"}
                 size={28}
-                color="#ef4444"
-              />
+                color="#ef4444" />
+              
             </View>
           </View>
 
@@ -35,37 +35,37 @@ export function ConfirmDeleteModal({
           </Text>
 
           <Text style={styles.message}>
-            {isEveryone
-              ? "Esta mensagem será apagada para todos os membros da tribo. Esta ação não poderá ser desfeita."
-              : "Esta mensagem será removida apenas do seu dispositivo. Os outros membros continuarão vendo normalmente."}
+            {isEveryone ?
+            "Esta mensagem será apagada para todos os membros da tribo. Esta ação não poderá ser desfeita." :
+            "Esta mensagem será removida apenas do seu dispositivo. Os outros membros continuarão vendo normalmente."}
           </Text>
 
           <View style={styles.actionsRow}>
             <Pressable
               style={({ pressed }) => [
-                styles.btnCancel,
-                { opacity: pressed ? 0.8 : 1 },
-              ]}
-              onPress={onCancel}
-            >
+              styles.btnCancel,
+              { opacity: pressed ? 0.8 : 1 }]
+              }
+              onPress={onCancel}>
+              
               <Text style={styles.btnCancelText}>Cancelar</Text>
             </Pressable>
 
             <Pressable
               style={({ pressed }) => [
-                styles.btnDelete,
-                { opacity: pressed ? 0.88 : 1 },
-              ]}
-              onPress={onConfirm}
-            >
+              styles.btnDelete,
+              { opacity: pressed ? 0.88 : 1 }]
+              }
+              onPress={onConfirm}>
+              
               <Ionicons name="trash" size={16} color="#ffffff" style={{ marginRight: 4 }} />
               <Text style={styles.btnDeleteText}>Apagar</Text>
             </Pressable>
           </View>
         </Pressable>
       </Pressable>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.78)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
+    padding: 24
   },
   card: {
     width: "100%",
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
-    elevation: 8,
+    elevation: 8
   },
   iconOuter: {
     width: 64,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(239, 68, 68, 0.12)",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 16
   },
   iconInner: {
     width: 48,
@@ -110,14 +110,14 @@ const styles = StyleSheet.create({
     shadowColor: "#ef4444",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
-    shadowRadius: 8,
+    shadowRadius: 8
   },
   title: {
     fontSize: 18,
     fontFamily: "Poppins_700Bold",
     color: "#ffffff",
     marginBottom: 8,
-    textAlign: "center",
+    textAlign: "center"
   },
   message: {
     fontSize: 13,
@@ -126,12 +126,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 18,
     marginBottom: 22,
-    paddingHorizontal: 6,
+    paddingHorizontal: 6
   },
   actionsRow: {
     flexDirection: "row",
     gap: 10,
-    width: "100%",
+    width: "100%"
   },
   btnCancel: {
     flex: 1,
@@ -139,12 +139,12 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: "#2a2a2e",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   btnCancelText: {
     color: "#e4e4e7",
     fontSize: 14,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   btnDelete: {
     flex: 1,
@@ -158,11 +158,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.35,
     shadowRadius: 6,
-    elevation: 3,
+    elevation: 3
   },
   btnDeleteText: {
     color: "#ffffff",
     fontSize: 14,
-    fontFamily: "Poppins_700Bold",
-  },
+    fontFamily: "Poppins_700Bold"
+  }
 });

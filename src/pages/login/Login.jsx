@@ -1,12 +1,12 @@
-/**
- * AuthScreen — orquestrador dos fluxos de autenticação com Modais de Alerta Tribo.
- *
- * Gerencia estado e lógica de negócio para:
- *   - Login (e-mail/senha + Google)
- *   - Cadastro (wizard de 5 passos)
- *   - Verificação de e-mail
- *   - Alertas visuais padronizados Tribo (senha incorreta, campos vazios, etc.)
- */
+
+
+
+
+
+
+
+
+
 
 import React, { useState, useEffect } from "react";
 import { BackHandler } from "react-native";
@@ -20,10 +20,10 @@ import TelaVerificacao from "../verificacao/tela-verificacao";
 import { TriboAlertModal } from "../../components/modals/tribo-alert-modal";
 
 export default function AuthScreen({ onAuthenticated }) {
-  // Modo atual: 'login' | 'register' | 'verify'
+
   const [mode, setMode] = useState("login");
 
-  // ── Estado de Modal de Alerta Tribo ───────────────────────────────────────
+
   const [alertModal, setAlertModal] = useState({
     visible: false,
     type: "error",
@@ -31,7 +31,7 @@ export default function AuthScreen({ onAuthenticated }) {
     message: "",
     buttonText: "Entendido",
     secondaryButtonText: null,
-    onSecondaryPress: null,
+    onSecondaryPress: null
   });
 
   const showAlert = ({
@@ -40,7 +40,7 @@ export default function AuthScreen({ onAuthenticated }) {
     message,
     buttonText = "Entendido",
     secondaryButtonText = null,
-    onSecondaryPress = null,
+    onSecondaryPress = null
   }) => {
     setAlertModal({
       visible: true,
@@ -49,7 +49,7 @@ export default function AuthScreen({ onAuthenticated }) {
       message,
       buttonText,
       secondaryButtonText,
-      onSecondaryPress,
+      onSecondaryPress
     });
   };
 
@@ -57,14 +57,14 @@ export default function AuthScreen({ onAuthenticated }) {
     setAlertModal((prev) => ({ ...prev, visible: false }));
   };
 
-  // ── Estado de Login ──────────────────────────────────────────────────────
+
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
 
-  // ── Estado do Cadastro (wizard) ──────────────────────────────────────────
+
   const [step, setStep] = useState(1);
   const [isGoogleProvider, setIsGoogleProvider] = useState(false);
   const [googleIdToken, setGoogleIdToken] = useState(null);
@@ -76,14 +76,14 @@ export default function AuthScreen({ onAuthenticated }) {
   const [avatarUri, setAvatarUri] = useState(null);
   const [bio, setBio] = useState("");
 
-  // ── Estado da Verificação ────────────────────────────────────────────────
+
   const [verifyEmail, setVerifyEmail] = useState("");
   const [verifyCode, setVerifyCode] = useState("");
   const [resending, setResending] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [verifiedRewardUser, setVerifiedRewardUser] = useState(null);
 
-  // ── Hardware Back Button Handler ─────────────────────────────────────────
+
   useEffect(() => {
     const handleBackPress = () => {
       if (alertModal.visible) {
@@ -118,7 +118,7 @@ export default function AuthScreen({ onAuthenticated }) {
     return () => backHandler.remove();
   }, [mode, step, alertModal.visible, showRewardModal]);
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
+
   const applyGoogleProfile = (profile) => {
     if (!profile) return;
     setIsGoogleProvider(true);
@@ -138,7 +138,7 @@ export default function AuthScreen({ onAuthenticated }) {
     if (profile.avatarUrl) setAvatarUri(profile.avatarUrl);
   };
 
-  // ── Handlers de Login ────────────────────────────────────────────────────
+
   const onGoogleLogin = async () => {
     try {
       setGoogleBusy(true);
@@ -148,7 +148,7 @@ export default function AuthScreen({ onAuthenticated }) {
           applyGoogleProfile(profile);
           setStep(1);
           setMode("register");
-        },
+        }
       });
       if (result?.googleProfile && !result?.user) {
         applyGoogleProfile(result.googleProfile);
@@ -159,7 +159,7 @@ export default function AuthScreen({ onAuthenticated }) {
       showAlert({
         type: "warning",
         title: "Aviso Google",
-        message: errorMessage(error),
+        message: errorMessage(error)
       });
     } finally {
       setGoogleBusy(false);
@@ -170,12 +170,12 @@ export default function AuthScreen({ onAuthenticated }) {
     const trimmedEmail = loginEmail.trim();
     const trimmedPassword = loginPassword;
 
-    // Validações de campos vazios
+
     if (!trimmedEmail && !trimmedPassword) {
       return showAlert({
         type: "warning",
         title: "Campos vazios",
-        message: "Por favor, preencha o e-mail e a senha para entrar na Tribo.",
+        message: "Por favor, preencha o e-mail e a senha para entrar na Tribo."
       });
     }
 
@@ -183,7 +183,7 @@ export default function AuthScreen({ onAuthenticated }) {
       return showAlert({
         type: "warning",
         title: "E-mail obrigatório",
-        message: "Por favor, informe seu endereço de e-mail para continuar.",
+        message: "Por favor, informe seu endereço de e-mail para continuar."
       });
     }
 
@@ -192,7 +192,7 @@ export default function AuthScreen({ onAuthenticated }) {
       return showAlert({
         type: "warning",
         title: "E-mail inválido",
-        message: "O formato do e-mail digitado não é válido. Verifique e tente novamente.",
+        message: "O formato do e-mail digitado não é válido. Verifique e tente novamente."
       });
     }
 
@@ -200,7 +200,7 @@ export default function AuthScreen({ onAuthenticated }) {
       return showAlert({
         type: "warning",
         title: "Senha obrigatória",
-        message: "Por favor, digite sua senha para entrar na Tribo.",
+        message: "Por favor, digite sua senha para entrar na Tribo."
       });
     }
 
@@ -217,33 +217,33 @@ export default function AuthScreen({ onAuthenticated }) {
       const status = error?.status || error?.response?.status;
 
       const isInvalidCreds =
-        status === 401 ||
-        status === 400 ||
-        msg.includes("password") ||
-        msg.includes("senha") ||
-        msg.includes("credential") ||
-        msg.includes("credenciais") ||
-        msg.includes("invalid") ||
-        msg.includes("inválid") ||
-        msg.includes("incorret") ||
-        msg.includes("não encontrado") ||
-        msg.includes("user not found") ||
-        msg.includes("unauthorized");
+      status === 401 ||
+      status === 400 ||
+      msg.includes("password") ||
+      msg.includes("senha") ||
+      msg.includes("credential") ||
+      msg.includes("credenciais") ||
+      msg.includes("invalid") ||
+      msg.includes("inválid") ||
+      msg.includes("incorret") ||
+      msg.includes("não encontrado") ||
+      msg.includes("user not found") ||
+      msg.includes("unauthorized");
 
       if (isInvalidCreds) {
         showAlert({
           type: "error",
           title: "Senha ou e-mail incorreto",
           message:
-            "A senha digitada está incorreta ou este e-mail não foi encontrado. Verifique suas credenciais e tente novamente.",
+          "A senha digitada está incorreta ou este e-mail não foi encontrado. Verifique suas credenciais e tente novamente."
         });
       } else {
         showAlert({
           type: "error",
           title: "Não foi possível entrar",
           message:
-            errorMessage(error) ||
-            "Ocorreu uma falha ao tentar autenticar. Verifique sua conexão e tente novamente.",
+          errorMessage(error) ||
+          "Ocorreu uma falha ao tentar autenticar. Verifique sua conexão e tente novamente."
         });
       }
     } finally {
@@ -251,7 +251,7 @@ export default function AuthScreen({ onAuthenticated }) {
     }
   };
 
-  // ── Handlers do Cadastro ─────────────────────────────────────────────────
+
   const handlePickAvatar = async () => {
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -259,14 +259,14 @@ export default function AuthScreen({ onAuthenticated }) {
         return showAlert({
           type: "warning",
           title: "Permissão necessária",
-          message: "Precisamos de permissão para acessar a galeria de fotos.",
+          message: "Precisamos de permissão para acessar a galeria de fotos."
         });
       }
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.8,
+        quality: 0.8
       });
       if (!result.canceled && result.assets?.[0]?.uri) {
         setAvatarUri(result.assets[0].uri);
@@ -275,7 +275,7 @@ export default function AuthScreen({ onAuthenticated }) {
       showAlert({
         type: "error",
         title: "Erro ao selecionar foto",
-        message: errorMessage(error),
+        message: errorMessage(error)
       });
     }
   };
@@ -286,7 +286,7 @@ export default function AuthScreen({ onAuthenticated }) {
         return showAlert({
           type: "warning",
           title: "Nome obrigatório",
-          message: "Por favor, informe seu nome para continuar.",
+          message: "Por favor, informe seu nome para continuar."
         });
       }
       setStep(2);
@@ -296,7 +296,7 @@ export default function AuthScreen({ onAuthenticated }) {
         return showAlert({
           type: "warning",
           title: "E-mail inválido",
-          message: "Por favor, informe um endereço de e-mail válido.",
+          message: "Por favor, informe um endereço de e-mail válido."
         });
       }
       setStep(3);
@@ -305,7 +305,7 @@ export default function AuthScreen({ onAuthenticated }) {
         return showAlert({
           type: "warning",
           title: "Senha fraca",
-          message: "A senha deve conter no mínimo 6 caracteres para proteger sua conta.",
+          message: "A senha deve conter no mínimo 6 caracteres para proteger sua conta."
         });
       }
       setStep(4);
@@ -317,8 +317,8 @@ export default function AuthScreen({ onAuthenticated }) {
   };
 
   const handleSkipStep = () => {
-    if (step === 4) setStep(5);
-    else if (step === 5) handleRegisterSubmit();
+    if (step === 4) setStep(5);else
+    if (step === 5) handleRegisterSubmit();
   };
 
   const handleRegisterSubmit = async () => {
@@ -333,7 +333,7 @@ export default function AuthScreen({ onAuthenticated }) {
         password: regPassword,
         bio: bio.trim() || undefined,
         isGoogleProvider: !!isGoogleProvider,
-        ...(googleIdToken ? { googleIdToken } : {}),
+        ...(googleIdToken ? { googleIdToken } : {})
       };
       const response = await api.register(payload);
       const token = response?.token || response?.data?.token;
@@ -350,11 +350,11 @@ export default function AuthScreen({ onAuthenticated }) {
       const registeredUser = unwrap(response, "user") || response?.user;
 
       if (
-        isGoogleProvider &&
-        (response?.email_confirmed_at ||
-          registeredUser?.is_verified ||
-          response?.alreadyVerified)
-      ) {
+      isGoogleProvider && (
+      response?.email_confirmed_at ||
+      registeredUser?.is_verified ||
+      response?.alreadyVerified))
+      {
         if (token && onAuthenticated) {
           onAuthenticated(
             registeredUser || { email: regEmail.trim(), name: fullName }
@@ -378,21 +378,21 @@ export default function AuthScreen({ onAuthenticated }) {
       showAlert({
         type: "error",
         title: "Não foi possível criar a conta",
-        message: errorMessage(error),
+        message: errorMessage(error)
       });
     } finally {
       setBusy(false);
     }
   };
 
-  // ── Handlers da Verificação ──────────────────────────────────────────────
+
   const handleVerifyEmail = async () => {
     const code = verifyCode.trim();
     if (!code || code.length < 6) {
       return showAlert({
         type: "warning",
         title: "Código incompleto",
-        message: "Por favor, digite o código de 6 dígitos enviado ao seu e-mail.",
+        message: "Por favor, digite o código de 6 dígitos enviado ao seu e-mail."
       });
     }
     try {
@@ -404,13 +404,13 @@ export default function AuthScreen({ onAuthenticated }) {
         email: verifyEmail,
         badge_type: "BLUE",
         badgeType: "BLUE",
-        is_verified: true,
+        is_verified: true
       };
       const completeUser = {
         ...verifiedUser,
         badge_type: verifiedUser.badge_type || "BLUE",
         badgeType: verifiedUser.badgeType || "BLUE",
-        is_verified: true,
+        is_verified: true
       };
       setVerifiedRewardUser(completeUser);
       setShowRewardModal(true);
@@ -418,7 +418,7 @@ export default function AuthScreen({ onAuthenticated }) {
       showAlert({
         type: "error",
         title: "Código inválido",
-        message: errorMessage(error),
+        message: errorMessage(error)
       });
     } finally {
       setBusy(false);
@@ -431,7 +431,7 @@ export default function AuthScreen({ onAuthenticated }) {
       email: verifyEmail,
       badge_type: "BLUE",
       badgeType: "BLUE",
-      is_verified: true,
+      is_verified: true
     };
     onAuthenticated(userToAuth);
   };
@@ -444,91 +444,91 @@ export default function AuthScreen({ onAuthenticated }) {
       showAlert({
         type: "success",
         title: "Código reenviado",
-        message: `Um novo código de segurança foi enviado para ${verifyEmail}.`,
+        message: `Um novo código de segurança foi enviado para ${verifyEmail}.`
       });
     } catch (error) {
       showAlert({
         type: "error",
         title: "Não foi possível reenviar",
-        message: errorMessage(error),
+        message: errorMessage(error)
       });
     } finally {
       setResending(false);
     }
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
+
   return (
     <>
-      {mode === "login" && (
-        <TelaLogin
-          email={loginEmail}
-          onChangeEmail={setLoginEmail}
-          password={loginPassword}
-          onChangePassword={setLoginPassword}
-          showPassword={showLoginPassword}
-          onTogglePassword={() => setShowLoginPassword(!showLoginPassword)}
-          busy={busy}
-          googleBusy={googleBusy}
-          onLogin={handleLogin}
-          onGoogleLogin={onGoogleLogin}
-          onGoToCadastro={() => { setStep(1); setMode("register"); }}
-          onEsqueciSenha={() =>
-            showAlert({
-              type: "info",
-              title: "Recuperar senha",
-              message: "A recuperação de senha estará disponível na próxima atualização da Tribo.",
-            })
-          }
-        />
-      )}
+      {mode === "login" &&
+      <TelaLogin
+        email={loginEmail}
+        onChangeEmail={setLoginEmail}
+        password={loginPassword}
+        onChangePassword={setLoginPassword}
+        showPassword={showLoginPassword}
+        onTogglePassword={() => setShowLoginPassword(!showLoginPassword)}
+        busy={busy}
+        googleBusy={googleBusy}
+        onLogin={handleLogin}
+        onGoogleLogin={onGoogleLogin}
+        onGoToCadastro={() => {setStep(1);setMode("register");}}
+        onEsqueciSenha={() =>
+        showAlert({
+          type: "info",
+          title: "Recuperar senha",
+          message: "A recuperação de senha estará disponível na próxima atualização da Tribo."
+        })
+        } />
 
-      {mode === "verify" && (
-        <TelaVerificacao
-          email={verifyEmail}
-          codigo={verifyCode}
-          onChangeCodigo={setVerifyCode}
-          busy={busy}
-          reenviando={resending}
-          showModal={showRewardModal}
-          onVerificar={handleVerifyEmail}
-          onReenviar={handleResendCode}
-          onVoltarLogin={() => setMode("login")}
-          onContinuar={handleRewardContinue}
-        />
-      )}
+      }
 
-      {mode === "register" && (
-        <TelaCadastro
-          step={step}
-          isGoogleProvider={isGoogleProvider}
-          firstName={firstName}
-          onChangeFirstName={setFirstName}
-          lastName={lastName}
-          onChangeLastName={setLastName}
-          email={regEmail}
-          onChangeEmail={setRegEmail}
-          password={regPassword}
-          onChangePassword={setRegPassword}
-          showPassword={showRegPassword}
-          onTogglePassword={() => setShowRegPassword(!showRegPassword)}
-          avatarUri={avatarUri}
-          onPickAvatar={handlePickAvatar}
-          bio={bio}
-          onChangeBio={setBio}
-          busy={busy}
-          onNext={handleNextStep}
-          onSkip={handleSkipStep}
-          onBack={() => {
-            if (step > 1) setStep(step - 1);
-            else setMode("login");
-          }}
-          onGoToLogin={() => setMode("login")}
-          onSubmit={handleRegisterSubmit}
-        />
-      )}
+      {mode === "verify" &&
+      <TelaVerificacao
+        email={verifyEmail}
+        codigo={verifyCode}
+        onChangeCodigo={setVerifyCode}
+        busy={busy}
+        reenviando={resending}
+        showModal={showRewardModal}
+        onVerificar={handleVerifyEmail}
+        onReenviar={handleResendCode}
+        onVoltarLogin={() => setMode("login")}
+        onContinuar={handleRewardContinue} />
 
-      {/* Modal de Alerta Tribo */}
+      }
+
+      {mode === "register" &&
+      <TelaCadastro
+        step={step}
+        isGoogleProvider={isGoogleProvider}
+        firstName={firstName}
+        onChangeFirstName={setFirstName}
+        lastName={lastName}
+        onChangeLastName={setLastName}
+        email={regEmail}
+        onChangeEmail={setRegEmail}
+        password={regPassword}
+        onChangePassword={setRegPassword}
+        showPassword={showRegPassword}
+        onTogglePassword={() => setShowRegPassword(!showRegPassword)}
+        avatarUri={avatarUri}
+        onPickAvatar={handlePickAvatar}
+        bio={bio}
+        onChangeBio={setBio}
+        busy={busy}
+        onNext={handleNextStep}
+        onSkip={handleSkipStep}
+        onBack={() => {
+          if (step > 1) setStep(step - 1);else
+          setMode("login");
+        }}
+        onGoToLogin={() => setMode("login")}
+        onSubmit={handleRegisterSubmit} />
+
+      }
+
+      {}
       <TriboAlertModal
         visible={alertModal.visible}
         type={alertModal.type}
@@ -537,8 +537,8 @@ export default function AuthScreen({ onAuthenticated }) {
         buttonText={alertModal.buttonText}
         secondaryButtonText={alertModal.secondaryButtonText}
         onSecondaryPress={alertModal.onSecondaryPress}
-        onClose={hideAlert}
-      />
-    </>
-  );
+        onClose={hideAlert} />
+      
+    </>);
+
 }

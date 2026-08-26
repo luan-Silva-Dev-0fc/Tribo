@@ -1,6 +1,6 @@
-/**
- * Estilos visuais da tela de Verificação de E-mail.
- */
+
+
+
 
 import { StyleSheet } from "react-native";
 
@@ -13,16 +13,16 @@ export const estilosVerificacao = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     marginBottom: 20,
-    alignSelf: "flex-start",
+    alignSelf: "flex-start"
   },
   verifyEmailText: {
     fontFamily: "System",
     fontWeight: "500",
-    fontSize: 13,
+    fontSize: 13
   },
   codeContainer: {
     marginVertical: 12,
-    alignItems: "center",
+    alignItems: "center"
   },
   codeInput: {
     height: 64,
@@ -34,39 +34,39 @@ export const estilosVerificacao = StyleSheet.create({
     fontWeight: "700",
     fontSize: 28,
     letterSpacing: 10,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#F9FAFB"
   },
   submit: {
     height: 52,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 8,
+    marginTop: 8
   },
   submitText: {
     color: "#ffffff",
     fontFamily: "System",
     fontWeight: "700",
-    fontSize: 15,
+    fontSize: 15
   },
   resendContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 6,
-    marginTop: 20,
+    marginTop: 20
   },
   resendPrompt: {
     fontFamily: "System",
-    fontSize: 13,
+    fontSize: 13
   },
   resendButton: {
-    paddingVertical: 4,
+    paddingVertical: 4
   },
   resendText: {
     fontFamily: "System",
     fontWeight: "600",
-    fontSize: 13,
+    fontSize: 13
   },
   backToLogin: {
     flexDirection: "row",
@@ -74,20 +74,20 @@ export const estilosVerificacao = StyleSheet.create({
     justifyContent: "center",
     gap: 6,
     marginTop: 24,
-    paddingVertical: 8,
+    paddingVertical: 8
   },
   backToLoginText: {
     fontFamily: "System",
     fontWeight: "500",
-    fontSize: 13,
+    fontSize: 13
   },
-  // Modal de recompensa (conta verificada)
+
   rewardOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.82)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
+    padding: 24
   },
   rewardCard: {
     width: "100%",
@@ -104,12 +104,12 @@ export const estilosVerificacao = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
-    elevation: 10,
+    elevation: 10
   },
   rewardBadgeImage: {
     width: 78,
     height: 78,
-    marginBottom: 20,
+    marginBottom: 20
   },
   rewardTitle: {
     fontFamily: "System",
@@ -117,7 +117,7 @@ export const estilosVerificacao = StyleSheet.create({
     fontSize: 18,
     color: "#ffffff",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 10
   },
   rewardMessage: {
     fontFamily: "System",
@@ -127,7 +127,7 @@ export const estilosVerificacao = StyleSheet.create({
     textAlign: "center",
     lineHeight: 21,
     marginBottom: 26,
-    paddingHorizontal: 4,
+    paddingHorizontal: 4
   },
   rewardButton: {
     width: "100%",
@@ -135,12 +135,12 @@ export const estilosVerificacao = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: "#ffffff",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   rewardButtonText: {
     fontFamily: "System",
     fontWeight: "600",
     fontSize: 15,
-    color: "#111111",
-  },
+    color: "#111111"
+  }
 });

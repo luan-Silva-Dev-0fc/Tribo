@@ -7,8 +7,8 @@ import {
   View,
   TextInput,
   ActivityIndicator,
-  Alert,
-} from "react-native";
+  Alert } from
+"react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 import { Avatar } from "../ui/ui";
@@ -24,7 +24,7 @@ export function ProfileDrawer({
   onOpenPrivacy,
   onOpenAppearance,
   onOpenSavedPosts,
-  onLogout,
+  onLogout
 }) {
   const { colors } = useTheme();
 
@@ -32,7 +32,7 @@ export function ProfileDrawer({
 
   const handle = user?.username ? `@${user.username}` : "";
   const displayName = userName(user) || "Meu Perfil";
-  
+
   const { updateUser } = useUserContext();
   const [verifyModalVisible, setVerifyModalVisible] = React.useState(false);
   const [verifyCode, setVerifyCode] = React.useState("");
@@ -82,80 +82,80 @@ export function ProfileDrawer({
   };
 
   const menuItems = [
-    {
-      id: "settings",
-      label: "Configurações e Privacidade",
-      icon: "settings",
-      color: colors.text,
-      onPress: () => {
-        onClose();
-        onOpenSettings?.();
-      },
-    },
-    {
-      id: "privacy",
-      label: "Privacidade da Conta",
-      icon: "shield",
-      color: colors.text,
-      onPress: () => {
-        onClose();
-        onOpenPrivacy?.();
-      },
-    },
-    {
-      id: "saved_posts",
-      label: "Posts Salvos",
-      icon: "bookmark",
-      color: colors.text,
-      onPress: () => {
-        onClose();
-        onOpenSavedPosts?.();
-      },
-    },
-    {
-      id: "appearance",
-      label: "Aparência",
-      icon: "monitor",
-      color: colors.text,
-      onPress: () => {
-        onClose();
-        onOpenAppearance?.();
-      },
-    },
-    {
-      id: "verify",
-      label: "Receber o selo de verificação",
-      icon: "check-circle",
-      color: "#3b82f6",
-      hidden: user?.email_verified,
-      onPress: () => {
-        onClose();
-        handleOpenVerify();
-      },
-    },
-  ];
+  {
+    id: "settings",
+    label: "Configurações e Privacidade",
+    icon: "settings",
+    color: colors.text,
+    onPress: () => {
+      onClose();
+      onOpenSettings?.();
+    }
+  },
+  {
+    id: "privacy",
+    label: "Privacidade da Conta",
+    icon: "shield",
+    color: colors.text,
+    onPress: () => {
+      onClose();
+      onOpenPrivacy?.();
+    }
+  },
+  {
+    id: "saved_posts",
+    label: "Posts Salvos",
+    icon: "bookmark",
+    color: colors.text,
+    onPress: () => {
+      onClose();
+      onOpenSavedPosts?.();
+    }
+  },
+  {
+    id: "appearance",
+    label: "Aparência",
+    icon: "monitor",
+    color: colors.text,
+    onPress: () => {
+      onClose();
+      onOpenAppearance?.();
+    }
+  },
+  {
+    id: "verify",
+    label: "Receber o selo de verificação",
+    icon: "check-circle",
+    color: "#3b82f6",
+    hidden: user?.email_verified,
+    onPress: () => {
+      onClose();
+      handleOpenVerify();
+    }
+  }];
+
 
   return (
     <>
     <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}>
+        
       <View style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
         <View
-          style={[
+            style={[
             styles.drawerContent,
             {
               backgroundColor: colors.surface || colors.card,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          {/* Header do Drawer */}
+              borderColor: colors.border
+            }]
+            }>
+            
+          {}
           <View style={[styles.header, { backgroundColor: colors.surfaceAlt || "rgba(255,255,255,0.03)" }]}>
             <View style={styles.userInfo}>
               <Avatar user={user} size={54} />
@@ -167,63 +167,63 @@ export function ProfileDrawer({
                   </Text>
                 </View>
                 <Text
-                  style={[styles.nameText, { color: colors.text }]}
-                  numberOfLines={1}
-                >
+                    style={[styles.nameText, { color: colors.text }]}
+                    numberOfLines={1}>
+                    
                   {displayName}
                 </Text>
-                {!!handle && (
+                {!!handle &&
                   <Text
                     style={[styles.handleText, { color: colors.subtext || colors.muted }]}
-                    numberOfLines={1}
-                  >
+                    numberOfLines={1}>
+                    
                     {handle}
                   </Text>
-                )}
+                  }
               </View>
             </View>
 
             <Pressable
-              style={({ pressed }) => [
+                style={({ pressed }) => [
                 styles.closeButton,
                 {
                   backgroundColor: colors.surfaceAlt || colors.background,
-                  opacity: pressed ? 0.7 : 1,
-                },
-              ]}
-              onPress={onClose}
-              accessibilityLabel="Fechar menu"
-            >
+                  opacity: pressed ? 0.7 : 1
+                }]
+                }
+                onPress={onClose}
+                accessibilityLabel="Fechar menu">
+                
               <Feather name="x" size={20} color={colors.text} />
             </Pressable>
           </View>
 
-          {/* Itens de Navegação */}
+          {}
           <View style={styles.menuList}>
-            {menuItems.filter(item => !item.hidden).map((item) => (
+            {menuItems.filter((item) => !item.hidden).map((item) =>
               <Pressable
                 key={item.id}
                 style={({ pressed }) => [
-                  styles.menuItem,
-                  {
-                    backgroundColor: pressed
-                      ? (colors.surface || "rgba(255,255,255,0.1)")
-                      : (colors.surfaceAlt || "rgba(255, 255, 255, 0.05)"),
-                    borderColor: colors.border,
-                  },
-                ]}
-                onPress={item.onPress}
-              >
+                styles.menuItem,
+                {
+                  backgroundColor: pressed ?
+                  colors.surface || "rgba(255,255,255,0.1)" :
+                  colors.surfaceAlt || "rgba(255, 255, 255, 0.05)",
+                  borderColor: colors.border
+                }]
+                }
+                onPress={item.onPress}>
+                
                 <View
                   style={[
-                    styles.iconBox,
-                    {
-                      backgroundColor:
-                        colors.surfaceAlt || "rgba(255, 255, 255, 0.08)",
-                    },
-                  ]}
-                >
-                  <Feather name={item.icon} size={19} color={item.id === "verify" ? item.color : (colors.accent || colors.text)} />
+                  styles.iconBox,
+                  {
+                    backgroundColor:
+                    colors.surfaceAlt || "rgba(255, 255, 255, 0.08)"
+                  }]
+                  }>
+                  
+                  <Feather name={item.icon} size={19} color={item.id === "verify" ? item.color : colors.accent || colors.text} />
                 </View>
                 <Text style={[styles.menuItemText, { color: item.id === "verify" ? item.color : colors.text }]}>
                   {item.label}
@@ -232,24 +232,24 @@ export function ProfileDrawer({
                   <Feather name="chevron-right" size={16} color={colors.subtext || colors.muted} />
                 </View>
               </Pressable>
-            ))}
+              )}
           </View>
 
-          {/* Rodapé do Drawer com Logout */}
+          {}
           <View style={styles.footer}>
             <Pressable
-              style={({ pressed }) => [
+                style={({ pressed }) => [
                 styles.logoutButton,
                 {
                   backgroundColor: pressed ? "#dc2626" : "#ef4444",
-                  shadowColor: "#ef4444",
-                },
-              ]}
-              onPress={() => {
-                onClose();
-                onLogout?.();
-              }}
-            >
+                  shadowColor: "#ef4444"
+                }]
+                }
+                onPress={() => {
+                  onClose();
+                  onLogout?.();
+                }}>
+                
               <Feather name="power" size={18} color="#ffffff" />
               <Text style={styles.logoutText}>Sair da Conta</Text>
             </Pressable>
@@ -258,13 +258,13 @@ export function ProfileDrawer({
       </View>
     </Modal>
 
-    {/* Modal de Verificação do Código (Overlay Global) */}
+    {}
     <Modal
-      visible={verifyModalVisible}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setVerifyModalVisible(false)}
-    >
+        visible={verifyModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setVerifyModalVisible(false)}>
+        
       <View style={styles.overlay}>
         <View style={[styles.drawerContent, { backgroundColor: colors.card || colors.surface, borderColor: colors.border, alignSelf: "center", width: "90%", padding: 24, paddingBottom: 32 }]}>
           <View style={{ alignItems: "center", marginBottom: 16 }}>
@@ -279,46 +279,46 @@ export function ProfileDrawer({
             </Text>
           </View>
           <TextInput
-            maxLength={6}
-            style={{ 
-              borderWidth: 1, borderColor: colors.border, borderRadius: 12,
-              textAlign: "center", fontSize: 24, letterSpacing: 10,
-              paddingVertical: 12, marginBottom: 16, color: colors.text, backgroundColor: colors.background || "transparent"
-            }}
-            value={verifyCode}
-            onChangeText={setVerifyCode}
-            keyboardType="number-pad"
-            placeholder="000000"
-            placeholderTextColor={colors.muted}
-            autoFocus
-          />
+              maxLength={6}
+              style={{
+                borderWidth: 1, borderColor: colors.border, borderRadius: 12,
+                textAlign: "center", fontSize: 24, letterSpacing: 10,
+                paddingVertical: 12, marginBottom: 16, color: colors.text, backgroundColor: colors.background || "transparent"
+              }}
+              value={verifyCode}
+              onChangeText={setVerifyCode}
+              keyboardType="number-pad"
+              placeholder="000000"
+              placeholderTextColor={colors.muted}
+              autoFocus />
+            
           <Pressable
-            onPress={handleConfirmVerify}
-            disabled={verifying}
-            style={{ backgroundColor: colors.primary || colors.accent, paddingVertical: 14, borderRadius: 12, alignItems: "center", marginBottom: 12 }}
-          >
+              onPress={handleConfirmVerify}
+              disabled={verifying}
+              style={{ backgroundColor: colors.primary || colors.accent, paddingVertical: 14, borderRadius: 12, alignItems: "center", marginBottom: 12 }}>
+              
             {verifying ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "#fff", fontFamily: "Poppins_600SemiBold", fontSize: 16 }}>Confirmar</Text>}
           </Pressable>
           <Pressable
-            onPress={handleResendVerify}
-            disabled={resendingCode}
-            style={{ paddingVertical: 12, alignItems: "center", marginBottom: 4 }}
-          >
+              onPress={handleResendVerify}
+              disabled={resendingCode}
+              style={{ paddingVertical: 12, alignItems: "center", marginBottom: 4 }}>
+              
             <Text style={{ color: colors.primary || colors.accent, fontWeight: "600", fontSize: 15 }}>
               {resendingCode ? "Reenviando..." : "Reenviar código"}
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => setVerifyModalVisible(false)}
-            style={{ borderWidth: 1, borderColor: colors.border, paddingVertical: 12, borderRadius: 12, alignItems: "center" }}
-          >
+              onPress={() => setVerifyModalVisible(false)}
+              style={{ borderWidth: 1, borderColor: colors.border, paddingVertical: 12, borderRadius: 12, alignItems: "center" }}>
+              
             <Text style={{ color: colors.text, fontFamily: "Poppins_600SemiBold", fontSize: 15 }}>Cancelar</Text>
           </Pressable>
         </View>
       </View>
     </Modal>
-    </>
-  );
+    </>);
+
 }
 
 const styles = StyleSheet.create({
@@ -326,10 +326,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.65)",
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "flex-end"
   },
   backdrop: {
-    flex: 1,
+    flex: 1
   },
   drawerContent: {
     width: "82%",
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 24,
     elevation: 30,
-    overflow: "hidden",
+    overflow: "hidden"
   },
   header: {
     paddingHorizontal: 24,
@@ -354,51 +354,51 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    marginRight: 10,
+    marginRight: 10
   },
   userMeta: {
     marginLeft: 12,
-    flex: 1,
+    flex: 1
   },
   brandRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    marginBottom: 2,
+    marginBottom: 2
   },
   brandText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 11,
     textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: 0.8
   },
   nameText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 15,
+    fontSize: 15
   },
   handleText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
-    marginTop: -2,
+    marginTop: -2
   },
   closeButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   menuList: {
     flex: 1,
     paddingVertical: 20,
     paddingHorizontal: 16,
-    gap: 12,
+    gap: 12
   },
   menuItem: {
     flexDirection: "row",
@@ -407,31 +407,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 20,
     borderWidth: 1,
-    gap: 14,
+    gap: 14
   },
   iconBox: {
     width: 42,
     height: 42,
     borderRadius: 14,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   menuItemText: {
     flex: 1,
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 14.5,
+    fontSize: 14.5
   },
   chevronBox: {
     width: 28,
     height: 28,
     borderRadius: 14,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   footer: {
     paddingHorizontal: 20,
     paddingBottom: 30,
-    paddingTop: 10,
+    paddingTop: 10
   },
   logoutButton: {
     flexDirection: "row",
@@ -443,11 +443,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 4
   },
   logoutText: {
     color: "#ffffff",
     fontFamily: "Poppins_700Bold",
-    fontSize: 15,
-  },
+    fontSize: 15
+  }
 });

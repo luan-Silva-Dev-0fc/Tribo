@@ -5,15 +5,15 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 
 export const ReelShareCard = React.memo(function ReelShareCard({
   reelData,
   isMe,
-  onPress,
+  onPress
 }) {
   const { colors } = useTheme();
 
@@ -23,9 +23,9 @@ export const ReelShareCard = React.memo(function ReelShareCard({
   const authorName = reelData.author_name || reelData.authorName || "Tribo";
   const videoId = reelData.video_id || reelData.videoId || reelData.youtube_video_id;
   const thumbnailUrl =
-    reelData.thumbnail_url ||
-    reelData.thumbnailUrl ||
-    (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null);
+  reelData.thumbnail_url ||
+  reelData.thumbnailUrl || (
+  videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null);
 
   const handleCardPress = () => {
     if (onPress) {
@@ -42,56 +42,56 @@ export const ReelShareCard = React.memo(function ReelShareCard({
     <Pressable
       onPress={handleCardPress}
       style={({ pressed }) => [
-        styles.cardContainer,
-        {
-          backgroundColor: isMe
-            ? "rgba(0, 0, 0, 0.25)"
-            : colors.surfaceAlt || "#27272a",
-          borderColor: isMe
-            ? "rgba(255, 255, 255, 0.15)"
-            : colors.border || "rgba(255, 255, 255, 0.08)",
-          opacity: pressed ? 0.9 : 1,
-        },
-      ]}
-    >
-      {/* Thumbnail com Overlay e Badge */}
+      styles.cardContainer,
+      {
+        backgroundColor: isMe ?
+        "rgba(0, 0, 0, 0.25)" :
+        colors.surfaceAlt || "#27272a",
+        borderColor: isMe ?
+        "rgba(255, 255, 255, 0.15)" :
+        colors.border || "rgba(255, 255, 255, 0.08)",
+        opacity: pressed ? 0.9 : 1
+      }]
+      }>
+      
+      {}
       <View style={styles.thumbnailWrapper}>
-        {thumbnailUrl ? (
-          <Image
-            source={{ uri: thumbnailUrl }}
-            style={styles.thumbnail}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={[styles.thumbnail, { backgroundColor: "#18181b", alignItems: "center", justifyContent: "center" }]}>
+        {thumbnailUrl ?
+        <Image
+          source={{ uri: thumbnailUrl }}
+          style={styles.thumbnail}
+          resizeMode="cover" /> :
+
+
+        <View style={[styles.thumbnail, { backgroundColor: "#18181b", alignItems: "center", justifyContent: "center" }]}>
             <Feather name="film" size={24} color="#71717a" />
           </View>
-        )}
+        }
 
-        {/* Overlay escuro sutil */}
+        {}
         <View style={styles.thumbOverlay} />
 
-        {/* Badge "Reel" discreta */}
+        {}
         <View style={styles.badge}>
           <Feather name="play" size={10} color="#ffffff" />
           <Text style={styles.badgeText}>Reel</Text>
         </View>
 
-        {/* Ícone de Play centralizado translúcido */}
+        {}
         <View style={styles.centerPlayIcon}>
           <Ionicons name="play" size={22} color="#ffffff" style={{ marginLeft: 2 }} />
         </View>
       </View>
 
-      {/* Detalhes do Reel */}
+      {}
       <View style={styles.detailsContainer}>
         <Text
           numberOfLines={2}
           style={[
-            styles.titleText,
-            { color: isMe ? "#ffffff" : colors.text },
-          ]}
-        >
+          styles.titleText,
+          { color: isMe ? "#ffffff" : colors.text }]
+          }>
+          
           {title}
         </Text>
         
@@ -99,16 +99,16 @@ export const ReelShareCard = React.memo(function ReelShareCard({
           <Text
             numberOfLines={1}
             style={[
-              styles.authorText,
-              { color: isMe ? "rgba(255, 255, 255, 0.75)" : colors.muted || "#a1a1aa" },
-            ]}
-          >
+            styles.authorText,
+            { color: isMe ? "rgba(255, 255, 255, 0.75)" : colors.muted || "#a1a1aa" }]
+            }>
+            
             @{authorName}
           </Text>
         </View>
       </View>
-    </Pressable>
-  );
+    </Pressable>);
+
 });
 
 const styles = StyleSheet.create({
@@ -117,21 +117,21 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     overflow: "hidden",
-    marginVertical: 4,
+    marginVertical: 4
   },
   thumbnailWrapper: {
     width: "100%",
     height: 140,
     position: "relative",
-    backgroundColor: "#000000",
+    backgroundColor: "#000000"
   },
   thumbnail: {
     width: "100%",
-    height: "100%",
+    height: "100%"
   },
   thumbOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.25)",
+    backgroundColor: "rgba(0, 0, 0, 0.25)"
   },
   badge: {
     position: "absolute",
@@ -145,13 +145,13 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderColor: "rgba(255, 255, 255, 0.2)"
   },
   badgeText: {
     color: "#ffffff",
     fontSize: 10.5,
     fontFamily: "Poppins_600SemiBold",
-    letterSpacing: 0.3,
+    letterSpacing: 0.3
   },
   centerPlayIcon: {
     position: "absolute",
@@ -166,24 +166,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.3)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   detailsContainer: {
     padding: 10,
-    gap: 3,
+    gap: 3
   },
   titleText: {
     fontSize: 13,
     fontFamily: "Poppins_600SemiBold",
-    lineHeight: 18,
+    lineHeight: 18
   },
   authorRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 2,
+    marginTop: 2
   },
   authorText: {
     fontSize: 11.5,
-    fontFamily: "Poppins_400Regular",
-  },
+    fontFamily: "Poppins_400Regular"
+  }
 });

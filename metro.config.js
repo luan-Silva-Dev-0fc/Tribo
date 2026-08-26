@@ -1,8 +1,6 @@
 const { getDefaultConfig } = require("expo/metro-config");
 
 const config = getDefaultConfig(__dirname);
-
-// Permite que o Metro resolva pacotes modernos ESM (.mjs, .cjs)
 if (!config.resolver.sourceExts.includes("mjs")) {
   config.resolver.sourceExts.push("mjs");
 }

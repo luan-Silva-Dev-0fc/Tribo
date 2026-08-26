@@ -6,17 +6,17 @@ import {
   Pressable,
   Text,
   TextInput,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 import BaseCardLayout from "../../components/layout/base-card-layout";
 import { estilosVerificacao } from "./designer/estilos-verificacao";
 
-/**
- * Modal exibido após verificação bem-sucedida do e-mail.
- * Mostra o selo de verificação azul como recompensa.
- */
+
+
+
+
 export function ModalContaVerificada({ visible, onContinuar }) {
   if (!visible) return null;
   return (
@@ -25,11 +25,11 @@ export function ModalContaVerificada({ visible, onContinuar }) {
         <View style={estilosVerificacao.rewardCard}>
           <Image
             source={{
-              uri: "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/selo%20de%20verificacao/selo%20azul.png",
+              uri: "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/selo%20de%20verificacao/selo%20azul.png"
             }}
             style={estilosVerificacao.rewardBadgeImage}
-            resizeMode="contain"
-          />
+            resizeMode="contain" />
+          
           <Text style={estilosVerificacao.rewardTitle}>Conta verificada com sucesso!</Text>
           <Text style={estilosVerificacao.rewardMessage}>
             Verificamos seu e-mail! Você acaba de ganhar o Selo de Verificação no seu perfil.
@@ -39,25 +39,25 @@ export function ModalContaVerificada({ visible, onContinuar }) {
           </Pressable>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
-/**
- * Tela de Verificação de E-mail — solicita o código de 6 dígitos enviado ao e-mail.
- *
- * @param {object}   props
- * @param {string}   props.email          - E-mail que recebeu o código
- * @param {string}   props.codigo         - Valor atual do campo de código
- * @param {Function} props.onChangeCodigo - Callback de mudança do código
- * @param {boolean}  props.busy           - Indica carregamento
- * @param {boolean}  props.reenviando     - Indica reenvio em andamento
- * @param {boolean}  props.showModal      - Exibe o modal de conta verificada
- * @param {Function} props.onVerificar    - Submete o código
- * @param {Function} props.onReenviar     - Reenvia o código
- * @param {Function} props.onVoltarLogin  - Volta para a tela de login
- * @param {Function} props.onContinuar    - Fecha o modal e prossegue
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export default function TelaVerificacao({
   email,
   codigo,
@@ -68,7 +68,7 @@ export default function TelaVerificacao({
   onVerificar,
   onReenviar,
   onVoltarLogin,
-  onContinuar,
+  onContinuar
 }) {
   const { colors, isDark } = useTheme();
 
@@ -80,8 +80,8 @@ export default function TelaVerificacao({
         badgeIcon={<FontAwesome name="star" size={12} color={colors.text} />}
         badgeText="Verificação"
         title="Verifique seu e-mail"
-        description="Enviamos um código de segurança de 6 dígitos para o seu e-mail."
-      >
+        description="Enviamos um código de segurança de 6 dígitos para o seu e-mail.">
+        
         <View style={{ backgroundColor: "#111111", padding: 12, borderRadius: 8, marginBottom: 16, flexDirection: "row", alignItems: "center" }}>
           <Feather name="info" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
           <Text style={{ flex: 1, color: "#FFFFFF", fontSize: 13, lineHeight: 18 }}>
@@ -91,10 +91,10 @@ export default function TelaVerificacao({
 
         <View
           style={[
-            estilosVerificacao.verifyEmailBadge,
-            { backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F3F4F6" },
-          ]}
-        >
+          estilosVerificacao.verifyEmailBadge,
+          { backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F3F4F6" }]
+          }>
+          
           <Feather name="mail" size={16} color={colors.muted} />
           <Text style={[estilosVerificacao.verifyEmailText, { color: colors.text }]}>
             {email}
@@ -105,35 +105,35 @@ export default function TelaVerificacao({
           <TextInput
             maxLength={6}
             style={[
-              estilosVerificacao.codeInput,
-              {
-                borderColor: colors.line,
-                backgroundColor: colors.surface,
-                color: colors.text,
-              },
-            ]}
+            estilosVerificacao.codeInput,
+            {
+              borderColor: colors.line,
+              backgroundColor: colors.surface,
+              color: colors.text
+            }]
+            }
             value={codigo}
             onChangeText={onChangeCodigo}
             keyboardType="number-pad"
             placeholder="000000"
             placeholderTextColor={colors.subtext || "#999999"}
-            autoFocus
-          />
+            autoFocus />
+          
         </View>
 
         <Pressable
           disabled={busy}
           onPress={onVerificar}
           style={[
-            estilosVerificacao.submit,
-            { backgroundColor: colors.primary, opacity: busy ? 0.8 : 1 },
-          ]}
-        >
-          {busy ? (
-            <ActivityIndicator color="#ffffff" />
-          ) : (
-            <Text style={estilosVerificacao.submitText}>Finalizar</Text>
-          )}
+          estilosVerificacao.submit,
+          { backgroundColor: colors.primary, opacity: busy ? 0.8 : 1 }]
+          }>
+          
+          {busy ?
+          <ActivityIndicator color="#ffffff" /> :
+
+          <Text style={estilosVerificacao.submitText}>Finalizar</Text>
+          }
         </Pressable>
 
         <View style={estilosVerificacao.resendContainer}>
@@ -156,6 +156,6 @@ export default function TelaVerificacao({
       </BaseCardLayout>
 
       <ModalContaVerificada visible={showModal} onContinuar={onContinuar} />
-    </>
-  );
+    </>);
+
 }

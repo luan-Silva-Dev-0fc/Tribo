@@ -14,8 +14,8 @@ import {
   StatusBar,
   Text,
   TextInput,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { Feather } from "@expo/vector-icons";
 import { api } from "../../api";
@@ -25,7 +25,7 @@ import { useTheme } from "../../theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-const STORY_DURATION = 60000; // 60 segundos por story
+const STORY_DURATION = 60000;
 
 function SafeStoryVideoView({ url, paused, style }) {
   const player = useVideoPlayer(url, (p) => {
@@ -52,9 +52,9 @@ function SafeStoryVideoView({ url, paused, style }) {
       player={player}
       style={style}
       contentFit="contain"
-      nativeControls={false}
-    />
-  );
+      nativeControls={false} />);
+
+
 }
 
 export function StoryViewerModal({
@@ -63,7 +63,7 @@ export function StoryViewerModal({
   userGroups = [],
   currentUser,
   onClose,
-  onStoryDeleted,
+  onStoryDeleted
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -82,13 +82,13 @@ export function StoryViewerModal({
   const [followers, setFollowers] = useState([]);
   const [loadingFollowers, setLoadingFollowers] = useState(false);
   const [myGroups, setMyGroups] = useState([]);
-  const [shareTab, setShareTab] = useState("followers"); // "followers" | "groups"
+  const [shareTab, setShareTab] = useState("followers");
   const [localLikes, setLocalLikes] = useState({});
 
   const progressAnim = useRef(new Animated.Value(0)).current;
   const timerRef = useRef(null);
 
-  // Determina o grupo de stories ativo
+
   const activeGroup = userGroups[currentUserIndex] || initialUserGroup;
   const stories = activeGroup?.stories || [];
   const currentStory = stories[currentStoryIndex];
@@ -104,20 +104,20 @@ export function StoryViewerModal({
     ""
   );
 
-  // Identifica se a mídia é um vídeo
+
   const mediaUri =
-    currentStory?.mediaUrl ||
-    currentStory?.media_url ||
-    currentStory?.imageUrl ||
-    currentStory?.image_url ||
-    currentStory?.url || "";
+  currentStory?.mediaUrl ||
+  currentStory?.media_url ||
+  currentStory?.imageUrl ||
+  currentStory?.image_url ||
+  currentStory?.url || "";
 
   const isVideo = mediaUri.toLowerCase().match(/\.(mp4|mov|mkv|webm)$/i);
 
   const currentUid = String(currentUser?.id || "");
   const isOwner = Boolean(currentUid && currentStoryUserId && currentUid === currentStoryUserId);
 
-  // Inicializa índice quando abre
+
   useEffect(() => {
     if (visible && initialUserGroup) {
       const idx = userGroups.findIndex(
@@ -153,7 +153,7 @@ export function StoryViewerModal({
     }
   }, [currentStoryIndex, currentUserIndex, userGroups]);
 
-  // Animação de progresso
+
   useEffect(() => {
     if (!visible || !currentStory || paused || menuVisible || editingCaption || shareModalVisible) {
       progressAnim.stopAnimation();
@@ -164,7 +164,7 @@ export function StoryViewerModal({
     const anim = Animated.timing(progressAnim, {
       toValue: 1,
       duration: STORY_DURATION,
-      useNativeDriver: false,
+      useNativeDriver: false
     });
 
     anim.start(({ finished }) => {
@@ -178,11 +178,11 @@ export function StoryViewerModal({
     };
   }, [visible, currentStory, currentStoryIndex, currentUserIndex, paused, menuVisible, editingCaption, shareModalVisible, handleNext, progressAnim]);
 
-  // Ações do dono: Excluir
+
   const handleDeleteStory = () => {
     if (!currentStory?.id) return;
     setMenuVisible(false);
-      setDeleteConfirmVisible(true);
+    setDeleteConfirmVisible(true);
   };
 
   const confirmDeleteStory = async () => {
@@ -197,7 +197,7 @@ export function StoryViewerModal({
     }
   };
 
-  // Ações do dono: Editar legenda
+
   const handleSaveCaption = async () => {
     if (!currentStory?.id) return;
     try {
@@ -212,7 +212,7 @@ export function StoryViewerModal({
     }
   };
 
-  // Resposta rápida via DM
+
   const handleSendReply = async () => {
     if (!replyText.trim() || sendingReply || !currentStory) return;
     try {
@@ -221,7 +221,7 @@ export function StoryViewerModal({
       await api.messages.send({
         receiver_id: receiverId,
         content: replyText.trim(),
-        story_id: currentStory.id,
+        story_id: currentStory.id
       });
       setReplyText("");
       Alert.alert("Mensagem enviada", "Sua resposta foi enviada no bate-papo.");
@@ -255,7 +255,7 @@ export function StoryViewerModal({
         await api.stories.unlike(storyId);
       }
     } catch (err) {
-      // Revert optimistic update
+
       setLocalLikes((prev) => ({
         ...prev,
         [storyId]: currentLikeState
@@ -264,20 +264,20 @@ export function StoryViewerModal({
     }
   };
 
-  // Compartilhar story com seguidor ou grupo
+
   const handleOpenShare = async () => {
     setShareModalVisible(true);
     try {
       setLoadingFollowers(true);
       const [followersRes, groupsRes] = await Promise.all([
-        api.users.following(currentUser?.id).catch(() => []),
-        api.groups.list().catch(() => [])
-      ]);
+      api.users.following(currentUser?.id).catch(() => []),
+      api.groups.list().catch(() => [])]
+      );
       const list = Array.isArray(followersRes) ? followersRes : followersRes?.following || followersRes?.users || [];
       setFollowers(list);
       setMyGroups(Array.isArray(groupsRes) ? groupsRes : groupsRes?.groups || []);
     } catch {
-      // Silencioso
+
     } finally {
       setLoadingFollowers(false);
     }
@@ -313,69 +313,69 @@ export function StoryViewerModal({
       <StatusBar hidden={visible} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={[styles.container, { backgroundColor: "#000000", paddingTop: insets.top }]}
-      >
-        {/* Background Media */}
-        {isVideo && visible && !!mediaUri ? (
-          <SafeStoryVideoView
-            url={mediaUri}
-            paused={paused}
-            style={styles.storyMedia}
-          />
-        ) : (
-          <Image
-            source={{ uri: mediaUri }}
-            style={styles.storyMedia}
-            resizeMode="contain"
-          />
-        )}
+        style={[styles.container, { backgroundColor: "#000000", paddingTop: insets.top }]}>
+        
+        {}
+        {isVideo && visible && !!mediaUri ?
+        <SafeStoryVideoView
+          url={mediaUri}
+          paused={paused}
+          style={styles.storyMedia} /> :
 
-        {/* Story Overlay & Gradient protection */}
+
+        <Image
+          source={{ uri: mediaUri }}
+          style={styles.storyMedia}
+          resizeMode="contain" />
+
+        }
+
+        {}
         <View style={[styles.overlay, { paddingTop: insets.top > 0 ? insets.top + 10 : 40 }]}>
           <View style={styles.topContainer}>
-            {/* Top Progress Bars */}
+            {}
             <View style={styles.progressContainer}>
             {stories.map((s, idx) => {
-              const isPast = idx < currentStoryIndex;
-              const isCurrent = idx === currentStoryIndex;
-              return (
-                <View key={s.id || idx} style={styles.progressBarBackground}>
+                const isPast = idx < currentStoryIndex;
+                const isCurrent = idx === currentStoryIndex;
+                return (
+                  <View key={s.id || idx} style={styles.progressBarBackground}>
                   {isPast && <View style={[styles.progressBarFill, { width: "100%" }]} />}
-                  {isCurrent && (
+                  {isCurrent &&
                     <Animated.View
                       style={[
-                        styles.progressBarFill,
-                        {
-                          width: progressAnim.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: ["0%", "100%"],
-                          }),
-                        },
-                      ]}
-                    />
-                  )}
-                </View>
-              );
-            })}
+                      styles.progressBarFill,
+                      {
+                        width: progressAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["0%", "100%"]
+                        })
+                      }]
+                      } />
+
+                    }
+                </View>);
+
+              })}
           </View>
 
-          {/* Header */}
+          {}
           <View style={styles.header}>
             <View style={styles.headerAuthor}>
               <Avatar user={author} size={38} />
               <View style={styles.headerAuthorDetails}>
                 <View style={styles.nameRow}>
-                  <Text style={[styles.authorName, { color: "#ffffff", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: {width: 0, height: 1}, textShadowRadius: 3 }]}>{userName(author)}</Text>
+                  <Text style={[styles.authorName, { color: "#ffffff", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }]}>{userName(author)}</Text>
                   <VerificationBadge user={author} size={14} />
                 </View>
-                <Text style={[styles.timeAgo, { color: "rgba(255,255,255,0.8)", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: {width: 0, height: 1}, textShadowRadius: 3 }]}>
+                <Text style={[styles.timeAgo, { color: "rgba(255,255,255,0.8)", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }]}>
                   {formatRelativeTime(currentStory.createdAt || currentStory.created_at)}
                 </Text>
               </View>
             </View>
 
             <View style={styles.headerRight}>
-              {isOwner && (
+              {isOwner &&
                 <IconButton
                   name="more-horizontal"
                   color="#ffffff"
@@ -384,104 +384,104 @@ export function StoryViewerModal({
                     setCaptionValue(currentStory.caption || "");
                     setMenuVisible(true);
                   }}
-                  label="Opções do story"
-                />
-              )}
+                  label="Opções do story" />
+
+                }
               <IconButton name="x" color="#ffffff" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onPress={onClose} label="Fechar story" />
             </View>
           </View>
           </View>
 
-          {/* Tap Navigation Touch Zones */}
+          {}
           <View style={styles.touchZones}>
             <Pressable
               style={styles.touchLeft}
               onPress={handlePrevious}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)}
-            />
+              onPressOut={() => setPaused(false)} />
+            
             <Pressable
               style={styles.touchCenter}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)}
-            />
+              onPressOut={() => setPaused(false)} />
+            
             <Pressable
               style={styles.touchRight}
               onPress={handleNext}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)}
-            />
+              onPressOut={() => setPaused(false)} />
+            
           </View>
 
           <View style={styles.bottomContainer}>
-            {/* Caption (if available) */}
-            {!!currentStory.caption && !editingCaption && (
-              <View
-                style={[
-                  styles.captionContainer,
-                  {
-                    backgroundColor: "rgba(0,0,0,0.6)",
-                  },
-                ]}
-              >
-                <Text style={[styles.captionText, { color: "#ffffff", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: {width: 0, height: 1}, textShadowRadius: 3 }]}>{currentStory.caption}</Text>
-              </View>
-            )}
-
-          {/* Inline Caption Editor */}
-          {editingCaption && (
+            {}
+            {!!currentStory.caption && !editingCaption &&
             <View
               style={[
-                styles.editCaptionBox,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                  borderWidth: 1,
-                },
-              ]}
-            >
+              styles.captionContainer,
+              {
+                backgroundColor: "rgba(0,0,0,0.6)"
+              }]
+              }>
+              
+                <Text style={[styles.captionText, { color: "#ffffff", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }]}>{currentStory.caption}</Text>
+              </View>
+            }
+
+          {}
+          {editingCaption &&
+            <View
+              style={[
+              styles.editCaptionBox,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                borderWidth: 1
+              }]
+              }>
+              
               <TextInput
                 value={captionValue}
                 onChangeText={setCaptionValue}
                 placeholder="Editar legenda..."
                 placeholderTextColor={colors.muted}
                 style={[styles.editCaptionInput, { color: colors.text }]}
-                autoFocus
-              />
+                autoFocus />
+              
               <View style={styles.editCaptionButtons}>
                 <Pressable
                   style={styles.editCancelBtn}
-                  onPress={() => setEditingCaption(false)}
-                >
+                  onPress={() => setEditingCaption(false)}>
+                  
                   <Text style={[styles.editCancelText, { color: colors.subtext }]}>Cancelar</Text>
                 </Pressable>
                 <Pressable
                   style={[styles.editSaveBtn, { backgroundColor: colors.primary || colors.accent }]}
                   onPress={handleSaveCaption}
-                  disabled={savingCaption}
-                >
-                  {savingCaption ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Text style={styles.editSaveText}>Salvar</Text>
-                  )}
+                  disabled={savingCaption}>
+                  
+                  {savingCaption ?
+                  <ActivityIndicator size="small" color="#fff" /> :
+
+                  <Text style={styles.editSaveText}>Salvar</Text>
+                  }
                 </Pressable>
               </View>
             </View>
-          )}
+            }
 
-          {/* Footer (Quick Reply & Share) */}
-          {!isOwner && (
+          {}
+          {!isOwner &&
             <View style={styles.footer}>
               <View
                 style={[
-                  styles.replyInputContainer,
-                  {
-                    backgroundColor: colors.card,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
+                styles.replyInputContainer,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border
+                }]
+                }>
+                
                 <TextInput
                   placeholder="Enviar mensagem..."
                   placeholderTextColor={colors.muted}
@@ -489,21 +489,21 @@ export function StoryViewerModal({
                   onChangeText={setReplyText}
                   style={[styles.replyInput, { color: colors.text }]}
                   onFocus={() => setPaused(true)}
-                  onBlur={() => setPaused(false)}
-                />
-                {!!replyText.trim() && (
-                  <Pressable
-                    style={styles.sendReplyBtn}
-                    onPress={handleSendReply}
-                    disabled={sendingReply}
-                  >
-                    {sendingReply ? (
-                      <ActivityIndicator size="small" color={colors.primary} />
-                    ) : (
-                      <Feather name="send" size={18} color={colors.primary || colors.accent} />
-                    )}
+                  onBlur={() => setPaused(false)} />
+                
+                {!!replyText.trim() &&
+                <Pressable
+                  style={styles.sendReplyBtn}
+                  onPress={handleSendReply}
+                  disabled={sendingReply}>
+                  
+                    {sendingReply ?
+                  <ActivityIndicator size="small" color={colors.primary} /> :
+
+                  <Feather name="send" size={18} color={colors.primary || colors.accent} />
+                  }
                   </Pressable>
-                )}
+                }
               </View>
 
               {(() => {
@@ -515,64 +515,64 @@ export function StoryViewerModal({
                 return (
                   <Pressable
                     style={[
-                      styles.shareIconBtn,
-                      {
-                        backgroundColor: colors.card,
-                        borderColor: colors.border,
-                        marginRight: 8,
-                      },
-                    ]}
+                    styles.shareIconBtn,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                      marginRight: 8
+                    }]
+                    }
                     onPress={handleToggleLike}
-                    accessibilityLabel="Curtir story"
-                  >
+                    accessibilityLabel="Curtir story">
+                    
                     <Feather
                       name="heart"
                       size={20}
-                      color={likeState.isLiked ? "#ef4444" : colors.text}
-                    />
-                  </Pressable>
-                );
+                      color={likeState.isLiked ? "#ef4444" : colors.text} />
+                    
+                  </Pressable>);
+
               })()}
 
               <Pressable
                 style={[
-                  styles.shareIconBtn,
-                  {
-                    backgroundColor: colors.card,
-                    borderColor: colors.border,
-                  },
-                ]}
+                styles.shareIconBtn,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border
+                }]
+                }
                 onPress={handleOpenShare}
-                accessibilityLabel="Compartilhar story"
-              >
+                accessibilityLabel="Compartilhar story">
+                
                 <Feather name="send" size={20} color={colors.text} />
               </Pressable>
             </View>
-          )}
+            }
           </View>
         </View>
 
         
-          {/* Menu Modal do Dono */}
-          {menuVisible && (
-            <View style={[StyleSheet.absoluteFill, { zIndex: 9998 }]}>
+          {}
+          {menuVisible &&
+        <View style={[StyleSheet.absoluteFill, { zIndex: 9998 }]}>
               <Pressable style={styles.modalOverlay} onPress={() => setMenuVisible(false)}>
               <View style={[styles.menuSheet, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <Pressable
-                  style={styles.menuItem}
-                  onPress={() => {
-                    setMenuVisible(false);
-                    setEditingCaption(true);
-                  }}
-                >
+                style={styles.menuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  setEditingCaption(true);
+                }}>
+                
                   <Feather name="edit-3" size={20} color={colors.text} />
                   <Text style={[styles.menuItemText, { color: colors.text }]}>Editar Legenda</Text>
                 </Pressable>
 
                 <Pressable
-                  style={[styles.menuItem, { borderTopWidth: 1, borderColor: colors.line }]}
-                  onPress={handleDeleteStory}
-                >
+                style={[styles.menuItem, { borderTopWidth: 1, borderColor: colors.line }]}
+                onPress={handleDeleteStory}>
+                
                   <Feather name="trash-2" size={20} color={colors.danger || "#ef4444"} />
                   <Text style={[styles.menuItemText, { color: colors.danger || "#ef4444" }]}>Excluir Story</Text>
                 </Pressable>
@@ -580,13 +580,13 @@ export function StoryViewerModal({
             </Pressable>
           
             </View>
-          )}
+        }
   
 
         
-        {/* Modal de Compartilhamento com Seguidor */}
-        {shareModalVisible && (
-          <View style={[StyleSheet.absoluteFill, { zIndex: 9997 }]}>
+        {}
+        {shareModalVisible &&
+        <View style={[StyleSheet.absoluteFill, { zIndex: 9997 }]}>
             <View style={styles.modalOverlay}>
               <View style={[styles.shareSheet, { backgroundColor: colors.card, borderColor: colors.border, borderTopWidth: 1 }]}>
                 <View style={styles.shareSheetHeader}>
@@ -594,79 +594,79 @@ export function StoryViewerModal({
                   <IconButton name="x" color={colors.text} onPress={() => setShareModalVisible(false)} />
                 </View>
 
-                {/* Tabs */}
+                {}
                 <View style={styles.shareTabsContainer}>
                   <Pressable
-                    style={[styles.shareTab, shareTab === "followers" && styles.shareTabActive, shareTab === "followers" && { borderBottomColor: colors.primary || colors.accent }]}
-                    onPress={() => setShareTab("followers")}
-                  >
+                  style={[styles.shareTab, shareTab === "followers" && styles.shareTabActive, shareTab === "followers" && { borderBottomColor: colors.primary || colors.accent }]}
+                  onPress={() => setShareTab("followers")}>
+                  
                     <Text style={[styles.shareTabText, shareTab === "followers" && { color: colors.primary || colors.accent }]}>Seguidores</Text>
                   </Pressable>
                   <Pressable
-                    style={[styles.shareTab, shareTab === "groups" && styles.shareTabActive, shareTab === "groups" && { borderBottomColor: colors.primary || colors.accent }]}
-                    onPress={() => setShareTab("groups")}
-                  >
+                  style={[styles.shareTab, shareTab === "groups" && styles.shareTabActive, shareTab === "groups" && { borderBottomColor: colors.primary || colors.accent }]}
+                  onPress={() => setShareTab("groups")}>
+                  
                     <Text style={[styles.shareTabText, shareTab === "groups" && { color: colors.primary || colors.accent }]}>Meus Grupos</Text>
                   </Pressable>
                 </View>
 
                 <ScrollView style={{ maxHeight: SCREEN_HEIGHT * 0.5 }}>
-                  {shareTab === "followers" ? (
-                    loadingFollowers ? (
-                      <ActivityIndicator size="small" color={colors.primary || colors.accent} style={{ marginVertical: 20 }} />
-                    ) : followers.length === 0 ? (
-                      <Text style={[styles.noFollowersText, { color: colors.muted }]}>Nenhum seguidor encontrado.</Text>
-                    ) : (
-                      followers.map((item) => {
-                        const u = item.following || item.user || item;
-                        return (
-                          <Pressable
-                            key={u.id}
-                            style={styles.followerRow}
-                            onPress={() => handleSendToUser(u)}
-                          >
+                  {shareTab === "followers" ?
+                loadingFollowers ?
+                <ActivityIndicator size="small" color={colors.primary || colors.accent} style={{ marginVertical: 20 }} /> :
+                followers.length === 0 ?
+                <Text style={[styles.noFollowersText, { color: colors.muted }]}>Nenhum seguidor encontrado.</Text> :
+
+                followers.map((item) => {
+                  const u = item.following || item.user || item;
+                  return (
+                    <Pressable
+                      key={u.id}
+                      style={styles.followerRow}
+                      onPress={() => handleSendToUser(u)}>
+                      
                             <Avatar user={u} size={40} />
                             <View style={{ flex: 1, marginLeft: 12 }}>
                               <Text style={[styles.followerName, { color: colors.text }]}>{userName(u)}</Text>
                               <Text style={[styles.followerHandle, { color: colors.subtext }]}>@{u.username || "usuario"}</Text>
                             </View>
                             <Feather name="send" size={18} color={colors.primary || colors.accent} />
-                          </Pressable>
-                        );
-                      })
-                    )
-                  ) : (
-                    loadingFollowers ? (
-                      <ActivityIndicator size="small" color={colors.primary || colors.accent} style={{ marginVertical: 20 }} />
-                    ) : myGroups.length === 0 ? (
-                      <Text style={[styles.noFollowersText, { color: colors.muted }]}>Você não está em nenhum grupo.</Text>
-                    ) : (
-                      myGroups.map((group) => (
-                        <Pressable
-                          key={group.id}
-                          style={styles.followerRow}
-                          onPress={() => handleSendToGroup(group)}
-                        >
+                          </Pressable>);
+
+                }) :
+
+
+                loadingFollowers ?
+                <ActivityIndicator size="small" color={colors.primary || colors.accent} style={{ marginVertical: 20 }} /> :
+                myGroups.length === 0 ?
+                <Text style={[styles.noFollowersText, { color: colors.muted }]}>Você não está em nenhum grupo.</Text> :
+
+                myGroups.map((group) =>
+                <Pressable
+                  key={group.id}
+                  style={styles.followerRow}
+                  onPress={() => handleSendToGroup(group)}>
+                  
                           <Image source={{ uri: group.avatar_url || group.avatarUrl }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.border }} />
                           <View style={{ flex: 1, marginLeft: 12 }}>
                             <Text style={[styles.followerName, { color: colors.text }]}>{group.name}</Text>
                           </View>
                           <Feather name="send" size={18} color={colors.primary || colors.accent} />
                         </Pressable>
-                      ))
-                    )
-                  )}
+                )
+
+                }
                 </ScrollView>
 
               </View>
             </View>
           </View>
-        )}
+        }
   
       
-        {/* Absolute View overlay instead of nested Modal */}
-        {deleteConfirmVisible && (
-          <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
+        {}
+        {deleteConfirmVisible &&
+        <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
             <Pressable style={[styles.modalOverlay, { justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.75)' }]} onPress={() => setDeleteConfirmVisible(false)}>
               <Pressable style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 20, width: '85%', padding: 24 }]} onPress={(e) => e.stopPropagation()}>
                 <Text style={[styles.modalTitle, { color: colors.text, fontSize: 18, marginBottom: 8, textAlign: 'center' }]}>
@@ -678,68 +678,68 @@ export function StoryViewerModal({
                 
                 <View style={{ gap: 12 }}>
                   <Pressable
-                    style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: "#EF4444", alignItems: 'center' }}
-                    onPress={confirmDeleteStory}
-                  >
+                  style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: "#EF4444", alignItems: 'center' }}
+                  onPress={confirmDeleteStory}>
+                  
                     <Text style={{ color: "#fff", fontFamily: "Poppins_600SemiBold", fontSize: 15 }}>Excluir</Text>
                   </Pressable>
 
                   <Pressable
-                    style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: colors.surfaceAlt, alignItems: 'center' }}
-                    onPress={() => setDeleteConfirmVisible(false)}
-                  >
+                  style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: colors.surfaceAlt, alignItems: 'center' }}
+                  onPress={() => setDeleteConfirmVisible(false)}>
+                  
                     <Text style={{ color: colors.text, fontFamily: "Poppins_600SemiBold", fontSize: 15 }}>Cancelar</Text>
                   </Pressable>
                 </View>
               </Pressable>
             </Pressable>
           </View>
-        )}
+        }
 
       </KeyboardAvoidingView>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   storyMedia: {
     ...StyleSheet.absoluteFillObject,
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    height: SCREEN_HEIGHT
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "space-between",
     paddingTop: Platform.OS === "ios" ? 48 : 20,
-    paddingBottom: 20,
+    paddingBottom: 20
   },
   progressContainer: {
     flexDirection: "row",
     gap: 6,
     paddingHorizontal: 12,
-    marginBottom: 8,
+    marginBottom: 8
   },
   progressBarBackground: {
     flex: 1,
     height: 2.5,
     backgroundColor: "rgba(255, 255, 255, 0.35)",
     borderRadius: 4,
-    overflow: "hidden",
+    overflow: "hidden"
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ffffff"
   },
   topContainer: {
-    paddingTop: 8,
+    paddingTop: 8
   },
   bottomContainer: {
     paddingBottom: 8,
     width: "100%",
-    alignItems: "center",
+    alignItems: "center"
   },
   header: {
     flexDirection: "row",
@@ -748,53 +748,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     marginTop: 4,
-    zIndex: 10,
+    zIndex: 10
   },
   headerAuthor: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 10
   },
   headerAuthorDetails: {
-    justifyContent: "center",
+    justifyContent: "center"
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 6
   },
   authorName: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 14,
+    fontSize: 14
   },
   timeAgo: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 11,
+    fontSize: 11
   },
   headerRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 4
   },
   touchZones: {
     ...StyleSheet.absoluteFillObject,
     flexDirection: "row",
-    zIndex: 5,
+    zIndex: 5
   },
   touchLeft: {
     width: "30%",
     height: "80%",
-    marginTop: 70,
+    marginTop: 70
   },
   touchCenter: {
     width: "40%",
     height: "80%",
-    marginTop: 70,
+    marginTop: 70
   },
   touchRight: {
     width: "30%",
     height: "80%",
-    marginTop: 70,
+    marginTop: 70
   },
   captionContainer: {
     paddingHorizontal: 16,
@@ -802,48 +802,48 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginHorizontal: 16,
     marginBottom: 12,
-    alignSelf: "center",
+    alignSelf: "center"
   },
   captionText: {
     fontFamily: "Poppins_500Medium",
     fontSize: 15,
-    textAlign: "center",
+    textAlign: "center"
   },
   editCaptionBox: {
     padding: 16,
     borderRadius: 20,
     marginHorizontal: 16,
     marginBottom: 16,
-    zIndex: 20,
+    zIndex: 20
   },
   editCaptionInput: {
     fontFamily: "Poppins_400Regular",
     fontSize: 14,
-    minHeight: 40,
+    minHeight: 40
   },
   editCaptionButtons: {
     flexDirection: "row",
     justifyContent: "flex-end",
     gap: 12,
-    marginTop: 10,
+    marginTop: 10
   },
   editCancelBtn: {
     paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingHorizontal: 14
   },
   editCancelText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 13,
+    fontSize: 13
   },
   editSaveBtn: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 14,
+    borderRadius: 14
   },
   editSaveText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 13,
-    color: "#fff",
+    color: "#fff"
   },
   footer: {
     flexDirection: "row",
@@ -851,7 +851,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === "ios" ? 12 : 8,
     gap: 12,
-    zIndex: 10,
+    zIndex: 10
   },
   replyInputContainer: {
     flex: 1,
@@ -860,15 +860,15 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     borderWidth: 1,
     paddingHorizontal: 18,
-    height: 50,
+    height: 50
   },
   replyInput: {
     flex: 1,
     fontFamily: "Poppins_400Regular",
-    fontSize: 13.5,
+    fontSize: 13.5
   },
   sendReplyBtn: {
-    padding: 4,
+    padding: 4
   },
   shareIconBtn: {
     width: 48,
@@ -876,12 +876,12 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
-    justifyContent: "flex-end",
+    justifyContent: "flex-end"
   },
   menuSheet: {
     borderTopLeftRadius: 28,
@@ -889,71 +889,71 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingVertical: 14,
     paddingHorizontal: 20,
-    paddingBottom: 36,
+    paddingBottom: 36
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 16,
-    gap: 14,
+    gap: 14
   },
   menuItemText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 15,
+    fontSize: 15
   },
   shareSheet: {
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     padding: 20,
     paddingBottom: 36,
-    maxHeight: "70%",
+    maxHeight: "70%"
   },
   shareSheetHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: 16
   },
   shareSheetTitle: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 16,
+    fontSize: 16
   },
   noFollowersText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
     textAlign: "center",
-    marginVertical: 20,
+    marginVertical: 20
   },
   followerRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   followerName: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 14,
+    fontSize: 14
   },
   followerHandle: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 12,
+    fontSize: 12
   },
   shareTabsContainer: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: "rgba(150, 150, 150, 0.2)",
-    marginBottom: 10,
+    marginBottom: 10
   },
   shareTab: {
     flex: 1,
     paddingVertical: 12,
     alignItems: "center",
     borderBottomWidth: 2,
-    borderBottomColor: "transparent",
+    borderBottomColor: "transparent"
   },
   shareTabActive: {},
   shareTabText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 13,
-    color: "#6b7280",
-  },
+    color: "#6b7280"
+  }
 });

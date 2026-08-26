@@ -55,14 +55,14 @@ export function GoldBadgeModal() {
 
           <Pressable
             style={[styles.button, { backgroundColor: "#fbbf24" }]}
-            onPress={handleClose}
-          >
+            onPress={handleClose}>
+            
             <Text style={styles.buttonText}>Entendi, obrigado!</Text>
           </Pressable>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 export function GoldBadgeBenefitsModal({ visible, onClose, featureName = "Voz ao Vivo no Chat" }) {
@@ -73,7 +73,7 @@ export function GoldBadgeBenefitsModal({ visible, onClose, featureName = "Voz ao
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={[styles.modalContainer, { backgroundColor: colors.card || "#18181b", borderColor: "#eab308" }]}>
-          {/* Header Glow Badge */}
+          {}
           <View style={[styles.iconContainer, { backgroundColor: "rgba(234, 179, 8, 0.15)", borderColor: "rgba(234, 179, 8, 0.3)", borderWidth: 1 }]}>
             <MaterialCommunityIcons name="crown" size={42} color="#eab308" />
           </View>
@@ -87,7 +87,7 @@ export function GoldBadgeBenefitsModal({ visible, onClose, featureName = "Voz ao
             Apenas membros com o <Text style={{ color: "#eab308", fontFamily: "Poppins_600SemiBold" }}>Selo Dourado</Text> têm acesso ao <Text style={{ color: colors.text, fontFamily: "Poppins_600SemiBold" }}>{featureName}</Text>, novidades antecipadas e benefícios exclusivos da Tribo.
           </Text>
 
-          {/* Benefits Cards */}
+          {}
           <View style={styles.benefitsList}>
             <View style={[styles.benefitItem, { backgroundColor: colors.surfaceAlt || "rgba(255,255,255,0.05)" }]}>
               <View style={styles.benefitIconBox}>
@@ -122,14 +122,14 @@ export function GoldBadgeBenefitsModal({ visible, onClose, featureName = "Voz ao
 
           <Pressable
             style={[styles.button, { backgroundColor: "#eab308", marginTop: 18 }]}
-            onPress={onClose}
-          >
+            onPress={onClose}>
+            
             <Text style={[styles.buttonText, { color: "#000", fontFamily: "Poppins_700Bold" }]}>Entendi</Text>
           </Pressable>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.75)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 20
   },
   modalContainer: {
     width: "100%",
@@ -151,44 +151,44 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
     shadowRadius: 25,
-    elevation: 12,
+    elevation: 12
   },
   iconContainer: {
     marginBottom: 14,
     padding: 14,
     borderRadius: 50,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   title: {
     fontSize: 22,
     fontFamily: "Poppins_700Bold",
     marginBottom: 4,
-    textAlign: "center",
+    textAlign: "center"
   },
   subtitle: {
     fontSize: 15,
     fontFamily: "Poppins_600SemiBold",
     marginBottom: 12,
-    textAlign: "center",
+    textAlign: "center"
   },
   message: {
     fontSize: 13,
     fontFamily: "Poppins_400Regular",
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 20
   },
   benefitsList: {
     width: "100%",
     gap: 8,
-    marginTop: 4,
+    marginTop: 4
   },
   benefitItem: {
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
     borderRadius: 14,
-    gap: 12,
+    gap: 12
   },
   benefitIconBox: {
     width: 38,
@@ -196,17 +196,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "rgba(234, 179, 8, 0.15)",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   benefitTitle: {
     fontSize: 13,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   benefitDesc: {
     fontSize: 11,
     fontFamily: "Poppins_400Regular",
     lineHeight: 15,
-    marginTop: 1,
+    marginTop: 1
   },
   button: {
     width: "100%",
@@ -218,10 +218,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 4
   },
   buttonText: {
     fontSize: 15,
-    fontFamily: "Poppins_600SemiBold",
-  },
+    fontFamily: "Poppins_600SemiBold"
+  }
 });

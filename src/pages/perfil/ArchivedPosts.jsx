@@ -20,8 +20,8 @@ export function ArchivedPostsScreen({ user, onBack, onOpenProfile }) {
     setLoading(true);
     try {
       const data = await api.posts.archived();
-      let list = Array.isArray(data) ? data : (data.posts || []);
-      list = list.map(item => item.post ? item.post : item);
+      let list = Array.isArray(data) ? data : data.posts || [];
+      list = list.map((item) => item.post ? item.post : item);
       setPosts(list);
     } catch (err) {
       console.warn("Erro ao carregar posts arquivados", err);
@@ -33,7 +33,7 @@ export function ArchivedPostsScreen({ user, onBack, onOpenProfile }) {
   const handleRestore = async (postId) => {
     try {
       await api.posts.restore(postId);
-      setPosts(prev => prev.filter(p => p.id !== postId));
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
     } catch (err) {
       console.warn("Erro ao restaurar", err);
     }
@@ -44,53 +44,52 @@ export function ArchivedPostsScreen({ user, onBack, onOpenProfile }) {
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <AppHeader
           title="Arquivo"
-          onBack={onBack}
-        />
-        {loading ? (
-          <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} />
-        ) : (
-          <FlatList
-            data={posts}
-            keyExtractor={(item, index) => String(item.id || item._id || index)}
-            contentContainerStyle={styles.listContent}
-            ListEmptyComponent={
-              <View style={{ marginTop: 60 }}>
-                <EmptyState 
-                  title="Arquivo vazio" 
-                  message="Você não possui publicações arquivadas." 
-                  icon="archive" 
-                />
+          onBack={onBack} />
+        
+        {loading ?
+        <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} /> :
+
+        <FlatList
+          data={posts}
+          keyExtractor={(item, index) => String(item.id || item._id || index)}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+          <View style={{ marginTop: 60 }}>
+                <EmptyState
+              title="Arquivo vazio"
+              message="Vocï¿½ nï¿½o possui publicaï¿½ï¿½es arquivadas."
+              icon="archive" />
+            
               </View>
-            }
-            renderItem={({ item }) => (
-              <View>
+          }
+          renderItem={({ item }) =>
+          <View>
                 <PostCard
-                  post={item}
-                  currentUser={user}
-                  currentUserId={user?.id}
-                  onOpenProfile={onOpenProfile}
-                />
+              post={item}
+              currentUser={user}
+              currentUserId={user?.id}
+              onOpenProfile={onOpenProfile} />
+            
                 <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
-                  <Pressable 
-                    onPress={() => handleRestore(item.id)}
-                    style={{ backgroundColor: colors.surfaceAlt, padding: 12, borderRadius: 8, alignItems: "center", borderWidth: 1, borderColor: colors.line }}
-                  >
-                    <Text style={{ color: colors.text, fontFamily: "Poppins_600SemiBold" }}>Restaurar Publicação</Text>
+                  <Pressable
+                onPress={() => handleRestore(item.id)}
+                style={{ backgroundColor: colors.surfaceAlt, padding: 12, borderRadius: 8, alignItems: "center", borderWidth: 1, borderColor: colors.line }}>
+                
+                    <Text style={{ color: colors.text, fontFamily: "Poppins_600SemiBold" }}>Restaurar Publicaï¿½ï¿½o</Text>
                   </Pressable>
                 </View>
               </View>
-            )}
-          />
-        )}
+          } />
+
+        }
       </View>
-    </AppLayout>
-  );
+    </AppLayout>);
+
 }
 
 const styles = StyleSheet.create({
   listContent: {
     paddingVertical: 16,
-    flexGrow: 1,
-  },
+    flexGrow: 1
+  }
 });
-

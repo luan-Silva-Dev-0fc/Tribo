@@ -6,8 +6,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { api, getUploadUrl } from "../../api";
@@ -42,7 +42,7 @@ export function CreateTribeScreen({ onCreated, onBack, user }) {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: true,
-        quality: 0.8,
+        quality: 0.8
       });
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setImage(result.assets[0]);
@@ -64,7 +64,7 @@ export function CreateTribeScreen({ onCreated, onBack, user }) {
     try {
       setBusy(true);
       let avatarUrl = null;
-      
+
       if (image) {
         const uploadRes = await api.uploads.photo(
           image.uri,
@@ -79,9 +79,9 @@ export function CreateTribeScreen({ onCreated, onBack, user }) {
         rules: rules.trim(),
         avatarUrl,
         avatar_url: avatarUrl,
-        avatar: avatarUrl,
+        avatar: avatarUrl
       });
-      
+
       const createdId = res?.group?.id || res?.id;
       if (!createdId) throw new Error("ID do grupo não retornado pela API");
 
@@ -116,14 +116,14 @@ export function CreateTribeScreen({ onCreated, onBack, user }) {
       <ScrollView contentContainerStyle={styles.form}>
         <View style={styles.imageSelector}>
           <Pressable onPress={pickImage} style={[styles.imagePreview, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-            {image ? (
-              <Image source={{ uri: image.uri }} style={styles.imageFilled} />
-            ) : (
-              <View style={styles.imagePlaceholder}>
+            {image ?
+            <Image source={{ uri: image.uri }} style={styles.imageFilled} /> :
+
+            <View style={styles.imagePlaceholder}>
                 <Feather name="camera" size={32} color={colors.muted} />
                 <Text style={[styles.imageText, { color: colors.muted }]}>Foto da Tribo</Text>
               </View>
-            )}
+            }
           </Pressable>
         </View>
         <Input
@@ -131,8 +131,8 @@ export function CreateTribeScreen({ onCreated, onBack, user }) {
           placeholder="Ex: Desenvolvedores BR"
           value={name}
           onChangeText={setName}
-          maxLength={50}
-        />
+          maxLength={50} />
+        
         <Input
           label="Regras da Tribo"
           placeholder="Ex: Proibido spam, respeitar os membros..."
@@ -140,15 +140,15 @@ export function CreateTribeScreen({ onCreated, onBack, user }) {
           onChangeText={setRules}
           multiline
           numberOfLines={4}
-          maxLength={300}
-        />
+          maxLength={300} />
+        
         <View style={styles.spacer} />
         <Button
           title="Criar Tribo"
           onPress={create}
           loading={busy}
-          variant="primary"
-        />
+          variant="primary" />
+        
       </ScrollView>
 
       <TriboAlertModal
@@ -156,10 +156,10 @@ export function CreateTribeScreen({ onCreated, onBack, user }) {
         type={alertConfig.type}
         title={alertConfig.title}
         message={alertConfig.message}
-        onClose={alertConfig.onClose || (() => setAlertConfig({ visible: false }))}
-      />
-    </View>
-  );
+        onClose={alertConfig.onClose || (() => setAlertConfig({ visible: false }))} />
+      
+    </View>);
+
 }
 
 const styles = StyleSheet.create({
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
-    zIndex: 10,
+    zIndex: 10
   },
   title: { fontSize: 20, fontFamily: "Poppins_700Bold", letterSpacing: -0.5 },
   form: { padding: 24, gap: 16 },
@@ -195,18 +195,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 4
   },
   imageFilled: { width: "100%", height: "100%", borderRadius: 60 },
   imagePlaceholder: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   imageText: {
     marginTop: 8,
     fontSize: 12,
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "Poppins_500Medium"
   },
-  spacer: { height: 16 },
+  spacer: { height: 16 }
 });

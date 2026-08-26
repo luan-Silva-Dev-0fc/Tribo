@@ -9,9 +9,9 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 function ActiveViewOnceSticker({ url, onEnded, style }) {
   const player = useVideoPlayer(url || "", (p) => {
-    p.loop = false; // Toca apenas uma única vez
+    p.loop = false;
     p.muted = false;
-    try { Promise.resolve(p.play()).catch(() => {}); } catch (e) {}
+    try {Promise.resolve(p.play()).catch(() => {});} catch (e) {}
   });
 
   useEffect(() => {
@@ -33,9 +33,9 @@ function ActiveViewOnceSticker({ url, onEnded, style }) {
       player={player}
       nativeControls={false}
       contentFit="cover"
-      style={style}
-    />
-  );
+      style={style} />);
+
+
 }
 
 export const ViewOnceStickerMessage = React.memo(
@@ -47,23 +47,23 @@ export const ViewOnceStickerMessage = React.memo(
         item?.is_viewed ||
         item?.isViewed ||
         item?.is_expired ||
-        item?.isExpired,
-      ),
+        item?.isExpired
+      )
     );
     const [hasStartedViewing, setHasStartedViewing] = useState(false);
 
     const videoUrl =
-      item.media_url ||
-      item.mediaUrl ||
-      item.video_url ||
-      item.videoUrl ||
-      item.url;
+    item.media_url ||
+    item.mediaUrl ||
+    item.video_url ||
+    item.videoUrl ||
+    item.url;
 
     const handleExpire = async () => {
       if (isExpired) return;
       setIsExpired(true);
 
-      // Destrói arquivo do cache/local se aplicável
+
       if (typeof videoUrl === "string" && videoUrl.startsWith("file://")) {
         try {
           await FileSystem.deleteAsync(videoUrl, { idempotent: true });
@@ -73,7 +73,7 @@ export const ViewOnceStickerMessage = React.memo(
       onExpire?.(item);
     };
 
-    // Monitora a saída do viewport após ter iniciado a visualização
+
     const checkViewportVisibility = () => {
       if (isExpired || !containerRef.current) return;
 
@@ -87,7 +87,7 @@ export const ViewOnceStickerMessage = React.memo(
             setHasStartedViewing(true);
           }
         } else if (hasStartedViewing) {
-          // Estava visível e saiu do viewport -> expira imediatamente
+
           handleExpire();
         }
       });
@@ -105,41 +105,41 @@ export const ViewOnceStickerMessage = React.memo(
       <View
         ref={containerRef}
         onLayout={checkViewportVisibility}
-        style={[styles.container, isMe ? styles.alignRight : styles.alignLeft]}
-      >
-        {isExpired ? (
-          /* Figurinha Expirada - Design Minimalista e Elegante */
-          <View
-            style={[
-              styles.expiredBox,
-              {
-                backgroundColor:
-                  colors.mode === "dark"
-                    ? "rgba(255, 255, 255, 0.05)"
-                    : "rgba(0, 0, 0, 0.04)",
-                borderColor:
-                  colors.mode === "dark"
-                    ? "rgba(255, 255, 255, 0.1)"
-                    : "rgba(0, 0, 0, 0.08)",
-              },
-            ]}
-          >
+        style={[styles.container, isMe ? styles.alignRight : styles.alignLeft]}>
+        
+        {isExpired ?
+
+        <View
+          style={[
+          styles.expiredBox,
+          {
+            backgroundColor:
+            colors.mode === "dark" ?
+            "rgba(255, 255, 255, 0.05)" :
+            "rgba(0, 0, 0, 0.04)",
+            borderColor:
+            colors.mode === "dark" ?
+            "rgba(255, 255, 255, 0.1)" :
+            "rgba(0, 0, 0, 0.08)"
+          }]
+          }>
+          
             <View
-              style={[
-                styles.expiredIcon,
-                {
-                  backgroundColor:
-                    colors.mode === "dark"
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(0,0,0,0.06)",
-                },
-              ]}
-            >
+            style={[
+            styles.expiredIcon,
+            {
+              backgroundColor:
+              colors.mode === "dark" ?
+              "rgba(255,255,255,0.08)" :
+              "rgba(0,0,0,0.06)"
+            }]
+            }>
+            
               <MaterialCommunityIcons
-                name="numeric-1-circle-outline"
-                size={20}
-                color={colors.muted}
-              />
+              name="numeric-1-circle-outline"
+              size={20}
+              color={colors.muted} />
+            
             </View>
             <View style={{ flex: 1, paddingHorizontal: 2 }}>
               <Text style={[styles.expiredTitle, { color: colors.text }]}>
@@ -150,66 +150,66 @@ export const ViewOnceStickerMessage = React.memo(
               </Text>
             </View>
             <Feather
-              name="check"
-              size={15}
-              color={colors.muted}
-              style={{ opacity: 0.8 }}
-            />
-          </View>
-        ) : (
-          /* Figurinha Ativa com Reprodução Única (Sem Loop e Sem Opção de Salvar) */
-          <View
-            style={[
-              styles.stickerFrame,
-              {
-                backgroundColor:
-                  colors.surfaceAlt ||
-                  (colors.mode === "dark" ? "#1e1e1e" : "#f1f5f9"),
-                borderColor: "#f59e0b",
-              },
-            ]}
-          >
-            <ActiveViewOnceSticker
-              url={videoUrl}
-              onEnded={handleExpire}
-              style={styles.video}
-            />
+            name="check"
+            size={15}
+            color={colors.muted}
+            style={{ opacity: 0.8 }} />
+          
+          </View> :
 
-            {/* Badge Superior de Visualização Única */}
+
+        <View
+          style={[
+          styles.stickerFrame,
+          {
+            backgroundColor:
+            colors.surfaceAlt || (
+            colors.mode === "dark" ? "#1e1e1e" : "#f1f5f9"),
+            borderColor: "#f59e0b"
+          }]
+          }>
+          
+            <ActiveViewOnceSticker
+            url={videoUrl}
+            onEnded={handleExpire}
+            style={styles.video} />
+          
+
+            {}
             <View style={styles.topBadge}>
               <MaterialCommunityIcons
-                name="numeric-1-circle"
-                size={16}
-                color="#f59e0b"
-              />
+              name="numeric-1-circle"
+              size={16}
+              color="#f59e0b" />
+            
               <Text style={styles.topBadgeText}>Visualização Única (1x)</Text>
             </View>
 
-            {/* Botão de Fechar e Destruir */}
+            {}
             <Pressable
-              onPress={handleExpire}
-              style={styles.dismissBtn}
-              accessibilityLabel="Fechar e expirar figurinha"
-            >
+            onPress={handleExpire}
+            style={styles.dismissBtn}
+            accessibilityLabel="Fechar e expirar figurinha">
+            
               <Feather name="x" size={14} color="#ffffff" />
             </Pressable>
           </View>
-        )}
-      </View>
-    );
-  },
+        }
+      </View>);
+
+  }
 );
 
 const styles = StyleSheet.create({
   container: {
     marginVertical: 6,
-    maxWidth: "80%",
+    maxWidth: "80%"
   },
   alignRight: {
-    alignSelf: "flex-end",
+    alignSelf: "flex-end"
   },
   alignLeft: {
-    alignSelf: "flex-start",
+    alignSelf: "flex-start"
   },
   stickerFrame: {
     width: 190,
@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 3,
-    position: "relative",
+    position: "relative"
   },
   video: {
     width: "100%",
-    height: "100%",
+    height: "100%"
   },
   topBadge: {
     position: "absolute",
@@ -238,12 +238,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.75)",
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 12,
+    borderRadius: 12
   },
   topBadgeText: {
     color: "#f59e0b",
     fontSize: 10,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   dismissBtn: {
     position: "absolute",
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   expiredBox: {
     flexDirection: "row",
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     gap: 10,
-    opacity: 0.75,
+    opacity: 0.75
   },
   expiredIcon: {
     width: 34,
@@ -272,14 +272,14 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: "rgba(0,0,0,0.06)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   expiredTitle: {
     fontSize: 13,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   expiredSubtitle: {
     fontSize: 11,
-    fontFamily: "Poppins_400Regular",
-  },
+    fontFamily: "Poppins_400Regular"
+  }
 });

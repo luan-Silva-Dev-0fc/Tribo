@@ -7,8 +7,8 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -22,7 +22,7 @@ function TrimmerVideoPreview({ url, startTime, style }) {
   const player = useVideoPlayer(url || "", (p) => {
     p.loop = true;
     p.muted = false;
-    try { Promise.resolve(p.play()).catch(() => {}); } catch (e) {}
+    try {Promise.resolve(p.play()).catch(() => {});} catch (e) {}
   });
 
   useEffect(() => {
@@ -40,9 +40,9 @@ function TrimmerVideoPreview({ url, startTime, style }) {
       player={player}
       nativeControls={false}
       contentFit="cover"
-      style={style}
-    />
-  );
+      style={style} />);
+
+
 }
 
 export function CreateVideoStickerModal({
@@ -50,30 +50,30 @@ export function CreateVideoStickerModal({
   onClose,
   onStickerCreated,
   currentUser,
-  onShowGoldModal,
+  onShowGoldModal
 }) {
   const { colors } = useTheme();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  // Estados do Trimmer / Recorte de Tempo (Máximo 30s)
+
   const [totalDuration, setTotalDuration] = useState(30);
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(30);
 
-  // Estados de Metadados e Organização em Pastas
+
   const [stickerName, setStickerName] = useState("");
   const [packName, setPackName] = useState("Memes");
   const [customPack, setCustomPack] = useState("");
   const [authorName, setAuthorName] = useState(
-    currentUser?.name || currentUser?.username || "",
+    currentUser?.name || currentUser?.username || ""
   );
   const [description, setDescription] = useState("");
   const [customAlert, setCustomAlert] = useState({
     visible: false,
     type: "info",
     title: "",
-    message: "",
+    message: ""
   });
 
   const showAlert = (cfg) => {
@@ -83,7 +83,7 @@ export function CreateVideoStickerModal({
       title: cfg.title || "",
       message: cfg.message || "",
       primaryText: cfg.primaryText || "Entendido",
-      onPrimaryPress: cfg.onPrimaryPress || null,
+      onPrimaryPress: cfg.onPrimaryPress || null
     });
   };
 
@@ -93,7 +93,7 @@ export function CreateVideoStickerModal({
     currentUser?.is_gold ||
     currentUser?.isGold ||
     currentUser?.isVip ||
-    currentUser?.is_vip,
+    currentUser?.is_vip
   );
 
   const pickVideo = async () => {
@@ -105,12 +105,12 @@ export function CreateVideoStickerModal({
 
     try {
       const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         showAlert({
           title: "Permissão Necessária",
           message: "Permita o acesso à galeria para selecionar seu vídeo.",
-          type: "warning",
+          type: "warning"
         });
         return;
       }
@@ -118,13 +118,13 @@ export function CreateVideoStickerModal({
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         allowsEditing: false,
-        quality: 0.8,
+        quality: 0.8
       });
 
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         const durationSec =
-          Math.max(1, Math.round((asset.duration || 0) / 1000)) || 30;
+        Math.max(1, Math.round((asset.duration || 0) / 1000)) || 30;
 
         setTotalDuration(durationSec);
         setStartTime(0);
@@ -134,13 +134,13 @@ export function CreateVideoStickerModal({
           uri: asset.uri,
           duration: durationSec,
           width: asset.width,
-          height: asset.height,
+          height: asset.height
         });
 
-        // Sugere nome padrão se vazio
+
         if (!stickerName) {
           setStickerName(
-            `Figurinha ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+            `Figurinha ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
           );
         }
       }
@@ -149,7 +149,7 @@ export function CreateVideoStickerModal({
       showAlert({
         title: "Erro no Vídeo",
         message: "Não foi possível carregar o vídeo.",
-        type: "error",
+        type: "error"
       });
     }
   };
@@ -165,7 +165,7 @@ export function CreateVideoStickerModal({
   const adjustEndTime = (delta) => {
     const newEnd = Math.min(
       totalDuration,
-      Math.max(startTime + 1, endTime + delta),
+      Math.max(startTime + 1, endTime + delta)
     );
     if (newEnd - startTime > 30) {
       setStartTime(Math.max(0, newEnd - 30));
@@ -182,8 +182,8 @@ export function CreateVideoStickerModal({
       showAlert({
         title: "Recurso Exclusivo",
         message:
-          "Apenas usuários com Selo Dourado VIP podem criar figurinhas de vídeo.",
-        type: "warning",
+        "Apenas usuários com Selo Dourado VIP podem criar figurinhas de vídeo.",
+        type: "warning"
       });
       return;
     }
@@ -199,7 +199,7 @@ export function CreateVideoStickerModal({
         throw new Error("Falha ao obter URL do vídeo.");
       }
 
-      // Cria o registro da figurinha com todos os metadados
+
       const stickerPayload = {
         video_url: videoUrl,
         duration: clipDuration,
@@ -208,11 +208,11 @@ export function CreateVideoStickerModal({
         sticker_name: stickerName.trim() || "Figurinha de Vídeo",
         pack_name: finalPack,
         author_name:
-          authorName.trim() ||
-          currentUser?.name ||
-          currentUser?.username ||
-          "Autor",
-        description: description.trim() || null,
+        authorName.trim() ||
+        currentUser?.name ||
+        currentUser?.username ||
+        "Autor",
+        description: description.trim() || null
       };
 
       let stickerRecord = null;
@@ -221,11 +221,11 @@ export function CreateVideoStickerModal({
       } catch (e) {
         stickerRecord = {
           id: `stk_${Date.now()}`,
-          ...stickerPayload,
+          ...stickerPayload
         };
       }
 
-      // Adiciona automaticamente ao inventário do criador
+
       try {
         if (stickerRecord?.id) {
           await api.stickers.favorite(stickerRecord.id);
@@ -241,7 +241,7 @@ export function CreateVideoStickerModal({
         sticker_name: stickerPayload.sticker_name,
         pack_name: stickerPayload.pack_name,
         author_name: stickerPayload.author_name,
-        description: stickerPayload.description,
+        description: stickerPayload.description
       });
 
       handleClose();
@@ -250,7 +250,7 @@ export function CreateVideoStickerModal({
       showAlert({
         title: "Erro na Criação",
         message: "Não foi possível criar a figurinha de vídeo.",
-        type: "error",
+        type: "error"
       });
     } finally {
       setUploading(false);
@@ -278,23 +278,23 @@ export function CreateVideoStickerModal({
       visible={visible}
       transparent
       animationType="slide"
-      onRequestClose={handleClose}
-    >
+      onRequestClose={handleClose}>
+      
       <View style={styles.overlay}>
         <View
           style={[
-            styles.container,
-            {
-              backgroundColor: colors.card || "#ffffff",
-              borderColor: colors.border || "#e2e8f0",
-            },
-          ]}
-        >
-          {/* Header */}
+          styles.container,
+          {
+            backgroundColor: colors.card || "#ffffff",
+            borderColor: colors.border || "#e2e8f0"
+          }]
+          }>
+          
+          {}
           <View style={styles.header}>
             <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-            >
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              
               <MaterialCommunityIcons name="crown" size={20} color="#f59e0b" />
               <Text style={[styles.title, { color: colors.text }]}>
                 Criar Figurinha de Vídeo
@@ -307,123 +307,123 @@ export function CreateVideoStickerModal({
 
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 10 }}
-          >
-            {/* Área de Seleção ou Preview + Trimmer */}
-            {selectedVideo?.uri ? (
-              <View style={styles.previewSection}>
-                {/* Compact Sticker Preview Card */}
+            contentContainerStyle={{ paddingBottom: 10 }}>
+            
+            {}
+            {selectedVideo?.uri ?
+            <View style={styles.previewSection}>
+                {}
                 <View style={styles.stickerPreviewCard}>
                   <TrimmerVideoPreview
-                    url={selectedVideo.uri}
-                    startTime={startTime}
-                    style={styles.previewVideo}
-                  />
+                  url={selectedVideo.uri}
+                  startTime={startTime}
+                  style={styles.previewVideo} />
+                
                   <View style={styles.liveIndicator}>
                     <Ionicons name="sparkles" size={10} color="#f59e0b" />
                     <Text style={styles.liveText}>{clipDuration}s</Text>
                   </View>
                 </View>
 
-                {/* Barra de Recorte / Trimmer (Máx 30s) */}
+                {}
                 <View
-                  style={[
-                    styles.trimmerBox,
-                    {
-                      backgroundColor:
-                        colors.surfaceAlt ||
-                        (colors.mode === "dark" ? "#1e1e1e" : "#f8fafc"),
-                      borderColor: colors.border || "#e2e8f0",
-                    },
-                  ]}
-                >
+                style={[
+                styles.trimmerBox,
+                {
+                  backgroundColor:
+                  colors.surfaceAlt || (
+                  colors.mode === "dark" ? "#1e1e1e" : "#f8fafc"),
+                  borderColor: colors.border || "#e2e8f0"
+                }]
+                }>
+                
                   <View style={styles.trimmerHeader}>
                     <Text style={[styles.trimmerLabel, { color: colors.text }]}>
                       Recorte do Clipe (Máx. 30s)
                     </Text>
                     <Text
-                      style={[styles.trimmerDurationText, { color: "#f59e0b" }]}
-                    >
+                    style={[styles.trimmerDurationText, { color: "#f59e0b" }]}>
+                    
                       {clipDuration}s selecionados
                     </Text>
                   </View>
 
-                  {/* Controles de Início e Fim */}
+                  {}
                   <View style={styles.trimmerControlsRow}>
                     <View style={styles.trimmerColumn}>
                       <Text
-                        style={[
-                          styles.trimmerTimeLabel,
-                          { color: colors.muted },
-                        ]}
-                      >
+                      style={[
+                      styles.trimmerTimeLabel,
+                      { color: colors.muted }]
+                      }>
+                      
                         Início ({formatSeconds(startTime)})
                       </Text>
                       <View style={styles.stepButtonGroup}>
                         <Pressable
-                          onPress={() => adjustStartTime(-1)}
-                          style={[
-                            styles.stepBtn,
-                            { backgroundColor: colors.card },
-                          ]}
-                        >
+                        onPress={() => adjustStartTime(-1)}
+                        style={[
+                        styles.stepBtn,
+                        { backgroundColor: colors.card }]
+                        }>
+                        
                           <Feather name="minus" size={14} color={colors.text} />
                         </Pressable>
                         <Text
-                          style={[styles.stepValue, { color: colors.text }]}
-                        >
+                        style={[styles.stepValue, { color: colors.text }]}>
+                        
                           {formatSeconds(startTime)}
                         </Text>
                         <Pressable
-                          onPress={() => adjustStartTime(1)}
-                          style={[
-                            styles.stepBtn,
-                            { backgroundColor: colors.card },
-                          ]}
-                        >
+                        onPress={() => adjustStartTime(1)}
+                        style={[
+                        styles.stepBtn,
+                        { backgroundColor: colors.card }]
+                        }>
+                        
                           <Feather name="plus" size={14} color={colors.text} />
                         </Pressable>
                       </View>
                     </View>
 
                     <Feather
-                      name="arrow-right"
-                      size={16}
-                      color={colors.muted}
-                      style={{ marginTop: 14 }}
-                    />
+                    name="arrow-right"
+                    size={16}
+                    color={colors.muted}
+                    style={{ marginTop: 14 }} />
+                  
 
                     <View style={styles.trimmerColumn}>
                       <Text
-                        style={[
-                          styles.trimmerTimeLabel,
-                          { color: colors.muted },
-                        ]}
-                      >
+                      style={[
+                      styles.trimmerTimeLabel,
+                      { color: colors.muted }]
+                      }>
+                      
                         Fim ({formatSeconds(endTime)})
                       </Text>
                       <View style={styles.stepButtonGroup}>
                         <Pressable
-                          onPress={() => adjustEndTime(-1)}
-                          style={[
-                            styles.stepBtn,
-                            { backgroundColor: colors.card },
-                          ]}
-                        >
+                        onPress={() => adjustEndTime(-1)}
+                        style={[
+                        styles.stepBtn,
+                        { backgroundColor: colors.card }]
+                        }>
+                        
                           <Feather name="minus" size={14} color={colors.text} />
                         </Pressable>
                         <Text
-                          style={[styles.stepValue, { color: colors.text }]}
-                        >
+                        style={[styles.stepValue, { color: colors.text }]}>
+                        
                           {formatSeconds(endTime)}
                         </Text>
                         <Pressable
-                          onPress={() => adjustEndTime(1)}
-                          style={[
-                            styles.stepBtn,
-                            { backgroundColor: colors.card },
-                          ]}
-                        >
+                        onPress={() => adjustEndTime(1)}
+                        style={[
+                        styles.stepBtn,
+                        { backgroundColor: colors.card }]
+                        }>
+                        
                           <Feather name="plus" size={14} color={colors.text} />
                         </Pressable>
                       </View>
@@ -431,133 +431,133 @@ export function CreateVideoStickerModal({
                   </View>
                 </View>
 
-                {/* Botão de Trocar Vídeo */}
+                {}
                 <Pressable
-                  onPress={pickVideo}
-                  style={[
-                    styles.changeButton,
-                    { backgroundColor: colors.surfaceAlt },
-                  ]}
-                >
+                onPress={pickVideo}
+                style={[
+                styles.changeButton,
+                { backgroundColor: colors.surfaceAlt }]
+                }>
+                
                   <Feather name="repeat" size={14} color={colors.text} />
                   <Text
-                    style={[styles.changeButtonText, { color: colors.text }]}
-                  >
+                  style={[styles.changeButtonText, { color: colors.text }]}>
+                  
                     Escolher outro vídeo
                   </Text>
                 </Pressable>
 
-                {/* Formulário de Metadados e Pastas */}
+                {}
                 <View style={styles.formContainer}>
-                  {/* Nome da Figurinha */}
+                  {}
                   <View style={styles.formGroup}>
                     <Text style={[styles.inputLabel, { color: colors.text }]}>
                       Nome da Figurinha
                     </Text>
                     <TextInput
-                      placeholder="Ex: Risada do Luan"
-                      placeholderTextColor={colors.subtext || "#94a3b8"}
-                      value={stickerName}
-                      onChangeText={setStickerName}
-                      style={[
-                        styles.textInput,
-                        {
-                          backgroundColor: colors.surfaceAlt,
-                          color: colors.text,
-                          borderColor: colors.border,
-                        },
-                      ]}
-                    />
+                    placeholder="Ex: Risada do Luan"
+                    placeholderTextColor={colors.subtext || "#94a3b8"}
+                    value={stickerName}
+                    onChangeText={setStickerName}
+                    style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: colors.surfaceAlt,
+                      color: colors.text,
+                      borderColor: colors.border
+                    }]
+                    } />
+                  
                   </View>
 
-                  {/* Pastas / Pacotes (Packs) */}
+                  {}
                   <View style={styles.formGroup}>
                     <Text style={[styles.inputLabel, { color: colors.text }]}>
                       Pasta / Pacote
                     </Text>
                     <View style={styles.packsRow}>
                       {DEFAULT_PACKS.map((pack) => {
-                        const isSelected = packName === pack && !customPack;
-                        return (
-                          <Pressable
-                            key={pack}
-                            onPress={() => {
-                              setPackName(pack);
-                              setCustomPack("");
-                            }}
-                            style={[
-                              styles.packChip,
-                              {
-                                backgroundColor: isSelected
-                                  ? "#f59e0b"
-                                  : colors.surfaceAlt,
-                                borderColor: isSelected
-                                  ? "#f59e0b"
-                                  : colors.border,
-                              },
-                            ]}
-                          >
+                      const isSelected = packName === pack && !customPack;
+                      return (
+                        <Pressable
+                          key={pack}
+                          onPress={() => {
+                            setPackName(pack);
+                            setCustomPack("");
+                          }}
+                          style={[
+                          styles.packChip,
+                          {
+                            backgroundColor: isSelected ?
+                            "#f59e0b" :
+                            colors.surfaceAlt,
+                            borderColor: isSelected ?
+                            "#f59e0b" :
+                            colors.border
+                          }]
+                          }>
+                          
                             <Text
-                              style={[
-                                styles.packChipText,
-                                { color: isSelected ? "#000000" : colors.text },
-                              ]}
-                            >
+                            style={[
+                            styles.packChipText,
+                            { color: isSelected ? "#000000" : colors.text }]
+                            }>
+                            
                               {pack}
                             </Text>
-                          </Pressable>
-                        );
-                      })}
+                          </Pressable>);
+
+                    })}
                     </View>
                     <TextInput
-                      placeholder="Ou digite uma nova pasta..."
-                      placeholderTextColor={colors.subtext || "#94a3b8"}
-                      value={customPack}
-                      onChangeText={(val) => {
-                        setCustomPack(val);
-                        if (val) setPackName("");
-                      }}
-                      style={[
-                        styles.textInput,
-                        {
-                          backgroundColor: colors.surfaceAlt,
-                          color: colors.text,
-                          borderColor: customPack ? "#f59e0b" : colors.border,
-                          marginTop: 6,
-                        },
-                      ]}
-                    />
+                    placeholder="Ou digite uma nova pasta..."
+                    placeholderTextColor={colors.subtext || "#94a3b8"}
+                    value={customPack}
+                    onChangeText={(val) => {
+                      setCustomPack(val);
+                      if (val) setPackName("");
+                    }}
+                    style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: colors.surfaceAlt,
+                      color: colors.text,
+                      borderColor: customPack ? "#f59e0b" : colors.border,
+                      marginTop: 6
+                    }]
+                    } />
+                  
                   </View>
 
-                  {/* Autor Original */}
+                  {}
                   <View style={styles.formGroup}>
                     <Text style={[styles.inputLabel, { color: colors.text }]}>
                       Autor / Criador Original
                     </Text>
                     <TextInput
-                      placeholder="Ex: @criador_original"
-                      placeholderTextColor={colors.subtext || "#94a3b8"}
-                      value={authorName}
-                      onChangeText={setAuthorName}
-                      style={[
-                        styles.textInput,
-                        {
-                          backgroundColor: colors.surfaceAlt,
-                          color: colors.text,
-                          borderColor: colors.border,
-                        },
-                      ]}
-                    />
+                    placeholder="Ex: @criador_original"
+                    placeholderTextColor={colors.subtext || "#94a3b8"}
+                    value={authorName}
+                    onChangeText={setAuthorName}
+                    style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: colors.surfaceAlt,
+                      color: colors.text,
+                      borderColor: colors.border
+                    }]
+                    } />
+                  
                   </View>
 
-                  {/* Descrição / Significado Opcional (Metadado apenas) */}
+                  {}
                   <View style={styles.formGroup}>
                     <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between"
+                    }}>
+                    
                       <Text style={[styles.inputLabel, { color: colors.text }]}>
                         Significado / Descrição (Opcional)
                       </Text>
@@ -566,41 +566,41 @@ export function CreateVideoStickerModal({
                       </Text>
                     </View>
                     <TextInput
-                      placeholder="Descreva o contexto ou significado desta figurinha..."
-                      placeholderTextColor={colors.subtext || "#94a3b8"}
-                      value={description}
-                      onChangeText={setDescription}
-                      multiline
-                      numberOfLines={2}
-                      style={[
-                        styles.textInput,
-                        {
-                          backgroundColor: colors.surfaceAlt,
-                          color: colors.text,
-                          borderColor: colors.border,
-                          minHeight: 56,
-                          textAlignVertical: "top",
-                        },
-                      ]}
-                    />
+                    placeholder="Descreva o contexto ou significado desta figurinha..."
+                    placeholderTextColor={colors.subtext || "#94a3b8"}
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                    numberOfLines={2}
+                    style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: colors.surfaceAlt,
+                      color: colors.text,
+                      borderColor: colors.border,
+                      minHeight: 56,
+                      textAlignVertical: "top"
+                    }]
+                    } />
+                  
                     <Text style={[styles.helperText, { color: colors.muted }]}>
                       🔒 Esse texto é salvo apenas para busca e detalhes. Ele
                       NÃO será exibido por cima do vídeo.
                     </Text>
                   </View>
                 </View>
-              </View>
-            ) : (
-              <Pressable
-                onPress={pickVideo}
-                style={[
-                  styles.uploadBox,
-                  {
-                    borderColor: "#f59e0b",
-                    backgroundColor: "rgba(245, 158, 11, 0.05)",
-                  },
-                ]}
-              >
+              </View> :
+
+            <Pressable
+              onPress={pickVideo}
+              style={[
+              styles.uploadBox,
+              {
+                borderColor: "#f59e0b",
+                backgroundColor: "rgba(245, 158, 11, 0.05)"
+              }]
+              }>
+              
                 <View style={styles.uploadIconContainer}>
                   <Feather name="video" size={32} color="#f59e0b" />
                 </View>
@@ -611,34 +611,34 @@ export function CreateVideoStickerModal({
                   Vídeos longos podem ser recortados em até 30s
                 </Text>
               </Pressable>
-            )}
+            }
           </ScrollView>
 
-          {/* Botão de Ação */}
+          {}
           <View style={styles.footer}>
             <Pressable
               onPress={selectedVideo ? handleCreateSticker : pickVideo}
               disabled={uploading}
               style={({ pressed }) => [
-                styles.createButton,
-                {
-                  backgroundColor: "#f59e0b",
-                  opacity: pressed || uploading ? 0.85 : 1,
-                },
-              ]}
-            >
-              {uploading ? (
-                <ActivityIndicator size="small" color="#000000" />
-              ) : (
-                <>
+              styles.createButton,
+              {
+                backgroundColor: "#f59e0b",
+                opacity: pressed || uploading ? 0.85 : 1
+              }]
+              }>
+              
+              {uploading ?
+              <ActivityIndicator size="small" color="#000000" /> :
+
+              <>
                   <Ionicons name="sparkles" size={18} color="#000000" />
                   <Text style={styles.createButtonText}>
-                    {selectedVideo
-                      ? "Criar Figurinha de Vídeo"
-                      : "Selecionar Vídeo"}
+                    {selectedVideo ?
+                  "Criar Figurinha de Vídeo" :
+                  "Selecionar Vídeo"}
                   </Text>
                 </>
-              )}
+              }
             </Pressable>
           </View>
         </View>
@@ -649,10 +649,10 @@ export function CreateVideoStickerModal({
         type={customAlert.type}
         title={customAlert.title}
         message={customAlert.message}
-        onClose={() => setCustomAlert((prev) => ({ ...prev, visible: false }))}
-      />
-    </Modal>
-  );
+        onClose={() => setCustomAlert((prev) => ({ ...prev, visible: false }))} />
+      
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.7)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: 16
   },
   container: {
     width: "100%",
@@ -673,17 +673,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
-    elevation: 6,
+    elevation: 6
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 12
   },
   title: {
     fontSize: 17,
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins_700Bold"
   },
   uploadBox: {
     borderWidth: 2,
@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
     paddingVertical: 36,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 14,
+    marginVertical: 14
   },
   uploadIconContainer: {
     width: 60,
@@ -701,20 +701,20 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(245, 158, 11, 0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
+    marginBottom: 12
   },
   uploadTitle: {
     fontSize: 14.5,
     fontFamily: "Poppins_600SemiBold",
-    marginBottom: 4,
+    marginBottom: 4
   },
   uploadSubtitle: {
     fontSize: 12,
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "Poppins_400Regular"
   },
   previewSection: {
     alignItems: "center",
-    paddingTop: 4,
+    paddingTop: 4
   },
   stickerPreviewCard: {
     width: 170,
@@ -729,11 +729,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 4
   },
   previewVideo: {
     width: "100%",
-    height: "100%",
+    height: "100%"
   },
   liveIndicator: {
     position: "absolute",
@@ -745,51 +745,51 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.65)",
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 12,
+    borderRadius: 12
   },
   liveText: {
     color: "#ffffff",
     fontSize: 10,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   trimmerBox: {
     width: "100%",
     borderRadius: 18,
     padding: 14,
     borderWidth: 1,
-    marginBottom: 10,
+    marginBottom: 10
   },
   trimmerHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 10
   },
   trimmerLabel: {
     fontSize: 12.5,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   trimmerDurationText: {
     fontSize: 12,
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins_700Bold"
   },
   trimmerControlsRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   trimmerColumn: {
     alignItems: "center",
-    gap: 4,
+    gap: 4
   },
   trimmerTimeLabel: {
     fontSize: 11,
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "Poppins_400Regular"
   },
   stepButtonGroup: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 6
   },
   stepBtn: {
     width: 28,
@@ -798,13 +798,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: "#e2e8f0"
   },
   stepValue: {
     fontSize: 13,
     fontFamily: "Poppins_600SemiBold",
     minWidth: 42,
-    textAlign: "center",
+    textAlign: "center"
   },
   changeButton: {
     flexDirection: "row",
@@ -813,22 +813,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 14,
-    marginBottom: 14,
+    marginBottom: 14
   },
   changeButtonText: {
     fontSize: 12,
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "Poppins_500Medium"
   },
   formContainer: {
     width: "100%",
-    gap: 12,
+    gap: 12
   },
   formGroup: {
-    gap: 4,
+    gap: 4
   },
   inputLabel: {
     fontSize: 12.5,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   textInput: {
     borderRadius: 14,
@@ -836,33 +836,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontFamily: "Poppins_400Regular",
-    fontSize: 13.5,
+    fontSize: 13.5
   },
   packsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 2,
+    marginTop: 2
   },
   packChip: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: 1
   },
   packChipText: {
     fontSize: 12,
-    fontFamily: "Poppins_600SemiBold",
+    fontFamily: "Poppins_600SemiBold"
   },
   helperText: {
     fontSize: 11,
     fontFamily: "Poppins_400Regular",
     marginTop: 2,
-    lineHeight: 15,
+    lineHeight: 15
   },
   footer: {
     width: "100%",
-    paddingTop: 10,
+    paddingTop: 10
   },
   createButton: {
     flexDirection: "row",
@@ -875,11 +875,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    elevation: 3,
+    elevation: 3
   },
   createButtonText: {
     color: "#000000",
     fontSize: 14.5,
-    fontFamily: "Poppins_700Bold",
-  },
+    fontFamily: "Poppins_700Bold"
+  }
 });

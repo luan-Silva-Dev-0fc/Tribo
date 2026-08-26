@@ -3,8 +3,8 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState,
-} from "react";
+  useState } from
+"react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const palettes = {
@@ -26,7 +26,7 @@ const palettes = {
     accentSoft: "rgba(2, 132, 199, 0.18)",
     primary: "#0284c7",
     ink: "#FFFFFF",
-    danger: "#ef4444",
+    danger: "#ef4444"
   },
   dark: {
     mode: "dark",
@@ -46,7 +46,7 @@ const palettes = {
     accentSoft: "rgba(2, 132, 199, 0.18)",
     primary: "#0284c7",
     ink: "#FFFFFF",
-    danger: "#ef4444",
+    danger: "#ef4444"
   },
   oled: {
     mode: "oled",
@@ -66,8 +66,8 @@ const palettes = {
     accentSoft: "rgba(2, 132, 199, 0.18)",
     primary: "#0284c7",
     ink: "#FFFFFF",
-    danger: "#ef4444",
-  },
+    danger: "#ef4444"
+  }
 };
 
 const ThemeContext = createContext(null);
@@ -97,7 +97,7 @@ export function ThemeProvider({ children }) {
     } catch (err) {}
   };
 
-  const mode = preference === "light" ? "dark" : preference; // Always dark/oled for true black immersion
+  const mode = preference === "light" ? "dark" : preference;
 
   const value = useMemo(
     () => ({
@@ -105,16 +105,16 @@ export function ThemeProvider({ children }) {
       mode,
       isDark: true,
       preference,
-      setPreference,
+      setPreference
     }),
-    [mode, preference],
+    [mode, preference]
   );
 
   if (!isReady) return null;
 
   return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>);
+
 }
 
 export function useTheme() {

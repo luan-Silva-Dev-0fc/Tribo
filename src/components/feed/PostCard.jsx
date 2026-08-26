@@ -12,8 +12,8 @@ import {
   Text,
   TextInput,
   View,
-  ScrollView,
-} from "react-native";
+  ScrollView } from
+"react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useVideoPlayer, VideoView } from "expo-video";
 import * as ImagePicker from "expo-image-picker";
@@ -26,8 +26,8 @@ import {
   Avatar,
   EmptyState,
   IconButton,
-  VerificationBadge,
-} from "../../components/ui/ui";
+  VerificationBadge } from
+"../../components/ui/ui";
 import { ReportModal } from "../../components/modals/report-modal";
 import { AppLayout } from "../../components/layout/AppLayout";
 import { StoriesBar } from "../../components/stories/stories-bar";
@@ -41,8 +41,8 @@ import {
   errorMessage,
   formatRelativeTime,
   listFrom,
-  userName,
-} from "../../lib/format";
+  userName } from
+"../../lib/format";
 import { useTheme } from "../../theme";
 
 function PostOptionsModal({
@@ -52,38 +52,38 @@ function PostOptionsModal({
   onReport,
   onBlock,
   onDelete,
-  showAlert,
+  showAlert
 }) {
   const { colors } = useTheme();
   if (!post) return null;
 
   const author = post.user || post.author || {};
   const authorId =
-    author.id ||
-    author._id ||
-    author.userId ||
-    author.user_id ||
-    post.user_id ||
-    post.userId ||
-    post.author_id ||
-    post.authorId;
+  author.id ||
+  author._id ||
+  author.userId ||
+  author.user_id ||
+  post.user_id ||
+  post.userId ||
+  post.author_id ||
+  post.authorId;
 
   const currentUserId =
-    currentUser?.id ||
-    currentUser?._id ||
-    currentUser?.userId ||
-    currentUser?.user_id ||
-    currentUser?.sub;
+  currentUser?.id ||
+  currentUser?._id ||
+  currentUser?.userId ||
+  currentUser?.user_id ||
+  currentUser?.sub;
 
   const isMine = Boolean(
     authorId &&
     currentUserId &&
-    String(authorId).toLowerCase() === String(currentUserId).toLowerCase(),
+    String(authorId).toLowerCase() === String(currentUserId).toLowerCase()
   );
   const authorHandle =
-    author.username || author.handle || post.username || "usuario";
+  author.username || author.handle || post.username || "usuario";
   const mediaUrl =
-    post.imageUrl || post.image_url || post.videoUrl || post.video_url;
+  post.imageUrl || post.image_url || post.videoUrl || post.video_url;
 
   const handleSave = async () => {
     onClose();
@@ -93,7 +93,7 @@ function PostOptionsModal({
         showAlert?.({
           type: "success",
           title: "Salvo!",
-          message: "A publicação foi salva nos seus itens.",
+          message: "A publicação foi salva nos seus itens."
         });
       }, 100);
     } catch (err) {
@@ -101,7 +101,7 @@ function PostOptionsModal({
         showAlert?.({
           type: "error",
           title: "Erro",
-          message: "Não foi possível salvar a publicação.",
+          message: "Não foi possível salvar a publicação."
         });
       }, 100);
     }
@@ -124,38 +124,38 @@ function PostOptionsModal({
             if (status !== "granted") {
               setTimeout(
                 () =>
-                  showAlert?.({
-                    type: "error",
-                    title: "Permissão negada",
-                    message:
-                      "Precisamos de acesso à galeria para salvar a mídia.",
-                  }),
-                100,
+                showAlert?.({
+                  type: "error",
+                  title: "Permissão negada",
+                  message:
+                  "Precisamos de acesso à galeria para salvar a mídia."
+                }),
+                100
               );
               return;
             }
             if (!mediaUrl) {
               setTimeout(
                 () =>
-                  showAlert?.({
-                    type: "error",
-                    title: "Erro",
-                    message: "Esta publicação não tem mídia para baixar.",
-                  }),
-                100,
+                showAlert?.({
+                  type: "error",
+                  title: "Erro",
+                  message: "Esta publicação não tem mídia para baixar."
+                }),
+                100
               );
               return;
             }
             const fileExt =
-              typeof mediaUrl === "string" && mediaUrl.includes(".mp4")
-                ? ".mp4"
-                : ".jpg";
+            typeof mediaUrl === "string" && mediaUrl.includes(".mp4") ?
+            ".mp4" :
+            ".jpg";
             const fileUri =
-              FileSystem.documentDirectory + `tribo_${post.id}${fileExt}`;
+            FileSystem.documentDirectory + `tribo_${post.id}${fileExt}`;
 
             const downloadRes = await FileSystem.downloadAsync(
               mediaUrl,
-              fileUri,
+              fileUri
             );
 
             if (downloadRes.status === 200 || downloadRes.status === 201) {
@@ -163,36 +163,36 @@ function PostOptionsModal({
               await api.posts.download(post.id).catch(() => {});
               setTimeout(
                 () =>
-                  showAlert?.({
-                    type: "success",
-                    title: "Sucesso",
-                    message: "Mídia salva na galeria com sucesso!",
-                  }),
-                100,
+                showAlert?.({
+                  type: "success",
+                  title: "Sucesso",
+                  message: "Mídia salva na galeria com sucesso!"
+                }),
+                100
               );
             } else {
               setTimeout(
                 () =>
-                  showAlert?.({
-                    type: "error",
-                    title: "Erro",
-                    message: "Não foi possível baixar a mídia.",
-                  }),
-                100,
+                showAlert?.({
+                  type: "error",
+                  title: "Erro",
+                  message: "Não foi possível baixar a mídia."
+                }),
+                100
               );
             }
           } catch (error) {
             setTimeout(
               () =>
-                showAlert?.({
-                  type: "error",
-                  title: "Erro",
-                  message: "Ocorreu um erro ao tentar salvar a mídia.",
-                }),
-              100,
+              showAlert?.({
+                type: "error",
+                title: "Erro",
+                message: "Ocorreu um erro ao tentar salvar a mídia."
+              }),
+              100
             );
           }
-        },
+        }
       });
     }, 100);
   };
@@ -204,14 +204,14 @@ function PostOptionsModal({
         type: "error",
         title: "Excluir publicação",
         message:
-          "Tem certeza que deseja excluir esta publicação? Essa ação é permanente e sem volta.",
+        "Tem certeza que deseja excluir esta publicação? Essa ação é permanente e sem volta.",
         buttonText: "Excluir",
         secondaryButtonText: "Cancelar",
         onSecondaryPress: () => showAlert?.({ visible: false }),
         onClose: () => {
           showAlert?.({ visible: false });
           onDelete?.(post.id);
-        },
+        }
       });
     }, 100);
   };
@@ -229,7 +229,7 @@ function PostOptionsModal({
         onClose: () => {
           showAlert?.({ visible: false });
           onBlock?.(authorId, authorHandle);
-        },
+        }
       });
     }, 100);
   };
@@ -240,7 +240,7 @@ function PostOptionsModal({
       targetType: "POST",
       targetId: post.id,
       authorId: authorId,
-      targetName: `publicação de @${authorHandle}`,
+      targetName: `publicação de @${authorHandle}`
     });
   };
 
@@ -249,26 +249,26 @@ function PostOptionsModal({
       visible={true}
       transparent
       animationType="slide"
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
+      
       <Pressable style={styles.modalOverlay} onPress={onClose} />
       <View
         style={[
-          styles.optionsSheet,
-          { backgroundColor: "#121214", borderColor: colors.border },
-        ]}
-      >
+        styles.optionsSheet,
+        { backgroundColor: "#121214", borderColor: colors.border }]
+        }>
+        
         <View
-          style={[styles.optionsHandle, { backgroundColor: colors.border }]}
-        />
+          style={[styles.optionsHandle, { backgroundColor: colors.border }]} />
+        
         <Text style={[styles.optionsTitle, { color: colors.text }]}>
           Ações da Publicação
         </Text>
 
         <Pressable style={styles.optionItem} onPress={handleSave}>
           <View
-            style={[styles.optionIcon, { backgroundColor: colors.surfaceAlt }]}
-          >
+            style={[styles.optionIcon, { backgroundColor: colors.surfaceAlt }]}>
+            
             <Feather name="bookmark" size={20} color={colors.text} />
           </View>
           <Text style={[styles.optionText, { color: colors.text }]}>
@@ -276,45 +276,45 @@ function PostOptionsModal({
           </Text>
         </Pressable>
 
-        {!!mediaUrl && (
-          <Pressable style={styles.optionItem} onPress={handleDownload}>
+        {!!mediaUrl &&
+        <Pressable style={styles.optionItem} onPress={handleDownload}>
             <View
-              style={[
-                styles.optionIcon,
-                { backgroundColor: colors.surfaceAlt },
-              ]}
-            >
+            style={[
+            styles.optionIcon,
+            { backgroundColor: colors.surfaceAlt }]
+            }>
+            
               <Feather name="download" size={20} color={colors.text} />
             </View>
             <Text style={[styles.optionText, { color: colors.text }]}>
               Baixar Mídia
             </Text>
           </Pressable>
-        )}
+        }
 
-        {isMine ? (
-          <Pressable style={styles.optionItem} onPress={handleDelete}>
+        {isMine ?
+        <Pressable style={styles.optionItem} onPress={handleDelete}>
             <View
-              style={[
-                styles.optionIcon,
-                { backgroundColor: "rgba(239, 68, 68, 0.15)" },
-              ]}
-            >
+            style={[
+            styles.optionIcon,
+            { backgroundColor: "rgba(239, 68, 68, 0.15)" }]
+            }>
+            
               <Feather name="trash-2" size={20} color="#ef4444" />
             </View>
             <Text style={[styles.optionText, { color: "#ef4444" }]}>
               Excluir publicação
             </Text>
-          </Pressable>
-        ) : (
-          <>
+          </Pressable> :
+
+        <>
             <Pressable style={styles.optionItem} onPress={handleBlock}>
               <View
-                style={[
-                  styles.optionIcon,
-                  { backgroundColor: "rgba(245, 158, 11, 0.15)" },
-                ]}
-              >
+              style={[
+              styles.optionIcon,
+              { backgroundColor: "rgba(245, 158, 11, 0.15)" }]
+              }>
+              
                 <Feather name="user-x" size={20} color="#f59e0b" />
               </View>
               <Text style={[styles.optionText, { color: "#f59e0b" }]}>
@@ -324,11 +324,11 @@ function PostOptionsModal({
 
             <Pressable style={styles.optionItem} onPress={handleReport}>
               <View
-                style={[
-                  styles.optionIcon,
-                  { backgroundColor: "rgba(239, 68, 68, 0.15)" },
-                ]}
-              >
+              style={[
+              styles.optionIcon,
+              { backgroundColor: "rgba(239, 68, 68, 0.15)" }]
+              }>
+              
                 <Feather name="flag" size={20} color="#ef4444" />
               </View>
               <Text style={[styles.optionText, { color: "#ef4444" }]}>
@@ -336,10 +336,10 @@ function PostOptionsModal({
               </Text>
             </Pressable>
           </>
-        )}
+        }
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 export function CommentOptionsModal({
@@ -349,43 +349,43 @@ export function CommentOptionsModal({
   onClose,
   onReport,
   onBlock,
-  onDelete,
+  onDelete
 }) {
   const { colors } = useTheme();
   if (!comment) return null;
 
   const author = comment.user || comment.author || {};
   const authorId =
-    author.id ||
-    author._id ||
-    author.userId ||
-    author.user_id ||
-    comment.user_id ||
-    comment.userId ||
-    comment.author_id ||
-    comment.authorId;
+  author.id ||
+  author._id ||
+  author.userId ||
+  author.user_id ||
+  comment.user_id ||
+  comment.userId ||
+  comment.author_id ||
+  comment.authorId;
 
   const currentUserId =
-    currentUser?.id ||
-    currentUser?._id ||
-    currentUser?.userId ||
-    currentUser?.user_id ||
-    currentUser?.sub;
+  currentUser?.id ||
+  currentUser?._id ||
+  currentUser?.userId ||
+  currentUser?.user_id ||
+  currentUser?.sub;
 
   const isMine = Boolean(
     authorId &&
     currentUserId &&
-    String(authorId).toLowerCase() === String(currentUserId).toLowerCase(),
+    String(authorId).toLowerCase() === String(currentUserId).toLowerCase()
   );
 
   const isPostAuthor = Boolean(
     postAuthorId &&
     currentUserId &&
-    String(postAuthorId).toLowerCase() === String(currentUserId).toLowerCase(),
+    String(postAuthorId).toLowerCase() === String(currentUserId).toLowerCase()
   );
 
   const authorHandle =
-    author.username || author.handle || comment.username || "usuario";
+  author.username || author.handle || comment.username || "usuario";
 
   const handleBlock = () => {
     if (isMine) return;
@@ -393,16 +393,16 @@ export function CommentOptionsModal({
       "Bloquear usuário",
       `Deseja bloquear @${authorHandle}? Você deixará de ver publicações e comentários deste perfil.`,
       [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Bloquear",
-          style: "destructive",
-          onPress: () => {
-            onClose();
-            onBlock?.(authorId, authorHandle);
-          },
-        },
-      ],
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Bloquear",
+        style: "destructive",
+        onPress: () => {
+          onClose();
+          onBlock?.(authorId, authorHandle);
+        }
+      }]
+
     );
   };
 
@@ -413,7 +413,7 @@ export function CommentOptionsModal({
       targetType: "COMMENT",
       targetId: comment.id,
       authorId: authorId,
-      targetName: `comentário de @${authorHandle}`,
+      targetName: `comentário de @${authorHandle}`
     });
   };
 
@@ -427,47 +427,47 @@ export function CommentOptionsModal({
       visible={true}
       transparent
       animationType="slide"
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
+      
       <Pressable style={styles.modalOverlay} onPress={onClose} />
       <View
         style={[
-          styles.optionsSheet,
-          { backgroundColor: "#121214", borderColor: colors.border },
-        ]}
-      >
+        styles.optionsSheet,
+        { backgroundColor: "#121214", borderColor: colors.border }]
+        }>
+        
         <View
-          style={[styles.optionsHandle, { backgroundColor: colors.border }]}
-        />
+          style={[styles.optionsHandle, { backgroundColor: colors.border }]} />
+        
         <Text style={[styles.optionsTitle, { color: colors.text }]}>
           Ações do Comentário
         </Text>
 
-        {(isMine || isPostAuthor) && (
-          <Pressable style={styles.optionItem} onPress={handleDelete}>
+        {(isMine || isPostAuthor) &&
+        <Pressable style={styles.optionItem} onPress={handleDelete}>
             <View
-              style={[
-                styles.optionIcon,
-                { backgroundColor: "rgba(239, 68, 68, 0.15)" },
-              ]}
-            >
+            style={[
+            styles.optionIcon,
+            { backgroundColor: "rgba(239, 68, 68, 0.15)" }]
+            }>
+            
               <Feather name="trash-2" size={20} color="#ef4444" />
             </View>
             <Text style={[styles.optionText, { color: "#ef4444" }]}>
               Excluir Comentário
             </Text>
           </Pressable>
-        )}
+        }
 
-        {!isMine && (
-          <>
+        {!isMine &&
+        <>
             <Pressable style={styles.optionItem} onPress={handleBlock}>
               <View
-                style={[
-                  styles.optionIcon,
-                  { backgroundColor: "rgba(245, 158, 11, 0.15)" },
-                ]}
-              >
+              style={[
+              styles.optionIcon,
+              { backgroundColor: "rgba(245, 158, 11, 0.15)" }]
+              }>
+              
                 <Feather name="user-x" size={20} color="#f59e0b" />
               </View>
               <Text style={[styles.optionText, { color: "#f59e0b" }]}>
@@ -477,11 +477,11 @@ export function CommentOptionsModal({
 
             <Pressable style={styles.optionItem} onPress={handleReport}>
               <View
-                style={[
-                  styles.optionIcon,
-                  { backgroundColor: "rgba(239, 68, 68, 0.15)" },
-                ]}
-              >
+              style={[
+              styles.optionIcon,
+              { backgroundColor: "rgba(239, 68, 68, 0.15)" }]
+              }>
+              
                 <Feather name="flag" size={20} color="#ef4444" />
               </View>
               <Text style={[styles.optionText, { color: "#ef4444" }]}>
@@ -489,10 +489,10 @@ export function CommentOptionsModal({
               </Text>
             </Pressable>
           </>
-        )}
+        }
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 function InlineVideo({ url, onOpenMedia, post, styles }) {
@@ -502,25 +502,25 @@ function InlineVideo({ url, onOpenMedia, post, styles }) {
     <Pressable
       onPress={() => onOpenMedia?.({ url, type: "video", post })}
       style={({ pressed }) => [
-        styles.imageWrapper,
-        {
-          opacity: pressed ? 0.92 : 1,
-          transform: [{ scale: pressed ? 0.995 : 1 }],
-        },
-      ]}
-    >
+      styles.imageWrapper,
+      {
+        opacity: pressed ? 0.92 : 1,
+        transform: [{ scale: pressed ? 0.995 : 1 }]
+      }]
+      }>
+      
       <SafePostInlineVideo key={url} url={url} styles={styles} />
       <View style={styles.expandPill}>
         <Feather
           name="maximize-2"
           size={13}
           color="#FFFFFF"
-          style={{ marginRight: 4 }}
-        />
+          style={{ marginRight: 4 }} />
+        
         <Text style={styles.expandPillText}>Tela cheia</Text>
       </View>
-    </Pressable>
-  );
+    </Pressable>);
+
 }
 
 function SafePostInlineVideo({ url, styles }) {
@@ -534,11 +534,11 @@ function SafePostInlineVideo({ url, styles }) {
     return (
       <View
         style={[
-          styles.postImage,
-          { backgroundColor: "#000000", minHeight: 220 },
-        ]}
-      />
-    );
+        styles.postImage,
+        { backgroundColor: "#000000", minHeight: 220 }]
+        } />);
+
+
   }
 
   return (
@@ -546,18 +546,18 @@ function SafePostInlineVideo({ url, styles }) {
       key={url}
       player={player}
       style={[
-        styles.postImage,
-        {
-          backgroundColor: "#000000",
-          height: undefined,
-          minHeight: 220,
-          maxHeight: 500,
-        },
-      ]}
+      styles.postImage,
+      {
+        backgroundColor: "#000000",
+        height: undefined,
+        minHeight: 220,
+        maxHeight: 500
+      }]
+      }
       contentFit="contain"
-      nativeControls={false}
-    />
-  );
+      nativeControls={false} />);
+
+
 }
 
 function QuoteVideo({ url, styles }) {
@@ -573,9 +573,9 @@ function QuoteVideo({ url, styles }) {
       player={player}
       style={styles.quoteMedia}
       contentFit="cover"
-      nativeControls={false}
-    />
-  );
+      nativeControls={false} />);
+
+
 }
 
 export function PostCard({
@@ -591,13 +591,13 @@ export function PostCard({
   showAlert,
   onSave,
   isCentered = false,
-  volume = 1.0,
+  volume = 1.0
 }) {
   const { colors } = useTheme();
   const { isAdultContentEnabled } = useUserContext();
   const [revealedTemporarily, setRevealedTemporarily] = useState(false);
   const [isSavedLocally, setIsSavedLocally] = useState(
-    Boolean(post.isSaved || post.is_saved),
+    Boolean(post.isSaved || post.is_saved)
   );
   const [imageAspect, setImageAspect] = useState(null);
 
@@ -607,30 +607,30 @@ export function PostCard({
 
   const effectiveUserId = currentUserId || currentUser?.id;
   const owner =
-    post.user ||
-    post.author ||
-    (post.user_id && post.username
-      ? {
-          id: post.user_id,
-          name: post.name,
-          username: post.username,
-          avatarUrl: post.user_avatar || post.avatar_url,
-        }
-      : null) ||
-    (post.userId === effectiveUserId ? currentUser : {});
+  post.user ||
+  post.author || (
+  post.user_id && post.username ?
+  {
+    id: post.user_id,
+    name: post.name,
+    username: post.username,
+    avatarUrl: post.user_avatar || post.avatar_url
+  } :
+  null) || (
+  post.userId === effectiveUserId ? currentUser : {});
   const count = (value) => value || "";
 
   const userHandle =
-    owner.username ||
-    owner.handle ||
-    (owner.email ? owner.email.split("@")[0] : "usuario");
+  owner.username ||
+  owner.handle || (
+  owner.email ? owner.email.split("@")[0] : "usuario");
 
   const createdAt = post.createdAt || post.created_at || post.date;
   const updatedAt = post.updatedAt || post.updated_at;
   const isEdited =
-    updatedAt &&
-    createdAt &&
-    new Date(updatedAt).getTime() - new Date(createdAt).getTime() > 2000;
+  updatedAt &&
+  createdAt &&
+  new Date(updatedAt).getTime() - new Date(createdAt).getTime() > 2000;
   const timeText = formatRelativeTime(createdAt) || "agora";
 
   const handleToggleSave = async () => {
@@ -647,11 +647,11 @@ export function PostCard({
         await api.posts.unsave(post.id);
       }
     } catch (err) {
-      setIsSavedLocally(!nextState); // revert on error
+      setIsSavedLocally(!nextState);
       showAlert?.({
         type: "error",
         title: "Erro",
-        message: "Não foi possível atualizar o salvamento da publicação.",
+        message: "Não foi possível atualizar o salvamento da publicação."
       });
     }
   };
@@ -662,10 +662,10 @@ export function PostCard({
     post.nsfw ??
     post.isAdult ??
     post.is_adult ??
-    false,
+    false
   );
   const isImageHidden =
-    isNSFW && !isAdultContentEnabled && !revealedTemporarily;
+  isNSFW && !isAdultContentEnabled && !revealedTemporarily;
 
   const likesList = post.likes || [];
   const hasLiked = Boolean(
@@ -673,10 +673,10 @@ export function PostCard({
     post.is_liked ||
     likesList.some(
       (item) =>
-        item.userId === effectiveUserId ||
-        item.user_id === effectiveUserId ||
-        item.user?.id === effectiveUserId,
-    ),
+      item.userId === effectiveUserId ||
+      item.user_id === effectiveUserId ||
+      item.user?.id === effectiveUserId
+    )
   );
 
   const repostsList = post.reposts || [];
@@ -686,52 +686,52 @@ export function PostCard({
     post.reposted ||
     repostsList.some(
       (item) =>
-        item.userId === effectiveUserId ||
-        item.user_id === effectiveUserId ||
-        item.user?.id === effectiveUserId ||
-        item.id === effectiveUserId,
-    ),
+      item.userId === effectiveUserId ||
+      item.user_id === effectiveUserId ||
+      item.user?.id === effectiveUserId ||
+      item.id === effectiveUserId
+    )
   );
 
   const rawAttachments = post.media_attachments || post.mediaAttachments || [];
   const hasAttachments =
-    Array.isArray(rawAttachments) && rawAttachments.length > 0;
+  Array.isArray(rawAttachments) && rawAttachments.length > 0;
   const legacyMediaUrl =
-    post.mediaUrl ||
-    post.media_url ||
-    post.imageUrl ||
-    post.image_url ||
-    post.videoUrl ||
-    post.video_url;
+  post.mediaUrl ||
+  post.media_url ||
+  post.imageUrl ||
+  post.image_url ||
+  post.videoUrl ||
+  post.video_url;
 
-  // Format attachments for rendering
-  const mediaList = hasAttachments
-    ? rawAttachments
-    : legacyMediaUrl
-      ? [
-          {
-            url: legacyMediaUrl,
-            type:
-              post.videoUrl ||
-              post.video_url ||
-              (typeof legacyMediaUrl === "string" &&
-                legacyMediaUrl.match(/\.(mp4|webm)$/i))
-                ? "video"
-                : "image",
-          },
-        ]
-      : [];
+
+  const mediaList = hasAttachments ?
+  rawAttachments :
+  legacyMediaUrl ?
+  [
+  {
+    url: legacyMediaUrl,
+    type:
+    post.videoUrl ||
+    post.video_url ||
+    typeof legacyMediaUrl === "string" &&
+    legacyMediaUrl.match(/\.(mp4|webm)$/i) ?
+    "video" :
+    "image"
+  }] :
+
+  [];
 
   const hasMedia = mediaList.length > 0;
 
   const youtubeVideoId =
-    post.youtube_video_id ||
-    post.youtubeVideoId ||
-    (post.media_type === "youtube"
-      ? (post.youtube_url || post.content)
-      : null);
+  post.youtube_video_id ||
+  post.youtubeVideoId || (
+  post.media_type === "youtube" ?
+  post.youtube_url || post.content :
+  null);
 
-  // Track current carousel index
+
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [mediaWidth, setMediaWidth] = useState(0);
 
@@ -745,9 +745,9 @@ export function PostCard({
           }
         },
         () => {
-          // Fallback if failed to load sizes
+
           setImageAspect(null);
-        },
+        }
       );
     }
   }, [hasMedia, mediaList]);
@@ -755,19 +755,19 @@ export function PostCard({
   return (
     <View
       style={[
-        styles.postCard,
-        {
-          backgroundColor: colors.surface,
-          borderColor: "#27272a",
-        },
-      ]}
-    >
+      styles.postCard,
+      {
+        backgroundColor: colors.surface,
+        borderColor: "#27272a"
+      }]
+      }>
+      
       <View style={styles.postHead}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Abrir perfil de ${userName(owner)}`}
-          onPress={() => onOpenProfile(owner)}
-        >
+          onPress={() => onOpenProfile(owner)}>
+          
           <Avatar user={owner} fallbackUser={currentUser} size={44} />
         </Pressable>
         <View style={styles.flex}>
@@ -779,71 +779,71 @@ export function PostCard({
           </View>
           <Text style={[styles.handle, { color: colors.subtext }]}>
             @{userHandle} • há {timeText}{" "}
-            {isEdited && (
-              <Text style={{ fontStyle: "italic", fontSize: 12 }}>
+            {isEdited &&
+            <Text style={{ fontStyle: "italic", fontSize: 12 }}>
                 (Editado)
               </Text>
-            )}
+            }
           </Text>
         </View>
         <Pressable
           onPress={onOptions}
           accessibilityLabel="Mais ações"
-          style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.5 : 1 }]}
-        >
+          style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.5 : 1 }]}>
+          
           <Feather name="more-horizontal" size={20} color={colors.subtext} />
         </Pressable>
       </View>
 
-      {post.content && (
-        <Text style={[styles.postText, { color: colors.text }]}>
+      {post.content &&
+      <Text style={[styles.postText, { color: colors.text }]}>
           {post.content}
         </Text>
-      )}
+      }
 
-      {/* Vídeo do YouTube Embutido com Autoplay e Volume Espacial */}
-      {!!youtubeVideoId && (
-        <View style={{ width: "100%", marginVertical: 6 }}>
+      {}
+      {!!youtubeVideoId &&
+      <View style={{ width: "100%", marginVertical: 6 }}>
           <YouTubePostCard
-            videoId={youtubeVideoId}
-            youtubeUrl={post.youtube_url || post.youtubeUrl}
-            isCentered={isCentered}
-            volume={volume}
-          />
+          videoId={youtubeVideoId}
+          youtubeUrl={post.youtube_url || post.youtubeUrl}
+          isCentered={isCentered}
+          volume={volume} />
+        
         </View>
-      )}
+      }
 
-      {hasMedia &&
-        (isImageHidden ? (
-          <Pressable
-            onPress={() => setRevealedTemporarily(true)}
-            style={({ pressed }) => [
-              styles.nsfwContainer,
-              {
-                backgroundColor: colors.cardSecondary || colors.surfaceAlt,
-                borderColor: "#27272a",
-                opacity: pressed ? 0.9 : 1,
-              },
-            ]}
-          >
+      {hasMedia && (
+      isImageHidden ?
+      <Pressable
+        onPress={() => setRevealedTemporarily(true)}
+        style={({ pressed }) => [
+        styles.nsfwContainer,
+        {
+          backgroundColor: colors.cardSecondary || colors.surfaceAlt,
+          borderColor: "#27272a",
+          opacity: pressed ? 0.9 : 1
+        }]
+        }>
+        
             <View
-              style={[
-                styles.nsfwBadge,
-                {
-                  backgroundColor: colors.danger || "#F4212E",
-                },
-              ]}
-            >
+          style={[
+          styles.nsfwBadge,
+          {
+            backgroundColor: colors.danger || "#F4212E"
+          }]
+          }>
+          
               <Text style={styles.nsfwBadgeText}>+18</Text>
             </View>
             <View style={styles.nsfwContent}>
               <View style={styles.nsfwHeaderRow}>
                 <Feather
-                  name="alert-triangle"
-                  size={16}
-                  color={colors.danger || "#F4212E"}
-                  style={{ marginRight: 6 }}
-                />
+              name="alert-triangle"
+              size={16}
+              color={colors.danger || "#F4212E"}
+              style={{ marginRight: 6 }} />
+            
                 <Text style={[styles.nsfwTitle, { color: colors.text }]}>
                   Conteúdo Sensível (+18) - Oculto por padrão
                 </Text>
@@ -852,278 +852,278 @@ export function PostCard({
                 Esta publicação contém mídia classificada como sensível.
               </Text>
               <View
-                style={[
-                  styles.nsfwRevealBtn,
-                  {
-                    backgroundColor: colors.card || colors.surface,
-                    borderColor: "#27272a",
-                  },
-                ]}
-              >
+            style={[
+            styles.nsfwRevealBtn,
+            {
+              backgroundColor: colors.card || colors.surface,
+              borderColor: "#27272a"
+            }]
+            }>
+            
                 <Feather
-                  name="eye"
-                  size={14}
-                  color={colors.text}
-                  style={{ marginRight: 6 }}
-                />
+              name="eye"
+              size={14}
+              color={colors.text}
+              style={{ marginRight: 6 }} />
+            
                 <Text style={[styles.nsfwRevealText, { color: colors.text }]}>
                   Toque para visualizar
                 </Text>
               </View>
             </View>
-          </Pressable>
-        ) : (
-          <View
-            style={styles.imageWrapper}
-            onLayout={(e) => setMediaWidth(e.nativeEvent.layout.width)}
-          >
+          </Pressable> :
+
+      <View
+        style={styles.imageWrapper}
+        onLayout={(e) => setMediaWidth(e.nativeEvent.layout.width)}>
+        
             <FlatList
-              data={mediaList}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(_, index) => index.toString()}
-              onMomentumScrollEnd={(e) => {
-                const index = Math.round(
-                  e.nativeEvent.contentOffset.x /
-                    e.nativeEvent.layoutMeasurement.width,
-                );
-                setCarouselIndex(index);
-              }}
-              renderItem={({ item }) => {
-                const isItemVideo = item.type === "video";
-                return (
-                  <View style={{ width: mediaWidth || "100%" }}>
-                    {/* Fixed width for Feed item, assuming container width. Actually we should use onLayout or full width minus padding. Let's use 100% since FlatList item takes full width of container if style width='100%'. But standard FlatList item needs absolute width. We can just use '100%' if container flexes, but in React Native it's tricky. Let's use a ref or style width. Actually, we can just use 100% width on the image and let it flex. Wait, if it's horizontal, we need Dimensions.get('window').width - margins. Let's use 100% width since it's nested in card. */}
-                    {isItemVideo ? (
-                      <InlineVideo
-                        url={item.url}
-                        onOpenMedia={onOpenMedia}
-                        post={post}
-                        styles={styles}
-                      />
-                    ) : (
-                      <Pressable
-                        onPress={() =>
-                          onOpenMedia?.({ url: item.url, type: "image", post })
-                        }
-                        style={({ pressed }) => [
-                          {
-                            opacity: pressed ? 0.92 : 1,
-                            transform: [{ scale: pressed ? 0.995 : 1 }],
-                          },
-                        ]}
-                      >
+          data={mediaList}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(_, index) => index.toString()}
+          onMomentumScrollEnd={(e) => {
+            const index = Math.round(
+              e.nativeEvent.contentOffset.x /
+              e.nativeEvent.layoutMeasurement.width
+            );
+            setCarouselIndex(index);
+          }}
+          renderItem={({ item }) => {
+            const isItemVideo = item.type === "video";
+            return (
+              <View style={{ width: mediaWidth || "100%" }}>
+                    {}
+                    {isItemVideo ?
+                <InlineVideo
+                  url={item.url}
+                  onOpenMedia={onOpenMedia}
+                  post={post}
+                  styles={styles} /> :
+
+
+                <Pressable
+                  onPress={() =>
+                  onOpenMedia?.({ url: item.url, type: "image", post })
+                  }
+                  style={({ pressed }) => [
+                  {
+                    opacity: pressed ? 0.92 : 1,
+                    transform: [{ scale: pressed ? 0.995 : 1 }]
+                  }]
+                  }>
+                  
                         <Image
-                          source={{ uri: item.url }}
-                          style={[
-                            styles.postImage,
-                            {
-                              backgroundColor: colors.surfaceAlt,
-                              height: imageAspect ? undefined : 220,
-                              aspectRatio: imageAspect || undefined,
-                              maxHeight: 500,
-                              width: "100%",
-                            },
-                          ]}
-                          resizeMode={imageAspect ? "contain" : "cover"}
-                        />
+                    source={{ uri: item.url }}
+                    style={[
+                    styles.postImage,
+                    {
+                      backgroundColor: colors.surfaceAlt,
+                      height: imageAspect ? undefined : 220,
+                      aspectRatio: imageAspect || undefined,
+                      maxHeight: 500,
+                      width: "100%"
+                    }]
+                    }
+                    resizeMode={imageAspect ? "contain" : "cover"} />
+                  
                         <View style={styles.expandPill}>
                           <Feather
-                            name="maximize-2"
-                            size={13}
-                            color="#FFFFFF"
-                            style={{ marginRight: 4 }}
-                          />
+                      name="maximize-2"
+                      size={13}
+                      color="#FFFFFF"
+                      style={{ marginRight: 4 }} />
+                    
                           <Text style={styles.expandPillText}>Tela cheia</Text>
                         </View>
                       </Pressable>
-                    )}
-                  </View>
-                );
-              }}
-            />
-            {mediaList.length > 1 && (
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  position: "absolute",
-                  bottom: 10,
-                  left: 0,
-                  right: 0,
-                }}
-              >
-                {mediaList.map((_, idx) => (
-                  <View
-                    key={idx}
-                    style={{
-                      height: 6,
-                      width: 6,
-                      borderRadius: 3,
-                      backgroundColor:
-                        idx === carouselIndex ? "#1D9BF0" : "#ccc",
-                      marginHorizontal: 3,
-                    }}
-                  />
-                ))}
-              </View>
-            )}
+                }
+                  </View>);
 
-            {isNSFW && !isAdultContentEnabled && revealedTemporarily && (
-              <Pressable
-                onPress={(e) => {
-                  e.stopPropagation?.();
-                  setRevealedTemporarily(false);
-                }}
-                style={[
-                  styles.nsfwHideBadge,
-                  {
-                    backgroundColor: "rgba(0, 0, 0, 0.75)",
-                  },
-                ]}
-              >
+          }} />
+        
+            {mediaList.length > 1 &&
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: 10,
+            left: 0,
+            right: 0
+          }}>
+          
+                {mediaList.map((_, idx) =>
+          <View
+            key={idx}
+            style={{
+              height: 6,
+              width: 6,
+              borderRadius: 3,
+              backgroundColor:
+              idx === carouselIndex ? "#1D9BF0" : "#ccc",
+              marginHorizontal: 3
+            }} />
+
+          )}
+              </View>
+        }
+
+            {isNSFW && !isAdultContentEnabled && revealedTemporarily &&
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation?.();
+            setRevealedTemporarily(false);
+          }}
+          style={[
+          styles.nsfwHideBadge,
+          {
+            backgroundColor: "rgba(0, 0, 0, 0.75)"
+          }]
+          }>
+          
                 <Feather
-                  name="eye-off"
-                  size={12}
-                  color="#FFFFFF"
-                  style={{ marginRight: 4 }}
-                />
+            name="eye-off"
+            size={12}
+            color="#FFFFFF"
+            style={{ marginRight: 4 }} />
+          
                 <Text style={styles.nsfwHideBadgeText}>Ocultar (+18)</Text>
               </Pressable>
-            )}
-          </View>
-        ))}
+        }
+          </View>)
+      }
 
-      {post.reposted_post && post.reposted_post.id && (
-        <View
-          style={[styles.quotedPostContainer, { borderColor: colors.border }]}
-        >
+      {post.reposted_post && post.reposted_post.id &&
+      <View
+        style={[styles.quotedPostContainer, { borderColor: colors.border }]}>
+        
           <View style={styles.quoteHeader}>
             <Avatar
-              user={post.reposted_post.author}
-              fallbackUser={post.reposted_post.author}
-              size={20}
-            />
+            user={post.reposted_post.author}
+            fallbackUser={post.reposted_post.author}
+            size={20} />
+          
             <Text style={[styles.quoteAuthorName, { color: colors.text }]}>
               {userName(post.reposted_post.author)}
             </Text>
             <VerificationBadge user={post.reposted_post.author} size={10} />
           </View>
           {(() => {
-            const rp = post.reposted_post;
-            const rpMediaList =
-              rp.media_attachments || rp.mediaAttachments || [];
-            const rpLegacyMedia =
-              rp.mediaUrl ||
-              rp.media_url ||
-              rp.imageUrl ||
-              rp.image_url ||
-              rp.videoUrl ||
-              rp.video_url;
-            const rpFirstMedia =
-              rpMediaList.length > 0 ? rpMediaList[0].url : rpLegacyMedia;
-            const isRpVideo =
-              rpMediaList.length > 0
-                ? rpMediaList[0].type === "video"
-                : rp.videoUrl ||
-                  rp.video_url ||
-                  (typeof rpLegacyMedia === "string" &&
-                    rpLegacyMedia.match(/\.(mp4|webm)$/i));
+          const rp = post.reposted_post;
+          const rpMediaList =
+          rp.media_attachments || rp.mediaAttachments || [];
+          const rpLegacyMedia =
+          rp.mediaUrl ||
+          rp.media_url ||
+          rp.imageUrl ||
+          rp.image_url ||
+          rp.videoUrl ||
+          rp.video_url;
+          const rpFirstMedia =
+          rpMediaList.length > 0 ? rpMediaList[0].url : rpLegacyMedia;
+          const isRpVideo =
+          rpMediaList.length > 0 ?
+          rpMediaList[0].type === "video" :
+          rp.videoUrl ||
+          rp.video_url ||
+          typeof rpLegacyMedia === "string" &&
+          rpLegacyMedia.match(/\.(mp4|webm)$/i);
 
-            const rpYoutubeVideoId =
-              rp.youtube_video_id ||
-              rp.youtubeVideoId ||
-              (rp.media_type === "youtube" ? (rp.youtube_url || rp.content) : null);
+          const rpYoutubeVideoId =
+          rp.youtube_video_id ||
+          rp.youtubeVideoId || (
+          rp.media_type === "youtube" ? rp.youtube_url || rp.content : null);
 
-            return (
-              <View>
-                {rp.content ? (
-                  <Text style={[styles.quoteContent, { color: colors.text }]}>
+          return (
+            <View>
+                {rp.content ?
+              <Text style={[styles.quoteContent, { color: colors.text }]}>
                     {rp.content}
-                  </Text>
-                ) : null}
-                {rpYoutubeVideoId ? (
-                  <View style={{ marginTop: 8, width: "100%" }}>
+                  </Text> :
+              null}
+                {rpYoutubeVideoId ?
+              <View style={{ marginTop: 8, width: "100%" }}>
                     <YouTubePostCard
-                      videoId={rpYoutubeVideoId}
-                      youtubeUrl={rp.youtube_url || rp.youtubeUrl}
-                      isCentered={isCentered}
-                      volume={volume}
-                    />
-                  </View>
-                ) : rpFirstMedia ? (
-                  <Pressable
-                    onPress={() =>
-                      onOpenMedia &&
-                      onOpenMedia({
-                        url: rpFirstMedia,
-                        type: isRpVideo ? "video" : "image",
-                        post: rp,
-                      })
+                  videoId={rpYoutubeVideoId}
+                  youtubeUrl={rp.youtube_url || rp.youtubeUrl}
+                  isCentered={isCentered}
+                  volume={volume} />
+                
+                  </View> :
+              rpFirstMedia ?
+              <Pressable
+                onPress={() =>
+                onOpenMedia &&
+                onOpenMedia({
+                  url: rpFirstMedia,
+                  type: isRpVideo ? "video" : "image",
+                  post: rp
+                })
+                }
+                style={{
+                  marginTop: 8,
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  height: 200,
+                  backgroundColor: colors.surfaceAlt
+                }}>
+                
+                    {isRpVideo ?
+                <QuoteVideo
+                  url={rpFirstMedia}
+                  styles={{
+                    quoteMedia: {
+                      flex: 1,
+                      width: "100%",
+                      height: "100%"
                     }
-                    style={{
-                      marginTop: 8,
-                      borderRadius: 12,
-                      overflow: "hidden",
-                      height: 200,
-                      backgroundColor: colors.surfaceAlt,
-                    }}
-                  >
-                    {isRpVideo ? (
-                      <QuoteVideo
-                        url={rpFirstMedia}
-                        styles={{
-                          quoteMedia: {
-                            flex: 1,
-                            width: "100%",
-                            height: "100%",
-                          },
-                        }}
-                      />
-                    ) : (
-                      <Image
-                        source={{ uri: rpFirstMedia }}
-                        style={{ flex: 1, width: "100%", height: "100%" }}
-                        resizeMode="cover"
-                      />
-                    )}
-                    {isRpVideo && (
-                      <View
-                        style={{
-                          position: "absolute",
-                          top: "50%",
-                          left: "50%",
-                          transform: [{ translateX: -24 }, { translateY: -24 }],
-                          backgroundColor: "rgba(0,0,0,0.6)",
-                          borderRadius: 24,
-                          width: 48,
-                          height: 48,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
+                  }} /> :
+
+
+                <Image
+                  source={{ uri: rpFirstMedia }}
+                  style={{ flex: 1, width: "100%", height: "100%" }}
+                  resizeMode="cover" />
+
+                }
+                    {isRpVideo &&
+                <View
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: [{ translateX: -24 }, { translateY: -24 }],
+                    backgroundColor: "rgba(0,0,0,0.6)",
+                    borderRadius: 24,
+                    width: 48,
+                    height: 48,
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                  
                         <Feather
-                          name="play"
-                          size={24}
-                          color="#fff"
-                          style={{ marginLeft: 4 }}
-                        />
+                    name="play"
+                    size={24}
+                    color="#fff"
+                    style={{ marginLeft: 4 }} />
+                  
                       </View>
-                    )}
-                  </Pressable>
-                ) : (
-                  !rp.content && (
-                    <Text style={[styles.quoteContent, { color: colors.text }]}>
+                }
+                  </Pressable> :
+
+              !rp.content &&
+              <Text style={[styles.quoteContent, { color: colors.text }]}>
                       Mídia
                     </Text>
-                  )
-                )}
-              </View>
-            );
-          })()}
+
+              }
+              </View>);
+
+        })()}
         </View>
-      )}
+      }
 
       <View style={[styles.actions, { borderTopColor: colors.border }]}>
         <Action
@@ -1131,26 +1131,26 @@ export function PostCard({
           iconColor={hasLiked ? "#ef4444" : colors.subtext}
           textColor={hasLiked ? "#ef4444" : colors.subtext}
           value={count(post.likesCount ?? post.likes_count ?? likesList.length)}
-          onPress={onLike}
-        />
+          onPress={onLike} />
+        
         <Action
           icon="message-circle"
           iconColor={colors.subtext}
           textColor={colors.subtext}
           value={count(
-            post.commentsCount ?? post.comments_count ?? post.comments?.length,
+            post.commentsCount ?? post.comments_count ?? post.comments?.length
           )}
-          onPress={onComment}
-        />
+          onPress={onComment} />
+        
         <Action
           icon="repeat"
           iconColor={hasReposted ? "#10b981" : colors.subtext}
           textColor={hasReposted ? "#10b981" : colors.subtext}
           value={count(
-            post.repostsCount ?? post.reposts_count ?? repostsList.length,
+            post.repostsCount ?? post.reposts_count ?? repostsList.length
           )}
-          onPress={onRepost}
-        />
+          onPress={onRepost} />
+        
         <Action
           icon="share-2"
           iconColor={colors.subtext}
@@ -1162,23 +1162,23 @@ export function PostCard({
               onOpenMedia?.({
                 url: currentMedia.url,
                 type: currentMedia.type,
-                post,
+                post
               });
             }
-          }}
-        />
+          }} />
+        
         <Action
           icon="bookmark"
           iconColor={
-            isSavedLocally ? colors.primary || colors.accent : colors.subtext
+          isSavedLocally ? colors.primary || colors.accent : colors.subtext
           }
           textColor={colors.subtext}
           value=""
-          onPress={handleToggleSave}
-        />
+          onPress={handleToggleSave} />
+        
       </View>
-    </View>
-  );
+    </View>);
+
 }
 
 function Action({ icon, value, onPress, iconColor, textColor }) {
@@ -1186,18 +1186,18 @@ function Action({ icon, value, onPress, iconColor, textColor }) {
 
   const handlePress = () => {
     Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: icon === "heart" ? 1.38 : 1.15,
-        duration: 110,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 3.5,
-        tension: 40,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(scaleAnim, {
+      toValue: icon === "heart" ? 1.38 : 1.15,
+      duration: 110,
+      useNativeDriver: true
+    }),
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3.5,
+      tension: 40,
+      useNativeDriver: true
+    })]
+    ).start();
 
     onPress?.();
   };
@@ -1205,16 +1205,16 @@ function Action({ icon, value, onPress, iconColor, textColor }) {
   return (
     <Pressable
       onPress={handlePress}
-      style={({ pressed }) => [styles.action, { opacity: pressed ? 0.7 : 1 }]}
-    >
+      style={({ pressed }) => [styles.action, { opacity: pressed ? 0.7 : 1 }]}>
+      
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <Feather name={icon} size={18} color={iconColor} />
       </Animated.View>
-      {value !== "" && (
-        <Text style={[styles.actionCount, { color: textColor }]}>{value}</Text>
-      )}
-    </Pressable>
-  );
+      {value !== "" &&
+      <Text style={[styles.actionCount, { color: textColor }]}>{value}</Text>
+      }
+    </Pressable>);
+
 }
 
 const styles = StyleSheet.create({
@@ -1224,33 +1224,33 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderRadius: 12,
-    backgroundColor: "transparent",
+    backgroundColor: "transparent"
   },
   quoteHeader: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 6,
-    gap: 6,
+    gap: 6
   },
   quoteAuthorName: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   quoteContent: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 13,
+    fontSize: 13
   },
   flex: {
-    flex: 1,
+    flex: 1
   },
   listContent: {
     paddingTop: 4,
     paddingHorizontal: 0,
     paddingBottom: 110,
-    flexGrow: 1,
+    flexGrow: 1
   },
   listHeader: {
-    marginBottom: 4,
+    marginBottom: 4
   },
 
   composerCardWrapper: {
@@ -1262,15 +1262,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
-    elevation: 4,
+    elevation: 4
   },
   composer: {
-    width: "100%",
+    width: "100%"
   },
   composerTop: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 12
   },
   composerInputWrapper: {
     flex: 1,
@@ -1279,7 +1279,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     minHeight: 46,
     borderWidth: 0,
-    justifyContent: "center",
+    justifyContent: "center"
   },
   composerInput: {
     flex: 1,
@@ -1289,18 +1289,18 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlignVertical: "center",
     padding: 0,
-    margin: 0,
+    margin: 0
   },
   preview: {
     marginTop: 12,
     position: "relative",
     alignSelf: "flex-start",
-    marginLeft: 54,
+    marginLeft: 54
   },
   previewImage: {
     width: 90,
     height: 70,
-    borderRadius: 14,
+    borderRadius: 14
   },
   removeImageBtn: {
     position: "absolute",
@@ -1311,29 +1311,29 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   composerDivider: {
-    display: "none",
+    display: "none"
   },
   composerFoot: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginTop: 8,
-    paddingLeft: 54,
+    paddingLeft: 54
   },
   composerIcons: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 6
   },
   composerActionBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   publishButton: {
     paddingHorizontal: 20,
@@ -1341,12 +1341,12 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    minWidth: 88,
+    minWidth: 88
   },
   publishButtonText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 13,
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
 
   postCard: {
@@ -1358,45 +1358,45 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
-    elevation: 2,
+    elevation: 2
   },
   postHead: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 12
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 4
   },
   name: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 14,
+    fontSize: 14
   },
   handle: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
-    marginTop: 1,
+    marginTop: 1
   },
   commentHandle: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 12,
+    fontSize: 12
   },
   postText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 14,
     lineHeight: 22,
-    marginTop: 12,
+    marginTop: 12
   },
   imageWrapper: {
     position: "relative",
     width: "100%",
-    marginTop: 12,
+    marginTop: 12
   },
   postImage: {
     width: "100%",
-    borderRadius: 16,
+    borderRadius: 16
   },
   nsfwContainer: {
     width: "100%",
@@ -1408,7 +1408,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 150,
+    minHeight: 150
   },
   nsfwBadge: {
     position: "absolute",
@@ -1416,33 +1416,33 @@ const styles = StyleSheet.create({
     right: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: 8
   },
   nsfwBadgeText: {
     fontFamily: "Poppins_700Bold",
     fontSize: 11,
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
   nsfwContent: {
     alignItems: "center",
     paddingHorizontal: 12,
-    paddingTop: 8,
+    paddingTop: 8
   },
   nsfwHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: 6
   },
   nsfwTitle: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 13
   },
   nsfwHint: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
     textAlign: "center",
     marginBottom: 12,
-    lineHeight: 16,
+    lineHeight: 16
   },
   nsfwRevealBtn: {
     flexDirection: "row",
@@ -1450,11 +1450,11 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 14,
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: 1
   },
   nsfwRevealText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 12,
+    fontSize: 12
   },
   nsfwHideBadge: {
     position: "absolute",
@@ -1464,34 +1464,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 12,
+    borderRadius: 12
   },
   nsfwHideBadgeText: {
     fontFamily: "Poppins_500Medium",
     fontSize: 11,
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
   actions: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 16,
     paddingTop: 12,
-    borderTopWidth: 1,
+    borderTopWidth: 1
   },
   action: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: 8
   },
   actionCount: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 12,
+    fontSize: 12
   },
 
   modal: {
-    flex: 1,
+    flex: 1
   },
   modalHeader: {
     flexDirection: "row",
@@ -1499,33 +1499,33 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1
   },
   modalTitle: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 16,
+    fontSize: 16
   },
   commentsList: {
     padding: 16,
     paddingBottom: 24,
-    flexGrow: 1,
+    flexGrow: 1
   },
   commentItem: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 18,
+    marginBottom: 18
   },
   commentText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
     lineHeight: 20,
-    marginTop: 4,
+    marginTop: 4
   },
   reply: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    padding: 14,
+    padding: 14
   },
   replyInput: {
     flex: 1,
@@ -1534,12 +1534,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     fontFamily: "Poppins_400Regular",
-    fontSize: 14,
+    fontSize: 14
   },
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)"
   },
   optionsSheet: {
     padding: 24,
@@ -1547,37 +1547,37 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     borderTopWidth: 1,
-    gap: 8,
+    gap: 8
   },
   optionsHandle: {
     width: 40,
     height: 4,
     borderRadius: 2,
     alignSelf: "center",
-    marginBottom: 12,
+    marginBottom: 12
   },
   optionsTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 16,
     marginBottom: 12,
-    textAlign: "center",
+    textAlign: "center"
   },
   optionItem: {
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   optionIcon: {
     width: 44,
     height: 44,
     borderRadius: 22,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   optionText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 15,
+    fontSize: 15
   },
 
   expandPill: {
@@ -1591,19 +1591,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.15)",
+    borderColor: "rgba(255, 255, 255, 0.15)"
   },
   expandPillText: {
     color: "#FFFFFF",
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 11,
+    fontSize: 11
   },
 
   scrollTopContainer: {
     position: "absolute",
     bottom: 95,
     right: 20,
-    zIndex: 99,
+    zIndex: 99
   },
   scrollTopButton: {
     flexDirection: "row",
@@ -1617,10 +1617,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 6,
+    elevation: 6
   },
   scrollTopText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 12,
-  },
+    fontSize: 12
+  }
 });

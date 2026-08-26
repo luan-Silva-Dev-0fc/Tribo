@@ -3,10 +3,10 @@ import { Platform } from "react-native";
 
 function resolveSocketUrl() {
   if (
-    !process.env.EXPO_PUBLIC_API_URL && Platform.OS === "web" &&
-    typeof window !== "undefined" &&
-    window.location?.hostname
-  ) {
+  !process.env.EXPO_PUBLIC_API_URL && Platform.OS === "web" &&
+  typeof window !== "undefined" &&
+  window.location?.hostname)
+  {
     return 'http://' + window.location.hostname + ':3000';
   }
   if (process.env.EXPO_PUBLIC_API_URL) {
@@ -22,7 +22,7 @@ export function getChatSocket() {
     const url = resolveSocketUrl();
     socketInstance = io(url, {
       transports: ["websocket", "polling"],
-      autoConnect: true,
+      autoConnect: true
     });
   }
   return socketInstance;

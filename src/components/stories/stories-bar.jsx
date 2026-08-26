@@ -5,8 +5,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { Feather } from "@expo/vector-icons";
 import { api } from "../../api";
 import { Avatar } from "../ui/ui";
@@ -28,11 +28,11 @@ export function StoriesBar({ user, onStoryChange }) {
     try {
       setLoading(true);
       const res = await api.stories.list();
-      const rawList = Array.isArray(res)
-        ? res
-        : res?.stories || res?.data || [];
+      const rawList = Array.isArray(res) ?
+      res :
+      res?.stories || res?.data || [];
 
-      // Agrupar stories por usuário
+
       const groupsMap = new Map();
       const currentUid = String(user?.id || user?.userId || "");
 
@@ -49,18 +49,18 @@ export function StoriesBar({ user, onStoryChange }) {
         if (!uId) return;
 
         const resolvedUser =
-          Object.keys(u).length > 0
-            ? u
-            : uId === currentUid && user
-            ? user
-            : { id: uId };
+        Object.keys(u).length > 0 ?
+        u :
+        uId === currentUid && user ?
+        user :
+        { id: uId };
 
         if (!groupsMap.has(uId)) {
           groupsMap.set(uId, {
             user: resolvedUser,
             userId: uId,
             stories: [],
-            hasUnseen: true,
+            hasUnseen: true
           });
         }
         groupsMap.get(uId).stories.push(story);
@@ -73,7 +73,7 @@ export function StoriesBar({ user, onStoryChange }) {
         if (id === currentUid) {
           own = {
             ...group,
-            user: user || group.user,
+            user: user || group.user
           };
         } else {
           others.push(group);
@@ -83,7 +83,7 @@ export function StoriesBar({ user, onStoryChange }) {
       setMyGroup(own);
       setUserGroups(others);
     } catch {
-      // Falha silenciosa para não travar o feed
+
     } finally {
       setLoading(false);
     }
@@ -111,12 +111,12 @@ export function StoriesBar({ user, onStoryChange }) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollList}
-      >
-        {/* Item do Usuário Logado: Seu Story */}
+        contentContainerStyle={styles.scrollList}>
+        
+        {}
         <View style={styles.storyItem}>
           <View style={styles.avatarWrapper}>
-            {/* Foto / Anel principal */}
+            {}
             <Pressable
               onPress={() => {
                 if (hasMyStory) {
@@ -125,39 +125,39 @@ export function StoriesBar({ user, onStoryChange }) {
                   setCreateVisible(true);
                 }
               }}
-              accessibilityLabel={hasMyStory ? "Ver seu story" : "Criar story"}
-            >
+              accessibilityLabel={hasMyStory ? "Ver seu story" : "Criar story"}>
+              
               <View
                 style={[
-                  styles.storyRing,
-                  {
-                    borderColor: hasMyStory ? colors.accent : colors.line,
-                    borderWidth: hasMyStory ? 2.5 : 1,
-                  },
-                ]}
-              >
+                styles.storyRing,
+                {
+                  borderColor: hasMyStory ? colors.accent : colors.line,
+                  borderWidth: hasMyStory ? 2.5 : 1
+                }]
+                }>
+                
                 <Avatar user={user} size={56} />
               </View>
             </Pressable>
 
-            {/* Badge de adicionar (+) com toque específico */}
+            {}
             <Pressable
               style={[
-                styles.addBadge,
-                {
-                  backgroundColor: colors.accent,
-                  borderColor: colors.background || "#000000",
-                },
-              ]}
+              styles.addBadge,
+              {
+                backgroundColor: colors.accent,
+                borderColor: colors.background || "#000000"
+              }]
+              }
               onPress={() => setCreateVisible(true)}
               accessibilityLabel="Criar Story"
-              hitSlop={6}
-            >
+              hitSlop={6}>
+              
               <Feather name="plus" size={13} color="#ffffff" />
             </Pressable>
           </View>
 
-          {/* Rótulo "Seu Story" */}
+          {}
           <Pressable
             onPress={() => {
               if (hasMyStory) {
@@ -165,59 +165,59 @@ export function StoriesBar({ user, onStoryChange }) {
               } else {
                 setCreateVisible(true);
               }
-            }}
-          >
+            }}>
+            
             <Text numberOfLines={1} style={[styles.storyLabel, { color: colors.text }]}>
               Seu Story
             </Text>
           </Pressable>
         </View>
 
-        {/* Stories dos outros usuários */}
+        {}
         {userGroups.map((group) => {
           const u = group.user;
           return (
             <Pressable
               key={group.userId}
               style={styles.storyItem}
-              onPress={() => handleOpenViewer(group)}
-            >
+              onPress={() => handleOpenViewer(group)}>
+              
               <View
                 style={[
-                  styles.storyRing,
-                  {
-                    borderColor: group.hasUnseen ? colors.accent : colors.line,
-                    borderWidth: group.hasUnseen ? 2.5 : 1.5,
-                  },
-                ]}
-              >
+                styles.storyRing,
+                {
+                  borderColor: group.hasUnseen ? colors.accent : colors.line,
+                  borderWidth: group.hasUnseen ? 2.5 : 1.5
+                }]
+                }>
+                
                 <Avatar user={u} size={56} />
               </View>
               <Text numberOfLines={1} style={[styles.storyLabel, { color: colors.text }]}>
                 {u?.firstName || userName(u).split(" ")[0]}
               </Text>
-            </Pressable>
-          );
+            </Pressable>);
+
         })}
 
-        {loading && userGroups.length === 0 && !hasMyStory && (
-          <View style={styles.loadingIndicator}>
+        {loading && userGroups.length === 0 && !hasMyStory &&
+        <View style={styles.loadingIndicator}>
             <ActivityIndicator size="small" color={colors.muted} />
           </View>
-        )}
+        }
       </ScrollView>
 
-      {/* Modal de Criação de Story */}
+      {}
       <CreateStoryModal
         visible={createVisible}
         onClose={() => setCreateVisible(false)}
         onSuccess={() => {
           loadStories();
           onStoryChange?.();
-        }}
-      />
+        }} />
+      
 
-      {/* Modal de Visualização de Stories Fullscreen */}
+      {}
       <StoryViewerModal
         visible={viewerVisible}
         initialUserGroup={selectedGroup}
@@ -227,31 +227,31 @@ export function StoriesBar({ user, onStoryChange }) {
           setViewerVisible(false);
           setSelectedGroup(null);
         }}
-        onStoryDeleted={handleStoryDeleted}
-      />
-    </View>
-  );
+        onStoryDeleted={handleStoryDeleted} />
+      
+    </View>);
+
 }
 
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 14,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1
   },
   scrollList: {
     paddingHorizontal: 18,
-    gap: 18, // Espaçamento mais limpo e proporcional
-    alignItems: "center",
+    gap: 18,
+    alignItems: "center"
   },
   storyItem: {
     alignItems: "center",
-    width: 72,
+    width: 72
   },
   avatarWrapper: {
-    position: "relative",
+    position: "relative"
   },
   storyRing: {
-    padding: 3, // Refinamento do anel do avatar
+    padding: 3,
     borderRadius: 36,
     alignItems: "center",
     justifyContent: "center",
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
-    elevation: 3, // Sombra suave
+    elevation: 3
   },
   addBadge: {
     position: "absolute",
@@ -276,17 +276,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 2
   },
   storyLabel: {
     fontFamily: "Poppins_500Medium",
     fontSize: 11.5,
     marginTop: 8,
     textAlign: "center",
-    maxWidth: 72,
+    maxWidth: 72
   },
   loadingIndicator: {
     justifyContent: "center",
-    paddingHorizontal: 12,
-  },
+    paddingHorizontal: 12
+  }
 });
