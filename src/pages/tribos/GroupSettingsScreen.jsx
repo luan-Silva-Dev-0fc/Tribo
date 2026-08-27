@@ -43,7 +43,16 @@ export function GroupSettingsScreen({
   mode === "dark" || mode === "oled" || colors.background !== "#f5f5f7");
   const [busy, setBusy] = useState(false);
   const [group, setGroup] = useState(initialGroup);
-  const [membersList, setMembersList] = useState(initialGroup?.members || []);
+  const [membersList, setMembersList] = useState(() => {
+    const initial = initialGroup?.members;
+    if (!Array.isArray(initial)) return [];
+    return initial.filter((m) => {
+      const u = m?.user || m;
+      const uid = u?.id || u?._id || m?.userId || m?.user_id;
+      const uname = u?.name || u?.username || m?.name;
+      return uid != null && String(uid) !== "undefined" && String(uid) !== "null" && uname !== "Tribo";
+    });
+  });
   const [name, setName] = useState(initialGroup?.name || "");
   const [rules, setRules] = useState(initialGroup?.rules || "");
   const [avatarUri, setAvatarUri] = useState(
@@ -135,7 +144,13 @@ export function GroupSettingsScreen({
           let fetchedMembers =
           resMembers.members || resMembers.data || resMembers || [];
           if (!Array.isArray(fetchedMembers)) fetchedMembers = [];
-          setMembersList(fetchedMembers);
+          const validMembers = fetchedMembers.filter((m) => {
+            const u = m?.user || m;
+            const uid = u?.id || u?._id || m?.userId || m?.user_id;
+            const uname = u?.name || u?.username || m?.name;
+            return uid != null && String(uid) !== "undefined" && String(uid) !== "null" && uname !== "Tribo";
+          });
+          setMembersList(validMembers);
         }
       } catch (error) {
         console.warn("Error refreshing group data", error);
@@ -147,33 +162,24 @@ export function GroupSettingsScreen({
     };
   }, [initialGroup?.id]);
 
-  const isMemberAdmin = membersList.some((m) => {
-    const memberUser = m?.user || m;
-    const memberId = memberUser?.id || memberUser?._id || m?.userId;
-    const role = (m?.role || "").toLowerCase();
-    return (
-      String(memberId) === String(user?.id) && (
-      role === "admin" ||
-      role === "owner" ||
-      role === "criador" ||
-      role === "creator" ||
-      role === "administrador"));
-
-  });
-
-  const isAdmin = Boolean(
-    group?.admin_id && String(group.admin_id) === String(user?.id) ||
-    group?.adminId && String(group.adminId) === String(user?.id) ||
-    group?.owner_id && String(group.owner_id) === String(user?.id) ||
-    group?.ownerId && String(group.ownerId) === String(user?.id) ||
-    group?.creator_id && String(group.creator_id) === String(user?.id) ||
-    group?.creatorId && String(group.creatorId) === String(user?.id) ||
-    isMemberAdmin ||
-    membersList.length === 1 &&
-    String(
-      (membersList[0]?.user || membersList[0])?.id || membersList[0]?.userId
-    ) === String(user?.id)
+  const isCreator = Boolean(
+    (group?.created_by && String(group.created_by) === String(user?.id)) ||
+    (group?.createdBy && String(group.createdBy) === String(user?.id)) ||
+    (group?.creator_id && String(group.creator_id) === String(user?.id)) ||
+    (group?.creatorId && String(group.creatorId) === String(user?.id)) ||
+    (group?.owner_id && String(group.owner_id) === String(user?.id)) ||
+    (group?.ownerId && String(group.ownerId) === String(user?.id)) ||
+    (group?.admin_id && String(group.admin_id) === String(user?.id)) ||
+    (group?.adminId && String(group.adminId) === String(user?.id)) ||
+    (initialGroup?.created_by && String(initialGroup.created_by) === String(user?.id)) ||
+    (initialGroup?.createdBy && String(initialGroup.createdBy) === String(user?.id)) ||
+    (initialGroup?.creator_id && String(initialGroup.creator_id) === String(user?.id)) ||
+    (initialGroup?.creatorId && String(initialGroup.creatorId) === String(user?.id)) ||
+    (initialGroup?.owner_id && String(initialGroup.owner_id) === String(user?.id)) ||
+    (initialGroup?.ownerId && String(initialGroup.ownerId) === String(user?.id))
   );
+
+  const isAdmin = isCreator;
 
   const pickImage = async () => {
     try {
@@ -660,114 +666,117 @@ export function GroupSettingsScreen({
               
                 Membros ({membersList.length})
               </Text>
-              <Pressable
-              onPress={openBannedModal}
-              style={[
-              styles.bannedLinkBtn,
-              {
-                backgroundColor: isDark ?
-                "rgba(239, 68, 68, 0.12)" :
-                "#fee2e2",
-                borderColor: isDark ? "rgba(239, 68, 68, 0.3)" : "#fca5a5",
-                borderWidth: 1,
-                borderRadius: 12,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6
-              }]
-              }>
-              
-                <Feather name="shield" size={13} color="#ef4444" />
-                <Text
-                style={[
-                styles.bannedLinkText,
-                { color: "#ef4444", fontSize: 12.5 }]
-                }>
-                
-                  Membros Banidos ({bannedList.length})
-                </Text>
-              </Pressable>
+              {isCreator && (
+                <Pressable
+                  onPress={openBannedModal}
+                  style={[
+                    styles.bannedLinkBtn,
+                    {
+                      backgroundColor: isDark ?
+                      "rgba(239, 68, 68, 0.12)" :
+                      "#fee2e2",
+                      borderColor: isDark ? "rgba(239, 68, 68, 0.3)" : "#fca5a5",
+                      borderWidth: 1,
+                      borderRadius: 12,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6
+                    }
+                  ]}>
+                  <Feather name="shield" size={13} color="#ef4444" />
+                  <Text
+                    style={[
+                      styles.bannedLinkText,
+                      { color: "#ef4444", fontSize: 12.5 }
+                    ]}>
+                    Membros Banidos ({bannedList.length})
+                  </Text>
+                </Pressable>
+              )}
             </View>
 
             <View style={{ marginBottom: 16 }}>
-              {membersList.map((m) => {
-              const memberUser = m.user || m;
-              const memberId = memberUser.id || memberUser._id || m.userId;
-              const isMemberAdm =
-              m.role === "admin" ||
-              m.role === "owner" ||
-              memberUser.id === group.ownerId ||
-              memberUser.id === group.adminId ||
-              memberUser.id === group.admin_id;
+              {membersList
+                .filter((m) => {
+                  const memberUser = m?.user || m;
+                  const memberId = memberUser?.id || memberUser?._id || m?.userId || m?.user_id;
+                  return memberId != null && String(memberId) !== "undefined" && String(memberId) !== "null";
+                })
+                .map((m) => {
+                  const memberUser = m.user || m;
+                  const memberId = memberUser.id || memberUser._id || m.userId || m.user_id;
+                  const role = (m.role || "").toLowerCase();
+                  const isMemberAdm =
+                    role === "admin" ||
+                    role === "owner" ||
+                    role === "criador" ||
+                    role === "creator" ||
+                    role === "administrador" ||
+                    String(memberId) === String(group?.ownerId || group?.owner_id || group?.adminId || group?.admin_id || group?.creatorId || group?.creator_id);
 
-              const isSelf = String(memberId) === String(user?.id);
+                  const isSelf = String(memberId) === String(user?.id);
 
-              return (
-                <View key={String(memberId)} style={styles.memberRow}>
-                    <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      flex: 1
-                    }}>
-                    
-                      <Avatar user={memberUser} size={40} />
-                      <View style={{ marginLeft: 12, flex: 1 }}>
-                        <Text
+                  return (
+                    <View key={String(memberId)} style={styles.memberRow}>
+                      <View
                         style={{
-                          fontSize: 15,
-                          fontFamily: "Poppins_600SemiBold",
-                          color: colors.text
-                        }}
-                        numberOfLines={1}>
-                        
-                          {userName(memberUser)}
-                        </Text>
-                        {isMemberAdm &&
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontFamily: "Poppins_400Regular",
-                          color: colors.primary || "#3b82f6"
+                          flexDirection: "row",
+                          alignItems: "center",
+                          flex: 1
                         }}>
-                        
-                            Administrador
+                        <Avatar user={memberUser} size={40} />
+                        <View style={{ marginLeft: 12, flex: 1 }}>
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontFamily: "Poppins_600SemiBold",
+                              color: colors.text
+                            }}
+                            numberOfLines={1}>
+                            {userName(memberUser)} {isSelf ? "(Você)" : ""}
                           </Text>
-                      }
+                          {isMemberAdm && (
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                fontFamily: "Poppins_400Regular",
+                                color: colors.primary || "#3b82f6"
+                              }}>
+                              Administrador
+                            </Text>
+                          )}
+                        </View>
                       </View>
+
+                      {isAdmin && !isMemberAdm && !isSelf && (
+                        <Pressable
+                          onPress={() => handleBanMember(memberUser)}
+                          style={[
+                            styles.banBtn,
+                            {
+                              backgroundColor:
+                                (colors.danger || "#ef4444") + "15"
+                            }
+                          ]}>
+                          <Feather
+                            name="slash"
+                            size={14}
+                            color={colors.danger || "#ef4444"}
+                          />
+                          <Text
+                            style={[
+                              styles.banBtnText,
+                              { color: colors.danger || "#ef4444" }
+                            ]}>
+                            Banir
+                          </Text>
+                        </Pressable>
+                      )}
                     </View>
-
-                    {isAdmin && !isMemberAdm && !isSelf &&
-                  <Pressable
-                    onPress={() => handleBanMember(memberUser)}
-                    style={[
-                    styles.banBtn,
-                    {
-                      backgroundColor:
-                      (colors.danger || "#ef4444") + "15"
-                    }]
-                    }>
-                    
-                        <Feather
-                      name="slash"
-                      size={14}
-                      color={colors.danger || "#ef4444"} />
-                    
-                        <Text
-                      style={[
-                      styles.banBtnText,
-                      { color: colors.danger || "#ef4444" }]
-                      }>
-                      
-                          Banir
-                        </Text>
-                      </Pressable>
-                  }
-                  </View>);
-
-            })}
+                  );
+                })}
             </View>
 
             <Button
@@ -839,44 +848,52 @@ export function GroupSettingsScreen({
               Membros ({membersList.length})
             </Text>
             <View style={{ marginBottom: 16 }}>
-              {membersList.map((m) => {
-              const memberUser = m.user || m;
-              const memberId = memberUser.id || memberUser._id || m.userId;
-              const isMemberAdm =
-              m.role === "admin" ||
-              m.role === "owner" ||
-              memberUser.id === group.ownerId ||
-              memberUser.id === group.adminId ||
-              memberUser.id === group.admin_id;
+              {membersList
+                .filter((m) => {
+                  const memberUser = m?.user || m;
+                  const memberId = memberUser?.id || memberUser?._id || m?.userId || m?.user_id;
+                  return memberId != null && String(memberId) !== "undefined" && String(memberId) !== "null";
+                })
+                .map((m) => {
+                  const memberUser = m.user || m;
+                  const memberId = memberUser.id || memberUser._id || m.userId || m.user_id;
+                  const role = (m.role || "").toLowerCase();
+                  const isMemberAdm =
+                    role === "admin" ||
+                    role === "owner" ||
+                    role === "criador" ||
+                    role === "creator" ||
+                    role === "administrador" ||
+                    String(memberId) === String(group?.ownerId || group?.owner_id || group?.adminId || group?.admin_id || group?.creatorId || group?.creator_id);
 
-              return (
-                <View key={String(memberId)} style={styles.memberRow}>
-                    <Avatar user={memberUser} size={40} />
-                    <View style={{ marginLeft: 12 }}>
-                      <Text
-                      style={{
-                        fontSize: 15,
-                        fontFamily: "Poppins_600SemiBold",
-                        color: colors.text
-                      }}>
-                      
-                        {userName(memberUser)}
-                      </Text>
-                      {isMemberAdm &&
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontFamily: "Poppins_400Regular",
-                        color: colors.primary || "#3b82f6"
-                      }}>
-                      
-                          Administrador
+                  const isSelf = String(memberId) === String(user?.id);
+
+                  return (
+                    <View key={String(memberId)} style={styles.memberRow}>
+                      <Avatar user={memberUser} size={40} />
+                      <View style={{ marginLeft: 12 }}>
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            fontFamily: "Poppins_600SemiBold",
+                            color: colors.text
+                          }}>
+                          {userName(memberUser)} {isSelf ? "(Você)" : ""}
                         </Text>
-                    }
+                        {isMemberAdm && (
+                          <Text
+                            style={{
+                              fontSize: 12,
+                              fontFamily: "Poppins_400Regular",
+                              color: colors.primary || "#3b82f6"
+                            }}>
+                            Administrador
+                          </Text>
+                        )}
+                      </View>
                     </View>
-                  </View>);
-
-            })}
+                  );
+                })}
             </View>
 
             <View style={{ height: 24 }} />
@@ -1216,13 +1233,15 @@ export function GroupSettingsScreen({
         </View>
       </Modal>
 
-      {}
-      <BanReasonModal
-        visible={banModal.visible}
-        member={banModal.member}
-        loading={busy}
-        onClose={() => setBanModal({ visible: false, member: null })}
-        onConfirmBan={handleConfirmBanMember} />
+      {isCreator && (
+        <BanReasonModal
+          visible={banModal.visible}
+          member={banModal.member}
+          loading={busy}
+          onClose={() => setBanModal({ visible: false, member: null })}
+          onConfirmBan={handleConfirmBanMember}
+        />
+      )}
       
 
       {}

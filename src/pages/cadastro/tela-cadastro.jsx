@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ActivityIndicator,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -9,9 +10,10 @@ import {
   StatusBar,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../theme";
 import { estilosCadastro } from "./designer/estilos-cadastro";
 
@@ -20,7 +22,7 @@ const TITULOS_PASSO = {
   2: "Qual é o seu e-mail?",
   3: "Crie uma senha forte",
   4: "Foto de perfil",
-  5: "Conte um pouco sobre você",
+  5: "Conte um pouco sobre você"
 };
 
 function CampoCadastro({
@@ -29,6 +31,7 @@ function CampoCadastro({
   onRightIconPress,
   style,
   editable = true,
+  onFocus,
   ...props
 }) {
   const { colors } = useTheme();
@@ -41,16 +44,16 @@ function CampoCadastro({
             ? colors.surface
             : colors.cardSecondary || colors.surfaceAlt,
           borderColor: colors.line,
-          opacity: editable ? 1 : 0.85,
+          opacity: editable ? 1 : 0.85
         },
-        style,
-      ]}
-    >
+        style
+      ]}>
       {!!icon && <Feather name={icon} size={18} color="#9EA0A5" />}
       <TextInput
         placeholderTextColor="#9EA0A5"
         style={[estilosCadastro.fieldInput, { color: colors.text }]}
         editable={editable}
+        onFocus={onFocus}
         {...props}
       />
 
@@ -58,8 +61,7 @@ function CampoCadastro({
         <Pressable
           onPress={onRightIconPress}
           hitSlop={10}
-          style={estilosCadastro.fieldRightIcon}
-        >
+          style={estilosCadastro.fieldRightIcon}>
           <Feather name={rightIcon} size={18} color="#9EA0A5" />
         </Pressable>
       )}
@@ -89,13 +91,37 @@ export default function TelaCadastro({
   onSkip,
   onBack,
   onGoToLogin,
-  onSubmit,
+  onSubmit
 }) {
+  const insets = useSafeAreaInsets();
   const { colors, isDark } = useTheme();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const scrollViewRef = useRef(null);
 
-  const fundoClaro = isDark ? colors.background : "#F5F5F7";
-  const corCard = isDark ? colors.card || "#181920" : "#FFFFFF";
-  const bordaCard = isDark ? colors.line : "rgba(0,0,0,0.04)";
+  useEffect(() => {
+    const showListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const hideListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
+
+  const handleInputFocus = (offset = 60) => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollTo({ y: offset, animated: true });
+    }, 100);
+  };
+
+  const corCard = isDark ? colors.card || "#16171d" : "#FFFFFF";
+  const bordaCard = isDark ? colors.line || "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
 
   const descricaoPasso = {
     1: "Informe seu nome e sobrenome para que as pessoas encontrem você.",
@@ -104,58 +130,47 @@ export default function TelaCadastro({
       : "Usaremos este e-mail para validar sua conta e enviar avisos de segurança.",
     3: "Sua senha deve ter no mínimo 6 caracteres para proteger sua conta.",
     4: "Adicione uma foto para personalizar seu perfil na comunidade.",
-    5: "Escreva uma breve biografia ou interesses para compartilhar.",
+    5: "Escreva uma breve biografia ou interesses para compartilhar."
   };
 
   return (
-    <View style={estilosCadastro.containerPrincipal}>
+    <View style={[estilosCadastro.containerPrincipal, { backgroundColor: colors.background || "#000000" }]}>
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
 
-      {}
-      <View style={estilosCadastro.fundoAbsoluto} pointerEvents="none">
-        <View style={estilosCadastro.topoFundoEscuro} />
-        <View
-          style={[
-            estilosCadastro.corpoFundoClaro,
-            { backgroundColor: fundoClaro },
-          ]}
-        />
-      </View>
+      <View style={estilosCadastro.ambientGlow} />
 
-      {}
       <KeyboardAvoidingView
         style={estilosCadastro.flex}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}>
         <ScrollView
-          contentContainerStyle={estilosCadastro.scrollContent}
+          ref={scrollViewRef}
+          contentContainerStyle={[
+            estilosCadastro.scrollContent,
+            {
+              justifyContent: keyboardVisible ? "flex-start" : "center",
+              paddingTop: Math.max(insets.top, 20) + (keyboardVisible ? 8 : 16),
+              paddingBottom: keyboardVisible ? 280 : Math.max(insets.bottom, 20) + 24
+            }
+          ]}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {}
+          showsVerticalScrollIndicator={false}>
           <View style={estilosCadastro.cabecalho}>
             <Pressable
               onPress={onBack}
               hitSlop={12}
               style={estilosCadastro.botaoVoltar}
-              accessibilityLabel="Voltar"
-            >
+              accessibilityLabel="Voltar">
               <Feather name="arrow-left" size={20} color="#FFFFFF" />
             </Pressable>
             <View style={estilosCadastro.logoContainer}>
               <Ionicons name="people" size={24} color="#FFFFFF" />
               <Text style={estilosCadastro.logoTexto}>Tribo</Text>
             </View>
+            <View style={{ width: 40 }} />
           </View>
 
-          {}
-          <View
-            style={[
-              estilosCadastro.cardFlutuante,
-              { backgroundColor: corCard, borderColor: bordaCard },
-            ]}
-          >
-            {}
+          <View style={[estilosCadastro.cardFlutuante, { backgroundColor: corCard, borderColor: bordaCard }]}>
             <View style={estilosCadastro.progressRow}>
               {[1, 2, 3, 4, 5].map((i) => (
                 <View
@@ -163,40 +178,34 @@ export default function TelaCadastro({
                   style={[
                     estilosCadastro.progressDot,
                     { backgroundColor: isDark ? "#2C2E38" : "#E4E4E7" },
-                    i <= step && { backgroundColor: colors.text },
+                    i <= step && { backgroundColor: colors.primary || colors.text }
                   ]}
                 />
               ))}
             </View>
 
-            {}
             <View
               style={[
                 estilosCadastro.badgeContainer,
                 {
                   backgroundColor: isDark
                     ? "rgba(255,255,255,0.08)"
-                    : "#F0F0F0",
-                },
-              ]}
-            >
+                    : "#F0F0F0"
+                }
+              ]}>
               <Ionicons name="people" size={12} color={colors.text} />
               <Text style={[estilosCadastro.badgeText, { color: colors.text }]}>
                 Passo {step} de 5
               </Text>
             </View>
 
-            {}
             <Text style={[estilosCadastro.tituloCard, { color: colors.text }]}>
               {TITULOS_PASSO[step]}
             </Text>
-            <Text
-              style={[estilosCadastro.descricaoCard, { color: colors.muted }]}
-            >
+            <Text style={[estilosCadastro.descricaoCard, { color: colors.muted }]}>
               {descricaoPasso[step]}
             </Text>
 
-            {}
             {step === 1 && (
               <View>
                 <CampoCadastro
@@ -206,6 +215,7 @@ export default function TelaCadastro({
                   onChangeText={onChangeFirstName}
                   autoCapitalize="words"
                   autoFocus
+                  onFocus={() => handleInputFocus(40)}
                 />
 
                 <CampoCadastro
@@ -214,21 +224,20 @@ export default function TelaCadastro({
                   value={lastName}
                   onChangeText={onChangeLastName}
                   autoCapitalize="words"
+                  onFocus={() => handleInputFocus(90)}
                 />
 
                 <Pressable
                   onPress={onNext}
                   style={[
                     estilosCadastro.submit,
-                    { backgroundColor: colors.primary },
-                  ]}
-                >
+                    { backgroundColor: colors.primary }
+                  ]}>
                   <Text style={estilosCadastro.submitText}>Próximo</Text>
                 </Pressable>
               </View>
             )}
 
-            {}
             {step === 2 && (
               <View>
                 <CampoCadastro
@@ -242,64 +251,66 @@ export default function TelaCadastro({
                   autoCapitalize="none"
                   autoComplete="email"
                   autoFocus={!isGoogleProvider}
+                  onFocus={() => handleInputFocus(40)}
                 />
 
                 {isGoogleProvider && (
                   <View style={estilosCadastro.googleVerifiedBadge}>
                     <Feather name="check-circle" size={14} color="#10B981" />
                     <Text style={estilosCadastro.googleVerifiedText}>
-                      E-mail autenticado pelo Google (somente leitura)
+                      Conta Google Conectada
                     </Text>
                   </View>
                 )}
+
                 <Pressable
                   onPress={onNext}
                   style={[
                     estilosCadastro.submit,
-                    { backgroundColor: colors.primary },
-                  ]}
-                >
+                    { backgroundColor: colors.primary }
+                  ]}>
                   <Text style={estilosCadastro.submitText}>Próximo</Text>
                 </Pressable>
               </View>
             )}
 
-            {}
             {step === 3 && (
               <View>
                 <CampoCadastro
                   icon="lock"
                   rightIcon={showPassword ? "eye-off" : "eye"}
                   onRightIconPress={onTogglePassword}
-                  placeholder="Sua senha secreta"
+                  placeholder="Senha segura"
                   value={password}
                   onChangeText={onChangePassword}
                   secureTextEntry={!showPassword}
+                  autoComplete="password"
                   autoFocus
+                  onFocus={() => handleInputFocus(40)}
                 />
 
                 <Pressable
                   onPress={onNext}
                   style={[
                     estilosCadastro.submit,
-                    { backgroundColor: colors.primary },
-                  ]}
-                >
+                    { backgroundColor: colors.primary }
+                  ]}>
                   <Text style={estilosCadastro.submitText}>Próximo</Text>
                 </Pressable>
               </View>
             )}
 
-            {}
             {step === 4 && (
               <View style={estilosCadastro.stepCenter}>
-                <View style={estilosCadastro.avatarPreviewContainer}>
+                <Pressable
+                  onPress={onPickAvatar}
+                  style={estilosCadastro.avatarPreviewContainer}>
                   {avatarUri ? (
                     <Image
                       source={{ uri: avatarUri }}
                       style={[
                         estilosCadastro.avatarPreview,
-                        { borderColor: colors.text },
+                        { borderColor: colors.primary }
                       ]}
                     />
                   ) : (
@@ -308,42 +319,38 @@ export default function TelaCadastro({
                         estilosCadastro.avatarPlaceholder,
                         {
                           backgroundColor: colors.surface,
-                          borderColor: colors.line,
-                        },
-                      ]}
-                    >
-                      <Feather name="user" size={48} color="#9EA0A5" />
+                          borderColor: colors.line
+                        }
+                      ]}>
+                      <Feather name="user" size={42} color={colors.muted} />
                     </View>
                   )}
-                  <Pressable
-                    onPress={onPickAvatar}
+                  <View
                     style={[
                       estilosCadastro.avatarCameraBadge,
-                      { backgroundColor: colors.primary },
-                    ]}
-                  >
-                    <Feather name="camera" size={16} color="#ffffff" />
-                  </Pressable>
-                </View>
+                      { backgroundColor: colors.primary }
+                    ]}>
+                    <Feather name="camera" size={14} color="#ffffff" />
+                  </View>
+                </Pressable>
 
                 <Pressable
                   onPress={onPickAvatar}
                   style={[
                     estilosCadastro.secondaryButton,
-                    {
-                      borderColor: colors.line,
-                      backgroundColor: colors.surface,
-                    },
-                  ]}
-                >
-                  <Feather name="image" size={18} color={colors.text} />
+                    { borderColor: colors.line, backgroundColor: colors.surface }
+                  ]}>
+                  <Feather
+                    name={avatarUri ? "refresh-cw" : "upload"}
+                    size={16}
+                    color={colors.text}
+                  />
                   <Text
                     style={[
                       estilosCadastro.secondaryButtonText,
-                      { color: colors.text },
-                    ]}
-                  >
-                    {avatarUri ? "Alterar foto" : "Escolher foto"}
+                      { color: colors.text }
+                    ]}>
+                    {avatarUri ? "Trocar foto" : "Escolher foto"}
                   </Text>
                 </Pressable>
 
@@ -351,50 +358,47 @@ export default function TelaCadastro({
                   onPress={onNext}
                   style={[
                     estilosCadastro.submit,
-                    { backgroundColor: colors.primary },
-                  ]}
-                >
+                    { backgroundColor: colors.primary }
+                  ]}>
                   <Text style={estilosCadastro.submitText}>Próximo</Text>
                 </Pressable>
 
-                <Pressable onPress={onSkip} style={estilosCadastro.skipButton}>
+                <Pressable onPress={onNext} style={estilosCadastro.skipButton}>
                   <Text
                     style={[
                       estilosCadastro.skipButtonText,
-                      { color: colors.muted },
-                    ]}
-                  >
+                      { color: colors.muted }
+                    ]}>
                     Agora não / Pular
                   </Text>
                 </Pressable>
               </View>
             )}
 
-            {}
             {step === 5 && (
               <View>
                 <View
                   style={[
                     estilosCadastro.bioContainer,
                     {
-                      borderColor: colors.line,
                       backgroundColor: colors.surface,
-                    },
-                  ]}
-                >
+                      borderColor: colors.line
+                    }
+                  ]}>
                   <TextInput
-                    placeholder="Ex: Designer, apaixonado por tecnologia e viagens..."
+                    placeholder="Ex: Apaixonado por tecnologia, música e fotografia..."
                     placeholderTextColor="#9EA0A5"
                     value={bio}
-                    onChangeText={(text) => onChangeBio(text.slice(0, 160))}
+                    onChangeText={onChangeBio}
                     multiline
                     numberOfLines={4}
+                    maxLength={160}
                     style={[estilosCadastro.bioInput, { color: colors.text }]}
                     autoFocus
+                    onFocus={() => handleInputFocus(50)}
                   />
-
                   <Text style={estilosCadastro.bioCounter}>
-                    {bio.length}/160
+                    {(bio || "").length}/160
                   </Text>
                 </View>
 
@@ -405,10 +409,9 @@ export default function TelaCadastro({
                     estilosCadastro.submit,
                     {
                       backgroundColor: colors.primary,
-                      opacity: busy ? 0.8 : 1,
-                    },
-                  ]}
-                >
+                      opacity: busy ? 0.8 : 1
+                    }
+                  ]}>
                   {busy ? (
                     <ActivityIndicator color="#ffffff" />
                   ) : (
@@ -421,28 +424,23 @@ export default function TelaCadastro({
                 <Pressable
                   disabled={busy}
                   onPress={onSkip}
-                  style={estilosCadastro.skipButton}
-                >
+                  style={estilosCadastro.skipButton}>
                   <Text
                     style={[
                       estilosCadastro.skipButtonText,
-                      { color: colors.muted },
-                    ]}
-                  >
+                      { color: colors.muted }
+                    ]}>
                     Agora não / Pular
                   </Text>
                 </Pressable>
               </View>
             )}
 
-            {}
             <Pressable
               onPress={onGoToLogin}
-              style={estilosCadastro.backToLoginBottom}
-            >
+              style={estilosCadastro.backToLoginBottom}>
               <Text
-                style={[estilosCadastro.linkText, { color: colors.primary }]}
-              >
+                style={[estilosCadastro.linkText, { color: colors.primary }]}>
                 Já tem uma conta? Entrar
               </Text>
             </Pressable>

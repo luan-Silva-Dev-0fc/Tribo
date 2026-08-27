@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -15,17 +15,13 @@ import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 import { api, getUploadUrl } from "../../api";
 import { NativeOptimization } from "../../services/nativeOptimization";
-import { CustomModal } from "../modals/CustomModal";
+import { CustomModal } from "./CustomModal";
 
 const MAX_STICKER_DURATION = 60;
 
-function SafeStickerPlayer({ url, startTime, style }) {
-  if (!url) return null;
-  return <SafeStickerPlayerItem key={url} uri={url} startTime={startTime} style={style} />;
-}
-
-function SafeStickerPlayerItem({ uri, startTime, style }) {
-  const player = useVideoPlayer(uri, (p) => {
+function SafeStickerPlayerInner({ url, startTime, style }) {
+  const [isReady, setIsReady] = useState(false);
+  const player = useVideoPlayer(url, (p) => {
     p.loop = true;
     p.muted = false;
     try {
@@ -33,28 +29,16 @@ function SafeStickerPlayerItem({ uri, startTime, style }) {
     } catch (_) {}
   });
 
-  const lastStartRef = useRef(startTime);
-
   useEffect(() => {
     if (!player) return;
-    if (lastStartRef.current !== startTime) {
-      lastStartRef.current = startTime;
-      try {
-        player.currentTime = startTime;
-        player.play();
-      } catch (_) {}
-    }
+    setIsReady(true);
+    try {
+      player.currentTime = startTime;
+      player.play();
+    } catch (_) {}
   }, [startTime, player]);
 
-  useEffect(() => {
-    return () => {
-      try {
-        player?.pause();
-      } catch (_) {}
-    };
-  }, [player]);
-
-  if (!player) {
+  if (!player || !isReady) {
     return (
       <View style={[style, styles.playerLoading]}>
         <ActivityIndicator size="small" color="#f59e0b" />
@@ -64,12 +48,18 @@ function SafeStickerPlayerItem({ uri, startTime, style }) {
 
   return (
     <VideoView
+      key={url}
       player={player}
       nativeControls={false}
       contentFit="cover"
       style={style}
     />
   );
+}
+
+function SafeStickerPlayer({ url, startTime, style }) {
+  if (!url) return null;
+  return <SafeStickerPlayerInner key={url} url={url} startTime={startTime} style={style} />;
 }
 
 function formatSec(seconds) {
@@ -79,7 +69,7 @@ function formatSec(seconds) {
   return `${m}:${rem < 10 ? "0" : ""}${rem}`;
 }
 
-export function CreateVideoStickerModal({
+export function VideoStickerEditorModal({
   visible,
   initialVideoAsset = null,
   onClose,
@@ -313,8 +303,6 @@ export function CreateVideoStickerModal({
     setTrimmingStatus("");
     onClose();
   };
-
-  if (!visible) return null;
 
   return (
     <Modal
@@ -793,6 +781,3 @@ const styles = StyleSheet.create({
     color: "#000000"
   }
 });
-
-export const VideoStickerEditorModal = CreateVideoStickerModal;
-export default CreateVideoStickerModal;

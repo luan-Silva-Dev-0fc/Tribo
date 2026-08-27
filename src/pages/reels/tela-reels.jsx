@@ -14,6 +14,7 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 import { api } from "../../api";
+import { NativeOptimization } from "../../services/nativeOptimization";
 import { ReelItem } from "../../components/reels/reel-item";
 import { ReelsOnboardingModal } from "../../components/reels/reels-onboarding-modal";
 import { ShareReelModal } from "../../components/reels/ShareReelModal";
@@ -113,6 +114,8 @@ export function TelaReels({ user }) {
       const res = await api.reels.feed({ limit: 25, reset: isRefresh });
       if (res?.reels && res.reels.length > 0) {
         setReels(res.reels);
+        const initialVideoIds = res.reels.slice(0, 8).map((r) => r.videoId).filter(Boolean);
+        NativeOptimization.prefetchReels(initialVideoIds);
       } else if (!isRefresh) {
         setReels([]);
       }
@@ -136,6 +139,8 @@ export function TelaReels({ user }) {
         const newReels = res.reels.filter((r) => !existingSet.has(r.videoId));
         if (newReels.length > 0) {
           setReels((prev) => [...prev, ...newReels]);
+          const newVideoIds = newReels.slice(0, 8).map((r) => r.videoId).filter(Boolean);
+          NativeOptimization.prefetchReels(newVideoIds);
         }
       }
     } catch (err) {
@@ -146,6 +151,7 @@ export function TelaReels({ user }) {
   }, [loadingMore, loading, reels]);
 
   useEffect(() => {
+    NativeOptimization.enableHighRefreshRate();
     loadPreferencesAndCategories();
     loadFeed();
   }, [loadPreferencesAndCategories, loadFeed]);
@@ -264,7 +270,22 @@ export function TelaReels({ user }) {
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems && viewableItems.length > 0) {
-      setActiveVideoIndex(viewableItems[0].index || 0);
+      const idx = viewableItems[0].index || 0;
+      setActiveVideoIndex(idx);
+
+      if (displayedReels && displayedReels.length > 0) {
+        const upcoming = displayedReels
+          .slice(idx + 1, idx + 4)
+          .map((r) => r.videoId)
+          .filter(Boolean);
+        if (upcoming.length > 0) {
+          NativeOptimization.prefetchReels(upcoming);
+        }
+
+        if (idx >= displayedReels.length - 4) {
+          handleLoadMore();
+        }
+      }
     }
   }).current;
 

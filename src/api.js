@@ -1,6 +1,7 @@
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { NativeOptimization } from "./services/nativeOptimization";
 
 const TOKEN_KEY = "tribo.auth.token";
 
@@ -17,6 +18,15 @@ function resolveApiBase() {
 
 export const BASE_URL = resolveApiBase();
 console.log("[API CONFIG] Conectado na Base URL:", BASE_URL);
+
+try {
+  NativeOptimization.prefetch([
+    BASE_URL,
+    "https://tribo-api-production-2f6f.up.railway.app",
+    "https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev",
+    "https://pub-34192334d7d14328ace69168b62cc510.r2.dev"
+  ]);
+} catch (_) {}
 
 export class ApiError extends Error {
   constructor(message, status = 0, payload) {
@@ -125,75 +135,109 @@ export function notifyPlatformSuspended(data) {
 }
 
 async function request(
-path,
-{ method = "GET", body, headers = {}, signal } = {})
-{
+  path,
+  { method = "GET", body, headers = {}, signal } = {}
+) {
   const isFormData =
-  body && (
-  typeof FormData !== "undefined" && body instanceof FormData ||
-  body.constructor?.name === "FormData" ||
-  body._parts);
-  const authToken = token || (await readStoredToken());
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method,
-    signal,
-    cache: "no-store",
-    headers: {
-      Accept: "application/json",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
-      "User-Agent": "TriboApp/1.0 (React Native)",
-      ...(body && !isFormData ? { "Content-Type": "application/json" } : {}),
-      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      ...headers
-    },
-    body:
-    body === undefined ? undefined : isFormData ? body : JSON.stringify(body)
-  }).catch((error) => {
-    if (error?.name === "AbortError") throw error;
-    throw new ApiError(
-      "Não foi possível conectar à API. Confira EXPO_PUBLIC_API_URL e a rede.",
-      0
+    body && (
+      (typeof FormData !== "undefined" && body instanceof FormData) ||
+      body.constructor?.name === "FormData" ||
+      body._parts
     );
-  });
+  const authToken = token || (await readStoredToken());
 
-  if (response.status === 204) return null;
-  const payload = await response.json().catch(() => null);
-  if (!response.ok) {
+  const requestHeaders = {
+    Accept: "application/json",
+    "User-Agent": "TriboApp/1.0 (React Native)",
+    ...(body && !isFormData ? { "Content-Type": "application/json" } : {}),
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    ...headers
+  };
+
+  let status = 0;
+  let ok = false;
+  let payload = null;
+
+  if (!isFormData && !signal && Platform.OS === "android") {
+    try {
+      const nativeRes = await NativeOptimization.fastFetch(
+        `${BASE_URL}${path}`,
+        method,
+        requestHeaders,
+        body
+      );
+      if (nativeRes && typeof nativeRes.status === "number") {
+        status = nativeRes.status;
+        ok = nativeRes.ok;
+        payload = nativeRes.data;
+      }
+    } catch (_) {}
+  }
+
+  if (status === 0) {
+    const response = await fetch(`${BASE_URL}${path}`, {
+      method,
+      signal,
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+        ...requestHeaders
+      },
+      body:
+        body === undefined ? undefined : isFormData ? body : JSON.stringify(body)
+    }).catch((error) => {
+      if (error?.name === "AbortError") throw error;
+      throw new ApiError(
+        "Não foi possível conectar à API. Confira EXPO_PUBLIC_API_URL e a rede.",
+        0
+      );
+    });
+
+    status = response.status;
+    ok = response.ok;
+    if (status === 204) return null;
+    payload = await response.json().catch(() => null);
+  }
+
+  if (status === 204) return null;
+
+  if (!ok) {
     const errorMsg =
-    payload?.message || payload?.error || `Erro HTTP ${response.status}`;
+      payload?.message || payload?.error || `Erro HTTP ${status}`;
 
     if (
-      response.status === 503 ||
-      response.status === 423 ||
+      status === 503 ||
+      status === 423 ||
       payload?.error === "PLATFORM_SUSPENDED" ||
       payload?.code === "PLATFORM_SUSPENDED"
     ) {
       notifyPlatformSuspended(payload || { error: "PLATFORM_SUSPENDED", message: errorMsg });
     }
 
-    if (response.status === 403) {
+    if (status === 403) {
       const isAccountBan =
-      payload?.code === "ACCOUNT_BANNED" ||
-      payload?.banned === true ||
-      errorMsg.toLowerCase().includes("ban") ||
-      errorMsg.toLowerCase().includes("bloqueada") ||
-      errorMsg.toLowerCase().includes("suspensa") ||
-      errorMsg.toLowerCase().includes("desativada");
+        payload?.code === "ACCOUNT_BANNED" ||
+        payload?.banned === true ||
+        errorMsg.toLowerCase().includes("ban") ||
+        errorMsg.toLowerCase().includes("bloqueada") ||
+        errorMsg.toLowerCase().includes("suspensa") ||
+        errorMsg.toLowerCase().includes("desativada");
 
       if (isAccountBan) {
         session.clear();
         notifyAccountBanned(
-          errorMsg.toLowerCase().includes("ban") ?
-          errorMsg :
-          "Sua conta foi banida por violação das diretrizes."
+          errorMsg.toLowerCase().includes("ban")
+            ? errorMsg
+            : "Sua conta foi banida por violação das diretrizes."
         );
       }
     }
 
-    throw new ApiError(errorMsg, response.status, payload);
+    throw new ApiError(errorMsg, status, payload);
   }
+
   return payload;
 }
 
@@ -530,6 +574,7 @@ export const api = {
     delete: (id) => request(`/stories/${id}`, { method: "DELETE" }),
     like: (id) => request(`/stories/${id}/like`, { method: "POST" }),
     unlike: (id) => request(`/stories/${id}/like`, { method: "DELETE" }),
+    view: (id) => request(`/stories/${id}/view`, { method: "POST" }),
     send: (id, receiverId) =>
     request("/messages", {
       method: "POST",

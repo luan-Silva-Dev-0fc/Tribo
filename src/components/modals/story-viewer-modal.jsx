@@ -14,22 +14,23 @@ import {
   StatusBar,
   Text,
   TextInput,
-  View } from
-"react-native";
+  View
+} from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { api } from "../../api";
 import { Avatar, IconButton, VerificationBadge } from "../ui/ui";
 import { errorMessage, formatRelativeTime, userName } from "../../lib/format";
 import { useTheme } from "../../theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { NativeOptimization } from "../../services/nativeOptimization";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-const STORY_DURATION = 60000;
+const STORY_PHOTO_DURATION = 6000;
 
-function SafeStoryVideoView({ url, paused, style }) {
+function SafeStoryVideoView({ url, paused, style, onVideoEnd }) {
   const player = useVideoPlayer(url, (p) => {
-    p.loop = true;
+    p.loop = false;
     p.muted = false;
     if (!paused) {
       p.play();
@@ -45,6 +46,16 @@ function SafeStoryVideoView({ url, paused, style }) {
     }
   }, [paused, player]);
 
+  useEffect(() => {
+    if (!player) return;
+    const sub = player.addListener("playToEnd", () => {
+      onVideoEnd?.();
+    });
+    return () => {
+      sub?.remove?.();
+    };
+  }, [player, onVideoEnd]);
+
   if (!url) return null;
 
   return (
@@ -52,9 +63,9 @@ function SafeStoryVideoView({ url, paused, style }) {
       player={player}
       style={style}
       contentFit="contain"
-      nativeControls={false} />);
-
-
+      nativeControls={false}
+    />
+  );
 }
 
 export function StoryViewerModal({
@@ -86,8 +97,6 @@ export function StoryViewerModal({
   const [localLikes, setLocalLikes] = useState({});
 
   const progressAnim = useRef(new Animated.Value(0)).current;
-  const timerRef = useRef(null);
-
 
   const activeGroup = userGroups[currentUserIndex] || initialUserGroup;
   const stories = activeGroup?.stories || [];
@@ -104,19 +113,17 @@ export function StoryViewerModal({
     ""
   );
 
-
   const mediaUri =
-  currentStory?.mediaUrl ||
-  currentStory?.media_url ||
-  currentStory?.imageUrl ||
-  currentStory?.image_url ||
-  currentStory?.url || "";
+    currentStory?.mediaUrl ||
+    currentStory?.media_url ||
+    currentStory?.imageUrl ||
+    currentStory?.image_url ||
+    currentStory?.url || "";
 
-  const isVideo = mediaUri.toLowerCase().match(/\.(mp4|mov|mkv|webm)$/i);
+  const isVideo = Boolean(mediaUri.toLowerCase().match(/\.(mp4|mov|mkv|webm)$/i));
 
   const currentUid = String(currentUser?.id || "");
   const isOwner = Boolean(currentUid && currentStoryUserId && currentUid === currentStoryUserId);
-
 
   useEffect(() => {
     if (visible && initialUserGroup) {
@@ -131,6 +138,11 @@ export function StoryViewerModal({
     }
   }, [visible, initialUserGroup, userGroups]);
 
+  const handleCloseViewer = useCallback(() => {
+    NativeOptimization.disableScreenSecurity();
+    onClose?.();
+  }, [onClose]);
+
   const handleNext = useCallback(() => {
     if (currentStoryIndex < stories.length - 1) {
       setCurrentStoryIndex((prev) => prev + 1);
@@ -138,9 +150,9 @@ export function StoryViewerModal({
       setCurrentUserIndex((prev) => prev + 1);
       setCurrentStoryIndex(0);
     } else {
-      onClose();
+      handleCloseViewer();
     }
-  }, [currentStoryIndex, stories.length, currentUserIndex, userGroups.length, onClose]);
+  }, [currentStoryIndex, stories.length, currentUserIndex, userGroups.length, handleCloseViewer]);
 
   const handlePrevious = useCallback(() => {
     if (currentStoryIndex > 0) {
@@ -153,9 +165,29 @@ export function StoryViewerModal({
     }
   }, [currentStoryIndex, currentUserIndex, userGroups]);
 
+  useEffect(() => {
+    if (!visible || !currentStory) {
+      NativeOptimization.disableScreenSecurity();
+      return;
+    }
+
+    if (currentStory.is_single_view) {
+      NativeOptimization.enableScreenSecurity();
+    } else {
+      NativeOptimization.disableScreenSecurity();
+    }
+
+    if (currentStory.id) {
+      api.stories.view(currentStory.id).catch(() => {});
+    }
+
+    return () => {
+      NativeOptimization.disableScreenSecurity();
+    };
+  }, [visible, currentStory?.id, currentStory?.is_single_view]);
 
   useEffect(() => {
-    if (!visible || !currentStory || paused || menuVisible || editingCaption || shareModalVisible) {
+    if (!visible || !currentStory || isVideo || paused || menuVisible || editingCaption || shareModalVisible) {
       progressAnim.stopAnimation();
       return;
     }
@@ -163,7 +195,7 @@ export function StoryViewerModal({
     progressAnim.setValue(0);
     const anim = Animated.timing(progressAnim, {
       toValue: 1,
-      duration: STORY_DURATION,
+      duration: STORY_PHOTO_DURATION,
       useNativeDriver: false
     });
 
@@ -176,8 +208,7 @@ export function StoryViewerModal({
     return () => {
       progressAnim.stopAnimation();
     };
-  }, [visible, currentStory, currentStoryIndex, currentUserIndex, paused, menuVisible, editingCaption, shareModalVisible, handleNext, progressAnim]);
-
+  }, [visible, currentStory, currentStoryIndex, currentUserIndex, isVideo, paused, menuVisible, editingCaption, shareModalVisible, handleNext, progressAnim]);
 
   const handleDeleteStory = () => {
     if (!currentStory?.id) return;
@@ -191,12 +222,11 @@ export function StoryViewerModal({
       await api.stories.delete(currentStory.id);
       setMenuVisible(false);
       onStoryDeleted?.(currentStory.id);
-      onClose();
+      handleCloseViewer();
     } catch (err) {
       Alert.alert("Erro ao excluir", errorMessage(err));
     }
   };
-
 
   const handleSaveCaption = async () => {
     if (!currentStory?.id) return;
@@ -212,381 +242,368 @@ export function StoryViewerModal({
     }
   };
 
-
   const handleSendReply = async () => {
     if (!replyText.trim() || sendingReply || !currentStory) return;
     try {
       setSendingReply(true);
       const receiverId = author?.id || currentStory?.userId;
+      if (!receiverId) throw new Error("Usuário destinatário não identificado");
+
       await api.messages.send({
         receiver_id: receiverId,
         content: replyText.trim(),
         story_id: currentStory.id
       });
+
       setReplyText("");
-      Alert.alert("Mensagem enviada", "Sua resposta foi enviada no bate-papo.");
+      Alert.alert("Sucesso", "Resposta enviada com sucesso!");
     } catch (err) {
-      Alert.alert("Não foi possível enviar resposta", errorMessage(err));
+      Alert.alert("Erro ao enviar", errorMessage(err));
     } finally {
       setSendingReply(false);
     }
   };
 
   const handleToggleLike = async () => {
-    if (!currentStory?.id) return;
+    if (!currentStory) return;
     const storyId = currentStory.id;
-    const currentLikeState = localLikes[storyId] || {
-      isLiked: Boolean(currentStory.is_liked || currentStory.isLiked),
-      likesCount: Number(currentStory.likes_count || currentStory.likesCount || 0)
-    };
+    const isCurrentlyLiked = localLikes[storyId]?.isLiked ?? Boolean(currentStory.is_liked || currentStory.isLiked);
+    const currentCount = localLikes[storyId]?.likesCount ?? Number(currentStory.likes_count || currentStory.likesCount || 0);
 
-    const newIsLiked = !currentLikeState.isLiked;
-    const newLikesCount = newIsLiked ? currentLikeState.likesCount + 1 : Math.max(0, currentLikeState.likesCount - 1);
+    const nextLiked = !isCurrentlyLiked;
+    const nextCount = nextLiked ? currentCount + 1 : Math.max(0, currentCount - 1);
 
     setLocalLikes((prev) => ({
       ...prev,
-      [storyId]: { isLiked: newIsLiked, likesCount: newLikesCount }
+      [storyId]: { isLiked: nextLiked, likesCount: nextCount }
     }));
 
     try {
-      if (newIsLiked) {
+      if (nextLiked) {
         await api.stories.like(storyId);
       } else {
         await api.stories.unlike(storyId);
       }
-    } catch (err) {
-
+    } catch (e) {
       setLocalLikes((prev) => ({
         ...prev,
-        [storyId]: currentLikeState
+        [storyId]: { isLiked: isCurrentlyLiked, likesCount: currentCount }
       }));
-      Alert.alert("Erro", "Não foi possível curtir o story.");
     }
   };
 
-
   const handleOpenShare = async () => {
+    setPaused(true);
     setShareModalVisible(true);
     try {
       setLoadingFollowers(true);
-      const [followersRes, groupsRes] = await Promise.all([
-      api.users.following(currentUser?.id).catch(() => []),
-      api.groups.list().catch(() => [])]
-      );
-      const list = Array.isArray(followersRes) ? followersRes : followersRes?.following || followersRes?.users || [];
-      setFollowers(list);
-      setMyGroups(Array.isArray(groupsRes) ? groupsRes : groupsRes?.groups || []);
-    } catch {
-
+      const [fRes, gRes] = await Promise.all([
+        api.follows.getFollowers(currentUser?.id || "").catch(() => ({ followers: [] })),
+        api.groups.list().catch(() => ({ groups: [] }))
+      ]);
+      setFollowers(fRes.followers || fRes.data || []);
+      setMyGroups(gRes.groups || gRes.data || []);
+    } catch (e) {
+      console.warn("Erro ao carregar dados de compartilhamento:", e);
     } finally {
       setLoadingFollowers(false);
     }
   };
 
   const handleSendToUser = async (targetUser) => {
-    if (!currentStory?.id || !targetUser?.id) return;
+    if (!currentStory || !targetUser?.id) return;
     try {
-      await api.stories.send(currentStory.id, targetUser.id);
-      Alert.alert("Enviado!", `Story enviado para @${targetUser.username || userName(targetUser)}.`);
+      await api.messages.send({
+        receiver_id: targetUser.id,
+        content: "Compartilhou um story",
+        story_id: currentStory.id
+      });
       setShareModalVisible(false);
-    } catch (err) {
-      Alert.alert("Erro ao enviar story", errorMessage(err));
+      setPaused(false);
+      Alert.alert("Enviado", `Story enviado para @${targetUser.username || targetUser.name}`);
+    } catch (e) {
+      Alert.alert("Erro", "Não foi possível compartilhar.");
     }
   };
 
-  const handleSendToGroup = async (targetGroup) => {
-    if (!currentStory?.id || !targetGroup?.id) return;
+  const handleSendToGroup = async (group) => {
+    if (!currentStory || !group?.id) return;
     try {
-      const mediaUrl = currentStory.mediaUrl || currentStory.media_url || currentStory.url;
-      await api.groups.sendChatMessage(targetGroup.id, "Compartilhou um story", mediaUrl, null, currentStory.id);
-      Alert.alert("Enviado!", `Story compartilhado no grupo ${targetGroup.name}.`);
+      await api.groups.sendMessage(group.id, {
+        content: "Compartilhou um story",
+        media_url: mediaUri,
+        media_type: "STORY_SHARE",
+        story_id: currentStory.id
+      });
       setShareModalVisible(false);
-    } catch (err) {
-      Alert.alert("Erro ao enviar story", errorMessage(err));
+      setPaused(false);
+      Alert.alert("Enviado", `Story compartilhado no grupo ${group.name}`);
+    } catch (e) {
+      Alert.alert("Erro", "Não foi possível compartilhar no grupo.");
     }
   };
 
   if (!visible || !currentStory) return null;
 
   return (
-    <Modal visible={visible} statusBarTranslucent animationType="fade" transparent onRequestClose={onClose}>
-      <StatusBar hidden={visible} />
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent={false}
+      statusBarTranslucent={true}
+      onRequestClose={handleCloseViewer}>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={[styles.container, { backgroundColor: "#000000", paddingTop: insets.top }]}>
-        
-        {}
-        {isVideo && visible && !!mediaUri ?
-        <SafeStoryVideoView
-          url={mediaUri}
-          paused={paused}
-          style={styles.storyMedia} /> :
-
-
-        <Image
-          source={{ uri: mediaUri }}
-          style={styles.storyMedia}
-          resizeMode="contain" />
-
-        }
-
-        {}
-        <View style={[styles.overlay, { paddingTop: insets.top > 0 ? insets.top + 10 : 40 }]}>
-          <View style={styles.topContainer}>
-            {}
-            <View style={styles.progressContainer}>
-            {stories.map((s, idx) => {
-                const isPast = idx < currentStoryIndex;
-                const isCurrent = idx === currentStoryIndex;
-                return (
-                  <View key={s.id || idx} style={styles.progressBarBackground}>
-                  {isPast && <View style={[styles.progressBarFill, { width: "100%" }]} />}
-                  {isCurrent &&
-                    <Animated.View
-                      style={[
-                      styles.progressBarFill,
-                      {
-                        width: progressAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ["0%", "100%"]
-                        })
-                      }]
-                      } />
-
-                    }
-                </View>);
-
-              })}
+        style={styles.container}>
+        <View style={styles.content}>
+          <View style={styles.mediaWrapper}>
+            {isVideo ? (
+              <SafeStoryVideoView
+                url={mediaUri}
+                paused={paused || menuVisible || editingCaption || shareModalVisible}
+                style={styles.fullscreenMedia}
+                onVideoEnd={handleNext}
+              />
+            ) : (
+              <Image
+                source={{ uri: mediaUri }}
+                style={styles.fullscreenMedia}
+                resizeMode="contain"
+              />
+            )}
           </View>
 
-          {}
-          <View style={styles.header}>
-            <View style={styles.headerAuthor}>
-              <Avatar user={author} size={38} />
-              <View style={styles.headerAuthorDetails}>
-                <View style={styles.nameRow}>
-                  <Text style={[styles.authorName, { color: "#ffffff", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }]}>{userName(author)}</Text>
-                  <VerificationBadge user={author} size={14} />
-                </View>
-                <Text style={[styles.timeAgo, { color: "rgba(255,255,255,0.8)", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }]}>
-                  {formatRelativeTime(currentStory.createdAt || currentStory.created_at)}
-                </Text>
-              </View>
+          <View style={[styles.topControls, { paddingTop: Math.max(insets.top, 16) + 4 }]}>
+            <View style={styles.progressBars}>
+              {stories.map((s, index) => {
+                const isPassed = index < currentStoryIndex;
+                const isCurrent = index === currentStoryIndex;
+                return (
+                  <View
+                    key={s.id || index}
+                    style={[styles.progressBarBg, { backgroundColor: "rgba(255,255,255,0.3)" }]}>
+                    {isPassed && (
+                      <View style={[styles.progressBarFill, { width: "100%", backgroundColor: "#ffffff" }]} />
+                    )}
+                    {isCurrent && (
+                      <Animated.View
+                        style={[
+                          styles.progressBarFill,
+                          {
+                            backgroundColor: "#ffffff",
+                            width: progressAnim.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: ["0%", "100%"]
+                            })
+                          }
+                        ]}
+                      />
+                    )}
+                  </View>
+                );
+              })}
             </View>
 
-            <View style={styles.headerRight}>
-              {isOwner &&
+            <View style={styles.header}>
+              <View style={styles.headerAuthor}>
+                <Avatar user={author} size={38} />
+                <View style={styles.headerAuthorDetails}>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.authorName}>{userName(author)}</Text>
+                    <VerificationBadge user={author} size={14} />
+                    {currentStory.is_single_view && (
+                      <View style={styles.singleViewBadge}>
+                        <MaterialCommunityIcons name="numeric-1-circle" size={13} color="#38bdf8" />
+                        <Text style={styles.singleViewBadgeText}>1x</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.timeAgo}>
+                    {formatRelativeTime(currentStory.createdAt || currentStory.created_at)}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.headerRight}>
+                {isOwner && (
+                  <IconButton
+                    name="more-horizontal"
+                    color="#ffffff"
+                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+                    onPress={() => {
+                      setCaptionValue(currentStory.caption || "");
+                      setMenuVisible(true);
+                    }}
+                    label="Opções do story"
+                  />
+                )}
                 <IconButton
-                  name="more-horizontal"
+                  name="x"
                   color="#ffffff"
                   style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-                  onPress={() => {
-                    setCaptionValue(currentStory.caption || "");
-                    setMenuVisible(true);
-                  }}
-                  label="Opções do story" />
-
-                }
-              <IconButton name="x" color="#ffffff" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onPress={onClose} label="Fechar story" />
+                  onPress={handleCloseViewer}
+                  label="Fechar story"
+                />
+              </View>
             </View>
           </View>
-          </View>
 
-          {}
           <View style={styles.touchZones}>
             <Pressable
               style={styles.touchLeft}
               onPress={handlePrevious}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)} />
-            
+              onPressOut={() => setPaused(false)}
+            />
             <Pressable
               style={styles.touchCenter}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)} />
-            
+              onPressOut={() => setPaused(false)}
+            />
             <Pressable
               style={styles.touchRight}
               onPress={handleNext}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)} />
-            
+              onPressOut={() => setPaused(false)}
+            />
           </View>
 
-          <View style={styles.bottomContainer}>
-            {}
-            {!!currentStory.caption && !editingCaption &&
-            <View
-              style={[
-              styles.captionContainer,
-              {
-                backgroundColor: "rgba(0,0,0,0.6)"
-              }]
-              }>
-              
-                <Text style={[styles.captionText, { color: "#ffffff", textShadowColor: "rgba(0,0,0,0.5)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }]}>{currentStory.caption}</Text>
+          <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, 16) + 6 }]}>
+            {!!currentStory.caption && !editingCaption && (
+              <View style={styles.captionContainer}>
+                <Text style={styles.captionText}>{currentStory.caption}</Text>
               </View>
-            }
+            )}
 
-          {}
-          {editingCaption &&
-            <View
-              style={[
-              styles.editCaptionBox,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderWidth: 1
-              }]
-              }>
-              
-              <TextInput
-                value={captionValue}
-                onChangeText={setCaptionValue}
-                placeholder="Editar legenda..."
-                placeholderTextColor={colors.muted}
-                style={[styles.editCaptionInput, { color: colors.text }]}
-                autoFocus />
-              
-              <View style={styles.editCaptionButtons}>
-                <Pressable
-                  style={styles.editCancelBtn}
-                  onPress={() => setEditingCaption(false)}>
-                  
-                  <Text style={[styles.editCancelText, { color: colors.subtext }]}>Cancelar</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.editSaveBtn, { backgroundColor: colors.primary || colors.accent }]}
-                  onPress={handleSaveCaption}
-                  disabled={savingCaption}>
-                  
-                  {savingCaption ?
-                  <ActivityIndicator size="small" color="#fff" /> :
-
-                  <Text style={styles.editSaveText}>Salvar</Text>
-                  }
-                </Pressable>
-              </View>
-            </View>
-            }
-
-          {}
-          {!isOwner &&
-            <View style={styles.footer}>
+            {editingCaption && (
               <View
                 style={[
-                styles.replyInputContainer,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border
-                }]
-                }>
-                
-                <TextInput
-                  placeholder="Enviar mensagem..."
-                  placeholderTextColor={colors.muted}
-                  value={replyText}
-                  onChangeText={setReplyText}
-                  style={[styles.replyInput, { color: colors.text }]}
-                  onFocus={() => setPaused(true)}
-                  onBlur={() => setPaused(false)} />
-                
-                {!!replyText.trim() &&
-                <Pressable
-                  style={styles.sendReplyBtn}
-                  onPress={handleSendReply}
-                  disabled={sendingReply}>
-                  
-                    {sendingReply ?
-                  <ActivityIndicator size="small" color={colors.primary} /> :
-
-                  <Feather name="send" size={18} color={colors.primary || colors.accent} />
+                  styles.editCaptionBox,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                    borderWidth: 1
                   }
-                  </Pressable>
-                }
-              </View>
-
-              {(() => {
-                const storyId = currentStory.id;
-                const likeState = localLikes[storyId] || {
-                  isLiked: Boolean(currentStory.is_liked || currentStory.isLiked),
-                  likesCount: Number(currentStory.likes_count || currentStory.likesCount || 0)
-                };
-                return (
+                ]}>
+                <TextInput
+                  value={captionValue}
+                  onChangeText={setCaptionValue}
+                  placeholder="Editar legenda..."
+                  placeholderTextColor={colors.muted}
+                  style={[styles.editCaptionInput, { color: colors.text }]}
+                  autoFocus
+                />
+                <View style={styles.editCaptionActions}>
                   <Pressable
-                    style={[
-                    styles.shareIconBtn,
+                    style={[styles.editBtn, { backgroundColor: colors.surfaceAlt }]}
+                    onPress={() => setEditingCaption(false)}>
+                    <Text style={[styles.editBtnText, { color: colors.text }]}>Cancelar</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.editBtn, { backgroundColor: colors.primary }]}
+                    onPress={handleSaveCaption}
+                    disabled={savingCaption}>
+                    {savingCaption ? (
+                      <ActivityIndicator size="small" color="#ffffff" />
+                    ) : (
+                      <Text style={[styles.editBtnText, { color: "#ffffff" }]}>Salvar</Text>
+                    )}
+                  </Pressable>
+                </View>
+              </View>
+            )}
+
+            {!isOwner && !editingCaption && (
+              <View style={styles.replyBar}>
+                <View
+                  style={[
+                    styles.replyInputContainer,
                     {
-                      backgroundColor: colors.card,
-                      borderColor: colors.border,
-                      marginRight: 8
-                    }]
+                      backgroundColor: "rgba(0,0,0,0.6)",
+                      borderColor: "rgba(255,255,255,0.2)"
                     }
-                    onPress={handleToggleLike}
-                    accessibilityLabel="Curtir story">
-                    
-                    <Feather
-                      name="heart"
-                      size={20}
-                      color={likeState.isLiked ? "#ef4444" : colors.text} />
-                    
-                  </Pressable>);
+                  ]}>
+                  <TextInput
+                    placeholder="Enviar mensagem..."
+                    placeholderTextColor="rgba(255,255,255,0.6)"
+                    value={replyText}
+                    onChangeText={setReplyText}
+                    style={styles.replyInput}
+                    editable={!sendingReply}
+                  />
+                  {!!replyText.trim() && (
+                    <Pressable
+                      onPress={handleSendReply}
+                      disabled={sendingReply}
+                      style={styles.sendReplyBtn}>
+                      {sendingReply ? (
+                        <ActivityIndicator size="small" color="#ffffff" />
+                      ) : (
+                        <Feather name="send" size={18} color="#ffffff" />
+                      )}
+                    </Pressable>
+                  )}
+                </View>
 
-              })()}
+                {(() => {
+                  const storyId = currentStory.id;
+                  const likeState = localLikes[storyId] || {
+                    isLiked: Boolean(currentStory.is_liked || currentStory.isLiked),
+                    likesCount: Number(currentStory.likes_count || currentStory.likesCount || 0)
+                  };
+                  return (
+                    <Pressable
+                      style={styles.iconCircleBtn}
+                      onPress={handleToggleLike}
+                      accessibilityLabel="Curtir story">
+                      <Feather
+                        name="heart"
+                        size={20}
+                        color={likeState.isLiked ? "#ef4444" : "#ffffff"}
+                      />
+                    </Pressable>
+                  );
+                })()}
 
-              <Pressable
-                style={[
-                styles.shareIconBtn,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border
-                }]
-                }
-                onPress={handleOpenShare}
-                accessibilityLabel="Compartilhar story">
-                
-                <Feather name="send" size={20} color={colors.text} />
-              </Pressable>
-            </View>
-            }
+                <Pressable
+                  style={styles.iconCircleBtn}
+                  onPress={handleOpenShare}
+                  accessibilityLabel="Compartilhar story">
+                  <Feather name="send" size={20} color="#ffffff" />
+                </Pressable>
+              </View>
+            )}
           </View>
         </View>
 
-        
-          {}
-          {menuVisible &&
-        <View style={[StyleSheet.absoluteFill, { zIndex: 9998 }]}>
-              <Pressable style={styles.modalOverlay} onPress={() => setMenuVisible(false)}>
+        {menuVisible && (
+          <View style={[StyleSheet.absoluteFill, { zIndex: 9998 }]}>
+            <Pressable style={styles.modalOverlay} onPress={() => setMenuVisible(false)}>
               <View style={[styles.menuSheet, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <Pressable
-                style={styles.menuItem}
-                onPress={() => {
-                  setMenuVisible(false);
-                  setEditingCaption(true);
-                }}>
-                
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setMenuVisible(false);
+                    setEditingCaption(true);
+                  }}>
                   <Feather name="edit-3" size={20} color={colors.text} />
                   <Text style={[styles.menuItemText, { color: colors.text }]}>Editar Legenda</Text>
                 </Pressable>
 
                 <Pressable
-                style={[styles.menuItem, { borderTopWidth: 1, borderColor: colors.line }]}
-                onPress={handleDeleteStory}>
-                
-                  <Feather name="trash-2" size={20} color={colors.danger || "#ef4444"} />
-                  <Text style={[styles.menuItemText, { color: colors.danger || "#ef4444" }]}>Excluir Story</Text>
+                  style={[styles.menuItem, { borderTopWidth: 1, borderColor: colors.line }]}
+                  onPress={handleDeleteStory}>
+                  <Feather name="trash-2" size={20} color="#ef4444" />
+                  <Text style={[styles.menuItemText, { color: "#ef4444" }]}>Excluir Story</Text>
                 </Pressable>
               </View>
             </Pressable>
-          
-            </View>
-        }
-  
+          </View>
+        )}
 
-        
-        {}
-        {shareModalVisible &&
-        <View style={[StyleSheet.absoluteFill, { zIndex: 9997 }]}>
+        {shareModalVisible && (
+          <View style={[StyleSheet.absoluteFill, { zIndex: 9997 }]}>
             <View style={styles.modalOverlay}>
               <View style={[styles.shareSheet, { backgroundColor: colors.card, borderColor: colors.border, borderTopWidth: 1 }]}>
                 <View style={styles.shareSheetHeader}>
@@ -594,161 +611,159 @@ export function StoryViewerModal({
                   <IconButton name="x" color={colors.text} onPress={() => setShareModalVisible(false)} />
                 </View>
 
-                {}
                 <View style={styles.shareTabsContainer}>
                   <Pressable
-                  style={[styles.shareTab, shareTab === "followers" && styles.shareTabActive, shareTab === "followers" && { borderBottomColor: colors.primary || colors.accent }]}
-                  onPress={() => setShareTab("followers")}>
-                  
-                    <Text style={[styles.shareTabText, shareTab === "followers" && { color: colors.primary || colors.accent }]}>Seguidores</Text>
+                    style={[
+                      styles.shareTab,
+                      shareTab === "followers" && styles.shareTabActive,
+                      shareTab === "followers" && { borderBottomColor: colors.primary || "#0095f6" }
+                    ]}
+                    onPress={() => setShareTab("followers")}>
+                    <Text style={[styles.shareTabText, shareTab === "followers" && { color: colors.primary || "#0095f6" }]}>
+                      Seguidores
+                    </Text>
                   </Pressable>
                   <Pressable
-                  style={[styles.shareTab, shareTab === "groups" && styles.shareTabActive, shareTab === "groups" && { borderBottomColor: colors.primary || colors.accent }]}
-                  onPress={() => setShareTab("groups")}>
-                  
-                    <Text style={[styles.shareTabText, shareTab === "groups" && { color: colors.primary || colors.accent }]}>Meus Grupos</Text>
+                    style={[
+                      styles.shareTab,
+                      shareTab === "groups" && styles.shareTabActive,
+                      shareTab === "groups" && { borderBottomColor: colors.primary || "#0095f6" }
+                    ]}
+                    onPress={() => setShareTab("groups")}>
+                    <Text style={[styles.shareTabText, shareTab === "groups" && { color: colors.primary || "#0095f6" }]}>
+                      Meus Grupos
+                    </Text>
                   </Pressable>
                 </View>
 
                 <ScrollView style={{ maxHeight: SCREEN_HEIGHT * 0.5 }}>
-                  {shareTab === "followers" ?
-                loadingFollowers ?
-                <ActivityIndicator size="small" color={colors.primary || colors.accent} style={{ marginVertical: 20 }} /> :
-                followers.length === 0 ?
-                <Text style={[styles.noFollowersText, { color: colors.muted }]}>Nenhum seguidor encontrado.</Text> :
-
-                followers.map((item) => {
-                  const u = item.following || item.user || item;
-                  return (
-                    <Pressable
-                      key={u.id}
-                      style={styles.followerRow}
-                      onPress={() => handleSendToUser(u)}>
-                      
+                  {shareTab === "followers" ? (
+                    loadingFollowers ? (
+                      <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 20 }} />
+                    ) : followers.length === 0 ? (
+                      <Text style={[styles.noFollowersText, { color: colors.muted }]}>Nenhum seguidor encontrado.</Text>
+                    ) : (
+                      followers.map((item) => {
+                        const u = item.following || item.user || item;
+                        return (
+                          <Pressable key={u.id} style={styles.followerRow} onPress={() => handleSendToUser(u)}>
                             <Avatar user={u} size={40} />
                             <View style={{ flex: 1, marginLeft: 12 }}>
                               <Text style={[styles.followerName, { color: colors.text }]}>{userName(u)}</Text>
                               <Text style={[styles.followerHandle, { color: colors.subtext }]}>@{u.username || "usuario"}</Text>
                             </View>
-                            <Feather name="send" size={18} color={colors.primary || colors.accent} />
-                          </Pressable>);
-
-                }) :
-
-
-                loadingFollowers ?
-                <ActivityIndicator size="small" color={colors.primary || colors.accent} style={{ marginVertical: 20 }} /> :
-                myGroups.length === 0 ?
-                <Text style={[styles.noFollowersText, { color: colors.muted }]}>Você não está em nenhum grupo.</Text> :
-
-                myGroups.map((group) =>
-                <Pressable
-                  key={group.id}
-                  style={styles.followerRow}
-                  onPress={() => handleSendToGroup(group)}>
-                  
-                          <Image source={{ uri: group.avatar_url || group.avatarUrl }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.border }} />
-                          <View style={{ flex: 1, marginLeft: 12 }}>
-                            <Text style={[styles.followerName, { color: colors.text }]}>{group.name}</Text>
-                          </View>
-                          <Feather name="send" size={18} color={colors.primary || colors.accent} />
-                        </Pressable>
-                )
-
-                }
+                            <Feather name="send" size={18} color={colors.primary || "#0095f6"} />
+                          </Pressable>
+                        );
+                      })
+                    )
+                  ) : loadingFollowers ? (
+                    <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 20 }} />
+                  ) : myGroups.length === 0 ? (
+                    <Text style={[styles.noFollowersText, { color: colors.muted }]}>Você não está em nenhum grupo.</Text>
+                  ) : (
+                    myGroups.map((group) => (
+                      <Pressable key={group.id} style={styles.followerRow} onPress={() => handleSendToGroup(group)}>
+                        <Image source={{ uri: group.avatar_url || group.avatarUrl }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.border }} />
+                        <View style={{ flex: 1, marginLeft: 12 }}>
+                          <Text style={[styles.followerName, { color: colors.text }]}>{group.name}</Text>
+                        </View>
+                        <Feather name="send" size={18} color={colors.primary || "#0095f6"} />
+                      </Pressable>
+                    ))
+                  )}
                 </ScrollView>
-
               </View>
             </View>
           </View>
-        }
-  
-      
-        {}
-        {deleteConfirmVisible &&
-        <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
-            <Pressable style={[styles.modalOverlay, { justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.75)' }]} onPress={() => setDeleteConfirmVisible(false)}>
-              <Pressable style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 20, width: '85%', padding: 24 }]} onPress={(e) => e.stopPropagation()}>
+        )}
+
+        {deleteConfirmVisible && (
+          <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
+            <Pressable
+              style={[styles.modalOverlay, { justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.75)' }]}
+              onPress={() => setDeleteConfirmVisible(false)}>
+              <Pressable
+                style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: 20, width: '85%', padding: 24 }]}
+                onPress={(e) => e.stopPropagation()}>
                 <Text style={[styles.modalTitle, { color: colors.text, fontSize: 18, marginBottom: 8, textAlign: 'center' }]}>
                   Excluir Story
                 </Text>
                 <Text style={{ color: colors.muted, fontSize: 14, fontFamily: "Poppins_400Regular", textAlign: 'center', marginBottom: 24 }}>
                   Tem certeza que deseja excluir esta publicação temporária?
                 </Text>
-                
                 <View style={{ gap: 12 }}>
                   <Pressable
-                  style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: "#EF4444", alignItems: 'center' }}
-                  onPress={confirmDeleteStory}>
-                  
+                    style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: "#EF4444", alignItems: 'center' }}
+                    onPress={confirmDeleteStory}>
                     <Text style={{ color: "#fff", fontFamily: "Poppins_600SemiBold", fontSize: 15 }}>Excluir</Text>
                   </Pressable>
-
                   <Pressable
-                  style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: colors.surfaceAlt, alignItems: 'center' }}
-                  onPress={() => setDeleteConfirmVisible(false)}>
-                  
+                    style={{ paddingVertical: 14, borderRadius: 12, backgroundColor: colors.surfaceAlt, alignItems: 'center' }}
+                    onPress={() => setDeleteConfirmVisible(false)}>
                     <Text style={{ color: colors.text, fontFamily: "Poppins_600SemiBold", fontSize: 15 }}>Cancelar</Text>
                   </Pressable>
                 </View>
               </Pressable>
             </Pressable>
           </View>
-        }
-
+        )}
       </KeyboardAvoidingView>
-    </Modal>);
-
+    </Modal>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: "#000000"
   },
-  storyMedia: {
-    ...StyleSheet.absoluteFillObject,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT
+  content: {
+    flex: 1,
+    position: "relative",
+    backgroundColor: "#000000"
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "space-between",
-    paddingTop: Platform.OS === "ios" ? 48 : 20,
-    paddingBottom: 20
+  mediaWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000000"
   },
-  progressContainer: {
+  fullscreenMedia: {
+    width: "100%",
+    height: "100%"
+  },
+  topControls: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    paddingHorizontal: 12
+  },
+  progressBars: {
     flexDirection: "row",
-    gap: 6,
-    paddingHorizontal: 12,
-    marginBottom: 8
+    gap: 4,
+    marginBottom: 10
   },
-  progressBarBackground: {
+  progressBarBg: {
     flex: 1,
     height: 2.5,
-    backgroundColor: "rgba(255, 255, 255, 0.35)",
-    borderRadius: 4,
+    borderRadius: 1.5,
     overflow: "hidden"
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: "#ffffff"
-  },
-  topContainer: {
-    paddingTop: 8
-  },
-  bottomContainer: {
-    paddingBottom: 8,
-    width: "100%",
-    alignItems: "center"
+    borderRadius: 1.5
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginTop: 4,
-    zIndex: 10
+    justifyContent: "space-between"
   },
   headerAuthor: {
     flexDirection: "row",
@@ -764,165 +779,196 @@ const styles = StyleSheet.create({
     gap: 6
   },
   authorName: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 14
+    fontSize: 14,
+    fontFamily: "Poppins_600SemiBold",
+    color: "#ffffff",
+    textShadowColor: "rgba(0,0,0,0.7)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3
+  },
+  singleViewBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(56, 189, 248, 0.2)",
+    borderColor: "#38bdf8",
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 10,
+    gap: 2
+  },
+  singleViewBadgeText: {
+    color: "#38bdf8",
+    fontSize: 10.5,
+    fontFamily: "Poppins_700Bold"
   },
   timeAgo: {
+    fontSize: 11.5,
     fontFamily: "Poppins_400Regular",
-    fontSize: 11
+    color: "rgba(255,255,255,0.8)",
+    textShadowColor: "rgba(0,0,0,0.7)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3
   },
   headerRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4
+    gap: 6
   },
   touchZones: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 100,
+    left: 0,
+    right: 0,
+    bottom: 90,
     flexDirection: "row",
     zIndex: 5
   },
   touchLeft: {
-    width: "30%",
-    height: "80%",
-    marginTop: 70
+    flex: 1
   },
   touchCenter: {
-    width: "40%",
-    height: "80%",
-    marginTop: 70
+    flex: 1
   },
   touchRight: {
-    width: "30%",
-    height: "80%",
-    marginTop: 70
+    flex: 1
+  },
+  bottomContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    paddingHorizontal: 14
   },
   captionContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 24,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    alignSelf: "center"
+    backgroundColor: "rgba(0,0,0,0.65)",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    marginBottom: 10,
+    alignSelf: "center",
+    maxWidth: "92%"
   },
   captionText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 15,
+    color: "#ffffff",
+    fontSize: 13.5,
+    fontFamily: "Poppins_400Regular",
     textAlign: "center"
   },
   editCaptionBox: {
-    padding: 16,
-    borderRadius: 20,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    zIndex: 20
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 10
   },
   editCaptionInput: {
-    fontFamily: "Poppins_400Regular",
     fontSize: 14,
+    fontFamily: "Poppins_400Regular",
     minHeight: 40
   },
-  editCaptionButtons: {
+  editCaptionActions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: 12,
-    marginTop: 10
+    gap: 8,
+    marginTop: 8
   },
-  editCancelBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 14
+  editBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 10
   },
-  editCancelText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 13
-  },
-  editSaveBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 14
-  },
-  editSaveText: {
-    fontFamily: "Poppins_600SemiBold",
+  editBtnText: {
     fontSize: 13,
-    color: "#fff"
+    fontFamily: "Poppins_600SemiBold"
   },
-  footer: {
+  replyBar: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: Platform.OS === "ios" ? 12 : 8,
-    gap: 12,
-    zIndex: 10
+    gap: 8
   },
   replyInputContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 28,
+    borderRadius: 24,
     borderWidth: 1,
-    paddingHorizontal: 18,
-    height: 50
+    paddingHorizontal: 14,
+    height: 46
   },
   replyInput: {
     flex: 1,
-    fontFamily: "Poppins_400Regular",
-    fontSize: 13.5
+    color: "#ffffff",
+    fontSize: 13.5,
+    fontFamily: "Poppins_400Regular"
   },
   sendReplyBtn: {
     padding: 4
   },
-  shareIconBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  iconCircleBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.6)",
     borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
     alignItems: "center",
     justifyContent: "center"
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    backgroundColor: "rgba(0,0,0,0.65)",
     justifyContent: "flex-end"
   },
   menuSheet: {
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     borderTopWidth: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 36
+    paddingVertical: 12
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 16,
-    gap: 14
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    gap: 12
   },
   menuItemText: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 15
+    fontSize: 15,
+    fontFamily: "Poppins_500Medium"
   },
   shareSheet: {
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 20,
-    paddingBottom: 36,
-    maxHeight: "70%"
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16
   },
   shareSheetHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16
+    marginBottom: 12
   },
   shareSheetTitle: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 16
+    fontSize: 16,
+    fontFamily: "Poppins_600SemiBold"
   },
-  noFollowersText: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 13,
-    textAlign: "center",
-    marginVertical: 20
+  shareTabsContainer: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.1)",
+    marginBottom: 12
+  },
+  shareTab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent"
+  },
+  shareTabActive: {},
+  shareTabText: {
+    fontSize: 13.5,
+    fontFamily: "Poppins_600SemiBold",
+    color: "#a1a1aa"
   },
   followerRow: {
     flexDirection: "row",
@@ -930,30 +976,23 @@ const styles = StyleSheet.create({
     paddingVertical: 10
   },
   followerName: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 14
+    fontSize: 13.5,
+    fontFamily: "Poppins_600SemiBold"
   },
   followerHandle: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 12
+    fontSize: 12,
+    fontFamily: "Poppins_400Regular"
   },
-  shareTabsContainer: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(150, 150, 150, 0.2)",
-    marginBottom: 10
+  noFollowersText: {
+    textAlign: "center",
+    marginVertical: 20,
+    fontSize: 13.5,
+    fontFamily: "Poppins_400Regular"
   },
-  shareTab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent"
+  modalContent: {
+    alignItems: "center"
   },
-  shareTabActive: {},
-  shareTabText: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
-    color: "#6b7280"
+  modalTitle: {
+    fontFamily: "Poppins_700Bold"
   }
 });

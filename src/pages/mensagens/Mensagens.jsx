@@ -41,6 +41,7 @@ import { useTheme } from "../../theme";
 
 import { StickerPickerModal } from "../../components/chat/StickerPickerModal";
 import { CreateVideoStickerModal } from "../../components/chat/CreateVideoStickerModal";
+import { VideoStickerEditorModal } from "../../components/modals/VideoStickerEditorModal";
 import { VideoStickerMessage } from "../../components/chat/VideoStickerMessage";
 import { ReelShareCard } from "../../components/chat/ReelShareCard";
 import { MediaContextMenuSheet } from "../../components/chat/MediaContextMenuSheet";
@@ -51,6 +52,8 @@ import { GoldBadgeModal } from "../../components/modals/gold-badge-modal";
 import { getChatSocket } from "../../services/chatSocket";
 import { saveMediaToGallery } from "../../services/mediaDownloadService";
 import { saveStickerToInventory } from "../../services/stickerInventory";
+import { NativeOptimization } from "../../services/nativeOptimization";
+import { ChatCache } from "../../services/chatCache";
 import {
   setOptimizedAudioMode,
   setAudioRecordingActive,
@@ -401,11 +404,17 @@ export function ConversationsListScreen({
 
   const loadConversations = useCallback(async () => {
     try {
+      NativeOptimization.enableHighRefreshRate().catch(() => {});
+      const cached = ChatCache.getConversationsSync();
+      if (cached && cached.length > 0) {
+        setConversations(cached);
+      }
       const res = await api.messages.conversations();
       const list = Array.isArray(res) ?
       res :
       res?.conversations || res?.data || [];
       setConversations(list);
+      ChatCache.setConversationsSync(list);
     } catch (err) {
       try {
         const msgs = listFrom(await api.messages.list(), ["messages"]);
@@ -428,7 +437,9 @@ export function ConversationsListScreen({
             });
           }
         });
-        setConversations(Array.from(groups.values()));
+        const convs = Array.from(groups.values());
+        setConversations(convs);
+        ChatCache.setConversationsSync(convs);
       } catch (fallbackErr) {
         console.warn("Conversas indisponíveis:", fallbackErr);
       }
@@ -771,6 +782,11 @@ export function DirectChatScreen({
   const loadMessages = useCallback(async () => {
     if (!targetUserId) return;
     try {
+      NativeOptimization.enableHighRefreshRate().catch(() => {});
+      const cached = ChatCache.getMessagesSync(targetUserId);
+      if (cached && cached.length > 0) {
+        setMessages(cached);
+      }
       let msgs = [];
       try {
         const res = await api.messages.getHistory(targetUserId);
@@ -794,6 +810,7 @@ export function DirectChatScreen({
 
       const reversedMsgs = msgs.slice().reverse();
       setMessages(reversedMsgs);
+      ChatCache.setMessagesSync(targetUserId, reversedMsgs);
 
 
       const unreadList = msgs.filter(
@@ -1897,9 +1914,12 @@ export function DirectChatScreen({
         visible={createStickerVisible}
         onClose={() => setCreateStickerVisible(false)}
         currentUser={currentUser}
-        onStickerCreated={() => {
+        onStickerCreated={(newSticker) => {
           setCreateStickerVisible(false);
           showToast("Figurinha criada com sucesso!");
+          if (newSticker) {
+            handleSelectSticker(newSticker);
+          }
         }}
         onShowGoldModal={() => setGoldModalVisible(true)} />
       

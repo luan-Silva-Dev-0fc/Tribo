@@ -397,19 +397,22 @@ function DetailModalVideo({ url, style }) {
   const player = useVideoPlayer(url || "", (p) => {
     p.loop = true;
     p.muted = false;
-    try {Promise.resolve(p.play()).catch(() => {});} catch (e) {}
+    try {
+      Promise.resolve(p.play()).catch(() => {});
+    } catch (e) {}
   });
 
-  if (!url) return null;
+  if (!url || !player) return null;
 
   return (
     <VideoView
+      key={url}
       player={player}
       nativeControls={false}
       contentFit="cover"
-      style={style} />);
-
-
+      style={style}
+    />
+  );
 }
 
 function StickerDetailModal({ item, visible, onClose, onSend, colors }) {

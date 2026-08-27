@@ -16,6 +16,7 @@ import { Avatar, IconButton, EmptyState } from "../../components/ui/ui";
 import { errorMessage } from "../../lib/format";
 import { useTheme } from "../../theme";
 import { getChatSocket } from "../../services/chatSocket";
+import { NativeOptimization } from "../../services/nativeOptimization";
 
 
 export { CreateTribeScreen } from "./CreateTribeScreen";

@@ -76,6 +76,8 @@ import {
   getClearedChatTimestamp } from
 "../../services/chatExportService";
 import { getChatSocket } from "../../services/chatSocket";
+import { ChatCache } from "../../services/chatCache";
+import { NativeOptimization } from "../../services/nativeOptimization";
 import { AppHeader } from "../../components/ui/ui";
 import {
   setOptimizedAudioMode,
@@ -2411,6 +2413,11 @@ ref)
 
   const loadMessages = useCallback(async () => {
     try {
+      NativeOptimization.enableHighRefreshRate().catch(() => {});
+      const cached = ChatCache.getMessagesSync(groupId);
+      if (cached && cached.length > 0) {
+        setMessages(cached);
+      }
       setLoading(true);
       const res = await api.groups.messages(groupId);
       let rawMsgs = listFrom(res, ["messages", "data"]) || res || [];
@@ -2421,6 +2428,7 @@ ref)
 
       list.sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt));
       setMessages(list);
+      ChatCache.setMessagesSync(groupId, list);
 
       const lastReadTimeStr = await AsyncStorage.getItem(`@tribo_group_last_read_${groupId}`);
       if (!groupInitialScrollDoneRef.current && lastReadTimeStr) {
