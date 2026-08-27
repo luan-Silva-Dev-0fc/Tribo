@@ -5,13 +5,6 @@ import { Platform } from "react-native";
 const TOKEN_KEY = "tribo.auth.token";
 
 function resolveApiBase() {
-  if (
-  !process.env.EXPO_PUBLIC_API_URL && Platform.OS === "web" &&
-  typeof window !== "undefined" &&
-  window.location?.hostname)
-  {
-    return `http://${window.location.hostname}:3000/api`;
-  }
   if (process.env.EXPO_PUBLIC_API_URL) {
     const raw = process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, "").replace(
       /\/api\/?$/,
@@ -19,15 +12,7 @@ function resolveApiBase() {
     );
     return `${raw}/api`;
   }
-  const hostUri =
-  Constants.expoConfig?.hostUri ||
-  Constants.manifest2?.extra?.expoClient?.hostUri ||
-  Constants.manifest?.debuggerHost;
-  if (hostUri) {
-    const ip = hostUri.split(":")[0];
-    return `http://${ip}:3000/api`;
-  }
-  return "http://192.168.18.19:3000/api";
+  return "https://tribo-api-production-2f6f.up.railway.app/api";
 }
 
 export const BASE_URL = resolveApiBase();
@@ -864,7 +849,7 @@ export function asList(payload, keys = []) {
 }
 
 export function getUploadUrl(payload) {
-  return (
+  const url = (
     payload?.url ||
     payload?.audio_url ||
     payload?.audioUrl ||
@@ -883,6 +868,19 @@ export function getUploadUrl(payload) {
     payload?.data?.audio_url ||
     payload?.data?.audioUrl ||
     payload?.data?.avatar_url ||
-    payload?.data?.avatarUrl);
+    payload?.data?.avatarUrl
+  );
 
+  if (!url || typeof url !== "string") return url;
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("data:") ||
+    url.startsWith("file://")
+  ) {
+    return url;
+  }
+
+  const root = BASE_URL.replace(/\/api\/?$/, "").replace(/\/$/, "");
+  return `${root}${url.startsWith("/") ? "" : "/"}${url}`;
 }

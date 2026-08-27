@@ -108,11 +108,7 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
       return trimmed;
     }
     const baseUrl = (
-      process.env.EXPO_PUBLIC_API_URL || (
-        typeof window !== "undefined" && window.location?.hostname ?
-        `http://${window.location.hostname}:3000` :
-        "http://192.168.18.19:3000"
-      )
+      process.env.EXPO_PUBLIC_API_URL || "https://tribo-api-production-2f6f.up.railway.app"
     )
       .replace(/\/api\/?$/, "")
       .replace(/\/$/, "");
