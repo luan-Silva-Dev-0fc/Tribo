@@ -65,6 +65,7 @@ Feed inteligente, mensagens em tempo real, stories, reels, tribos temáticas e m
 |:--|:--|:--|
 | **Core** | React Native 0.81 | Interface mobile nativa |
 | **Framework** | Expo SDK 54 | Toolchain e build |
+| **OTA Updates** | Revopush / CodePush | Atualizações em tempo real sem novo APK |
 | **Backend** | Supabase | Autenticação, banco de dados e storage |
 | **Realtime** | Socket.IO | Mensagens e eventos em tempo real |
 | **Navegação** | React Navigation 7 | Roteamento entre telas |
@@ -117,7 +118,8 @@ Feed inteligente, mensagens em tempo real, stories, reels, tribos temáticas e m
 </td>
     <td width="50%">
 
-**Experiência**
+**Experiência & Infra**
+- Atualizações Over-The-Air (OTA) silenciosas
 - Tema claro e escuro
 - Personalização de aparência
 - Haptic feedback
@@ -127,6 +129,29 @@ Feed inteligente, mensagens em tempo real, stories, reels, tribos temáticas e m
 </td>
   </tr>
 </table>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%" />
+</p>
+
+## Atualizações Over-the-Air (OTA / CodePush)
+
+A Tribo utiliza **Revopush / CodePush** para entregar atualizações instantâneas de código JavaScript e assets aos usuários sem necessidade de baixar um novo APK.
+
+### Publicar Atualização em Tempo Real (CLI)
+
+```bash
+# Publicar atualização imediata para Produção (Android)
+npm run release:prod
+
+# Publicar atualização para o ambiente de Staging (Testes)
+npm run release:staging
+
+# Publicar atualização para iOS
+npm run release:ios
+```
+
+> ⚡ **Sincronização Silenciosa:** As atualizações são baixadas em segundo plano sem interromper a navegação do usuário e são aplicadas automaticamente no próximo reinício do aplicativo.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%" />
