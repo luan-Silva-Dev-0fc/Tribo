@@ -344,12 +344,20 @@ export const api = {
     }),
     exportData: () => request("/users/export-data"),
     deletionStatus: () => request(`/users/deletion-status?t=${Date.now()}`),
-    requestDeletion: () => request("/users/me", { method: "DELETE" }),
+    requestDeletion: (data) =>
+      request("/users/me", {
+        method: "DELETE",
+        body: typeof data === "object" ? data : data ? { password: String(data) } : undefined
+      }),
     cancelDeletion: () => request("/users/cancel-deletion", { method: "POST" })
   },
   exportData: () => request("/users/export-data"),
   deletionStatus: () => request(`/users/deletion-status?t=${Date.now()}`),
-  requestDeletion: () => request("/users/me", { method: "DELETE" }),
+  requestDeletion: (data) =>
+    request("/users/me", {
+      method: "DELETE",
+      body: typeof data === "object" ? data : data ? { password: String(data) } : undefined
+    }),
   cancelDeletion: () => request("/users/cancel-deletion", { method: "POST" }),
 
   follows: {

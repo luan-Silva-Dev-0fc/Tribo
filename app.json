@@ -15,11 +15,15 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "androidNavigationBar": {
-      "barStyle": "dark-content",
-      "backgroundColor": "#00000000"
+      "barStyle": "light-content",
+      "backgroundColor": "#000000"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,6 +39,12 @@
           "microphonePermission": "Allow  to access your microphone."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "4806cd3f-51e8-4893-b4b1-d938a3d6852e"
+      }
+    },
+    "owner": "luanzinbr"
   }
 }

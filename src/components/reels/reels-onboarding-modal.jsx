@@ -12,8 +12,8 @@ import {
   Text,
   TextInput,
   TouchableWithoutFeedback,
-  View,
-} from "react-native";
+  View } from
+"react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
@@ -22,23 +22,23 @@ import { api } from "../../api";
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const QUICK_IDEAS = [
-  "Memes de 2026",
-  "Tecnologia & IA",
-  "Programação React",
-  "Shitpost Engraçado",
-  "Jogos & Gaming",
-  "Carros & Drift",
-  "Futebol & Gols",
-  "Animes & Cenas",
-  "Curiosidades Incríveis",
-  "Trap & Funk Brasil",
-];
+"Memes de 2026",
+"Tecnologia & IA",
+"Programação React",
+"Shitpost Engraçado",
+"Jogos & Gaming",
+"Carros & Drift",
+"Futebol & Gols",
+"Animes & Cenas",
+"Curiosidades Incríveis",
+"Trap & Funk Brasil"];
+
 
 export function ReelsOnboardingModal({
   visible,
   onClose,
   onPreferencesSaved,
-  currentPrompt = "",
+  currentPrompt = ""
 }) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -109,36 +109,36 @@ export function ReelsOnboardingModal({
       animationType="slide"
       transparent={true}
       statusBarTranslucent={true}
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
+      
       <View style={styles.overlay}>
-        {/* Backdrop clickable para fechar */}
+        {}
         <Pressable style={StyleSheet.absoluteFillObject} onPress={onClose} />
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.keyboardView}
-        >
+          style={styles.keyboardView}>
+          
           <View
             style={[
-              styles.modalCard,
-              {
-                backgroundColor: "#18181b",
-                borderColor: "rgba(255, 255, 255, 0.1)",
-                paddingBottom: bottomPadding + (Platform.OS === "android" ? (keyboardHeight > 0 ? keyboardHeight - insets.bottom : 0) : 0),
-                maxHeight: SCREEN_HEIGHT * 0.88,
-              },
-            ]}
-          >
-            {/* Drag indicator */}
+            styles.modalCard,
+            {
+              backgroundColor: "#18181b",
+              borderColor: "rgba(255, 255, 255, 0.1)",
+              paddingBottom: bottomPadding + (Platform.OS === "android" ? keyboardHeight > 0 ? keyboardHeight - insets.bottom : 0 : 0),
+              maxHeight: SCREEN_HEIGHT * 0.88
+            }]
+            }>
+            
+            {}
             <View style={styles.dragIndicator} />
 
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
-              contentContainerStyle={{ paddingBottom: 10 }}
-            >
-              {/* Header */}
+              contentContainerStyle={{ paddingBottom: 10 }}>
+              
+              {}
               <View style={styles.header}>
                 <View style={styles.headerTitleRow}>
                   <View style={styles.iconCircle}>
@@ -151,19 +151,19 @@ export function ReelsOnboardingModal({
                 </Pressable>
               </View>
 
-              {/* Subtitle */}
+              {}
               <Text style={styles.subtitle}>
                 Escreva com suas palavras o que você quer ver nos seus Reels. O algoritmo inteligente vai buscar e priorizar exatamente o que você descrever.
               </Text>
 
-              {error && (
-                <View style={styles.errorBanner}>
+              {error &&
+              <View style={styles.errorBanner}>
                   <Feather name="alert-circle" size={16} color="#ef4444" />
                   <Text style={styles.errorText}>{error}</Text>
                 </View>
-              )}
+              }
 
-              {/* Campo de Escrita / Prompt */}
+              {}
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.textInput}
@@ -177,76 +177,76 @@ export function ReelsOnboardingModal({
                   placeholder="Ex: Memes brasileiros engraçados de 2026, tecnologia e IA, programação em React, curiosidades sobre o universo, carros esportivos..."
                   placeholderTextColor="#71717a"
                   textAlignVertical="top"
-                  maxLength={500}
-                />
-                {prompt.length > 0 && (
-                  <Pressable
-                    onPress={() => setPrompt("")}
-                    style={styles.clearInputBtn}
-                    hitSlop={8}
-                  >
+                  maxLength={500} />
+                
+                {prompt.length > 0 &&
+                <Pressable
+                  onPress={() => setPrompt("")}
+                  style={styles.clearInputBtn}
+                  hitSlop={8}>
+                  
                     <Feather name="x-circle" size={16} color="#71717a" />
                   </Pressable>
-                )}
+                }
               </View>
 
-              {/* Sugestões Rápidas de Ideias */}
+              {}
               <Text style={styles.ideasLabel}>Sugestões para adicionar:</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.tagsContainer}
-              >
-                {QUICK_IDEAS.map((tag, idx) => (
-                  <Pressable
-                    key={idx}
-                    onPress={() => handleAddTag(tag)}
-                    style={styles.tagChip}
-                  >
+                contentContainerStyle={styles.tagsContainer}>
+                
+                {QUICK_IDEAS.map((tag, idx) =>
+                <Pressable
+                  key={idx}
+                  onPress={() => handleAddTag(tag)}
+                  style={styles.tagChip}>
+                  
                     <Feather name="plus" size={12} color="#a1a1aa" />
                     <Text style={styles.tagText}>{tag}</Text>
                   </Pressable>
-                ))}
+                )}
               </ScrollView>
 
-              {/* Botão de Ação */}
+              {}
               <View style={styles.footer}>
                 <Pressable
                   onPress={handleSave}
                   disabled={saving}
                   style={({ pressed }) => [
-                    styles.submitBtn,
-                    pressed && { opacity: 0.85 },
-                  ]}
-                >
-                  {saving ? (
-                    <ActivityIndicator size="small" color="#ffffff" />
-                  ) : (
-                    <>
+                  styles.submitBtn,
+                  pressed && { opacity: 0.85 }]
+                  }>
+                  
+                  {saving ?
+                  <ActivityIndicator size="small" color="#ffffff" /> :
+
+                  <>
                       <Ionicons name="sparkles" size={18} color="#ffffff" />
                       <Text style={styles.submitBtnText}>
                         Calibrar Algoritmo Agora
                       </Text>
                     </>
-                  )}
+                  }
                 </Pressable>
               </View>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.75)",
-    justifyContent: "flex-end",
+    justifyContent: "flex-end"
   },
   keyboardView: {
-    width: "100%",
+    width: "100%"
   },
   modalCard: {
     width: "100%",
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     borderWidth: 1,
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 12
   },
   dragIndicator: {
     width: 40,
@@ -262,18 +262,18 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     alignSelf: "center",
-    marginBottom: 14,
+    marginBottom: 14
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: 8
   },
   headerTitleRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 10
   },
   iconCircle: {
     width: 34,
@@ -281,12 +281,12 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: "rgba(245, 158, 11, 0.15)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   title: {
     fontSize: 18,
     fontFamily: "Poppins_700Bold",
-    color: "#ffffff",
+    color: "#ffffff"
   },
   closeBtn: {
     width: 32,
@@ -294,14 +294,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: "rgba(255, 255, 255, 0.08)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   subtitle: {
     fontSize: 13,
     fontFamily: "Poppins_400Regular",
     color: "#a1a1aa",
     lineHeight: 19,
-    marginBottom: 14,
+    marginBottom: 14
   },
   errorBanner: {
     flexDirection: "row",
@@ -312,17 +312,17 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 12
   },
   errorText: {
     color: "#f87171",
     fontSize: 12.5,
     fontFamily: "Poppins_500Medium",
-    flex: 1,
+    flex: 1
   },
   inputContainer: {
     position: "relative",
-    marginBottom: 14,
+    marginBottom: 14
   },
   textInput: {
     backgroundColor: "#27272a",
@@ -335,23 +335,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Poppins_400Regular",
     minHeight: 100,
-    lineHeight: 20,
+    lineHeight: 20
   },
   clearInputBtn: {
     position: "absolute",
     top: 14,
     right: 12,
-    padding: 4,
+    padding: 4
   },
   ideasLabel: {
     fontSize: 12,
     fontFamily: "Poppins_500Medium",
     color: "#a1a1aa",
-    marginBottom: 8,
+    marginBottom: 8
   },
   tagsContainer: {
     gap: 8,
-    paddingBottom: 4,
+    paddingBottom: 4
   },
   tagChip: {
     flexDirection: "row",
@@ -362,16 +362,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    gap: 5,
+    gap: 5
   },
   tagText: {
     color: "#e4e4e7",
     fontSize: 12,
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "Poppins_500Medium"
   },
   footer: {
     marginTop: 18,
-    marginBottom: 6,
+    marginBottom: 6
   },
   submitBtn: {
     backgroundColor: "#2563eb",
@@ -385,11 +385,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 4
   },
   submitBtnText: {
     color: "#ffffff",
     fontSize: 15,
-    fontFamily: "Poppins_700Bold",
-  },
+    fontFamily: "Poppins_700Bold"
+  }
 });

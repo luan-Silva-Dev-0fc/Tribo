@@ -54,8 +54,8 @@ import { saveStickerToInventory } from "../../services/stickerInventory";
 import {
   setOptimizedAudioMode,
   setAudioRecordingActive,
-  notifyChatScroll
-} from "../../services/audioRecordingDucking";
+  notifyChatScroll } from
+"../../services/audioRecordingDucking";
 
 
 
@@ -99,19 +99,19 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
     if (!url || typeof url !== "string") return null;
     const trimmed = url.trim();
     if (
-      trimmed.startsWith("http://") ||
-      trimmed.startsWith("https://") ||
-      trimmed.startsWith("blob:") ||
-      trimmed.startsWith("data:") ||
-      trimmed.startsWith("file://")
-    ) {
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("blob:") ||
+    trimmed.startsWith("data:") ||
+    trimmed.startsWith("file://"))
+    {
       return trimmed;
     }
     const baseUrl = (
-      process.env.EXPO_PUBLIC_API_URL || "https://tribo-api-production-2f6f.up.railway.app"
-    )
-      .replace(/\/api\/?$/, "")
-      .replace(/\/$/, "");
+    process.env.EXPO_PUBLIC_API_URL || "https://tribo-api-production-2f6f.up.railway.app").
+
+    replace(/\/api\/?$/, "").
+    replace(/\/$/, "");
     return `${baseUrl}${trimmed.startsWith("/") ? "" : "/"}${trimmed}`;
   };
 
@@ -183,9 +183,9 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
   };
 
   const progress =
-    durationMillis > 0
-      ? Math.min(Math.max(positionMillis / durationMillis, 0), 1)
-      : 0;
+  durationMillis > 0 ?
+  Math.min(Math.max(positionMillis / durationMillis, 0), 1) :
+  0;
 
   return (
     <View style={styles.audioPlayerContainer}>
@@ -193,118 +193,118 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
         onPress={handlePlayPause}
         disabled={isLoading}
         style={({ pressed }) => [
-          styles.audioPlayBtn,
-          {
-            backgroundColor: isMe ? "#ffffff" : colors.primary || "#0284c7",
-            opacity: pressed ? 0.85 : 1,
-          },
-        ]}
-      >
-        {isLoading ? (
-          <ActivityIndicator
-            size="small"
-            color={isMe ? colors.primary || "#0284c7" : "#ffffff"}
-          />
-        ) : (
-          <Ionicons
-            name={isPlaying ? "pause" : "play"}
-            size={18}
-            color={isMe ? colors.primary || "#0284c7" : "#ffffff"}
-            style={{ marginLeft: isPlaying ? 0 : 2 }}
-          />
-        )}
+        styles.audioPlayBtn,
+        {
+          backgroundColor: isMe ? "#ffffff" : colors.primary || "#0284c7",
+          opacity: pressed ? 0.85 : 1
+        }]
+        }>
+        
+        {isLoading ?
+        <ActivityIndicator
+          size="small"
+          color={isMe ? colors.primary || "#0284c7" : "#ffffff"} /> :
+
+
+        <Ionicons
+          name={isPlaying ? "pause" : "play"}
+          size={18}
+          color={isMe ? colors.primary || "#0284c7" : "#ffffff"}
+          style={{ marginLeft: isPlaying ? 0 : 2 }} />
+
+        }
       </Pressable>
 
       <View style={styles.audioProgressWrapper}>
         <View
           style={[
-            styles.audioTrack,
-            {
-              backgroundColor: isMe
-                ? "rgba(255, 255, 255, 0.25)"
-                : "rgba(255, 255, 255, 0.12)",
-            },
-          ]}
-        >
+          styles.audioTrack,
+          {
+            backgroundColor: isMe ?
+            "rgba(255, 255, 255, 0.25)" :
+            "rgba(255, 255, 255, 0.12)"
+          }]
+          }>
+          
           <View
             style={[
-              styles.audioFill,
-              {
-                width: `${progress * 100}%`,
-                backgroundColor: isMe ? "#ffffff" : colors.primary || "#0284c7",
-              },
-            ]}
-          />
+            styles.audioFill,
+            {
+              width: `${progress * 100}%`,
+              backgroundColor: isMe ? "#ffffff" : colors.primary || "#0284c7"
+            }]
+            } />
+          
         </View>
         <View style={styles.audioTimeRow}>
           <Text
             style={[
-              styles.audioTimeText,
-              {
-                color: isMe
-                  ? "rgba(255, 255, 255, 0.85)"
-                  : colors.muted || "#a1a1aa",
-              },
-            ]}
-          >
+            styles.audioTimeText,
+            {
+              color: isMe ?
+              "rgba(255, 255, 255, 0.85)" :
+              colors.muted || "#a1a1aa"
+            }]
+            }>
+            
             {formatAudioTime(isPlaying ? positionMillis : durationMillis || 0)}
           </Text>
           <Feather
             name="mic"
             size={12}
             color={
-              isMe ? "rgba(255, 255, 255, 0.7)" : colors.muted || "#a1a1aa"
-            }
-          />
+            isMe ? "rgba(255, 255, 255, 0.7)" : colors.muted || "#a1a1aa"
+            } />
+          
         </View>
       </View>
 
-      {/* Botão de Velocidade de Áudio (1x, 1.5x, 2x, 3x, 5x) */}
+      {}
       <Pressable
         onPress={handleToggleSpeed}
         hitSlop={6}
         style={({ pressed }) => [
-          styles.audioSpeedPill,
-          {
-            backgroundColor: isMe
-              ? playbackSpeed > 1.0
-                ? "rgba(255, 255, 255, 0.3)"
-                : "rgba(255, 255, 255, 0.15)"
-              : playbackSpeed > 1.0
-              ? "rgba(2, 132, 199, 0.3)"
-              : "rgba(255, 255, 255, 0.08)",
-            borderColor: isMe
-              ? playbackSpeed > 1.0
-                ? "#ffffff"
-                : "rgba(255, 255, 255, 0.2)"
-              : playbackSpeed > 1.0
-              ? colors.primary || "#0284c7"
-              : "rgba(255, 255, 255, 0.1)",
-            opacity: pressed ? 0.75 : 1,
-          },
-        ]}
-      >
+        styles.audioSpeedPill,
+        {
+          backgroundColor: isMe ?
+          playbackSpeed > 1.0 ?
+          "rgba(255, 255, 255, 0.3)" :
+          "rgba(255, 255, 255, 0.15)" :
+          playbackSpeed > 1.0 ?
+          "rgba(2, 132, 199, 0.3)" :
+          "rgba(255, 255, 255, 0.08)",
+          borderColor: isMe ?
+          playbackSpeed > 1.0 ?
+          "#ffffff" :
+          "rgba(255, 255, 255, 0.2)" :
+          playbackSpeed > 1.0 ?
+          colors.primary || "#0284c7" :
+          "rgba(255, 255, 255, 0.1)",
+          opacity: pressed ? 0.75 : 1
+        }]
+        }>
+        
         <Text
           style={[
-            styles.audioSpeedText,
-            {
-              color: isMe
-                ? "#ffffff"
-                : playbackSpeed > 1.0
-                ? colors.primary || "#0284c7"
-                : colors.muted || "#a1a1aa",
-              fontFamily:
-                playbackSpeed > 1.0
-                  ? "Poppins_700Bold"
-                  : "Poppins_600SemiBold",
-            },
-          ]}
-        >
+          styles.audioSpeedText,
+          {
+            color: isMe ?
+            "#ffffff" :
+            playbackSpeed > 1.0 ?
+            colors.primary || "#0284c7" :
+            colors.muted || "#a1a1aa",
+            fontFamily:
+            playbackSpeed > 1.0 ?
+            "Poppins_700Bold" :
+            "Poppins_600SemiBold"
+          }]
+          }>
+          
           {playbackSpeed === 1.0 ? "1x" : `${playbackSpeed}x`}
         </Text>
       </Pressable>
-    </View>
-  );
+    </View>);
+
 }
 
 
@@ -466,13 +466,13 @@ export function ConversationsListScreen({
   const handleOpenUserChat = (otherUser) => {
     if (otherUser?.id) {
       setConversations((prev) =>
-        prev.map((c) => {
-          const cUser = c.contact || c.user || c.participant;
-          if (String(cUser?.id) === String(otherUser.id)) {
-            return { ...c, unread_count: 0, unreadCount: 0 };
-          }
-          return c;
-        })
+      prev.map((c) => {
+        const cUser = c.contact || c.user || c.participant;
+        if (String(cUser?.id) === String(otherUser.id)) {
+          return { ...c, unread_count: 0, unreadCount: 0 };
+        }
+        return c;
+      })
       );
       api.messages.markConversationRead(otherUser.id).catch(() => {});
     }
@@ -489,7 +489,7 @@ export function ConversationsListScreen({
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      {/* Header */}
+      {}
       <View
         style={[
         styles.headerModern,
@@ -512,7 +512,7 @@ export function ConversationsListScreen({
         <View style={{ width: 42 }} />
       </View>
 
-      {/* Busca */}
+      {}
       <View
         style={[
         styles.searchBarContainer,
@@ -542,7 +542,7 @@ export function ConversationsListScreen({
         }
       </View>
 
-      {/* Lista de Conversas */}
+      {}
       <FlatList
         data={filteredConversations}
         keyExtractor={(item, index) =>
@@ -795,12 +795,12 @@ export function DirectChatScreen({
       const reversedMsgs = msgs.slice().reverse();
       setMessages(reversedMsgs);
 
-      // Foco inteligente na primeira mensagem não lida
+
       const unreadList = msgs.filter(
         (m) =>
-          !m.read_at &&
-          m.isRead !== true &&
-          String(m.sender_id || m.userId) === String(targetUserId)
+        !m.read_at &&
+        m.isRead !== true &&
+        String(m.sender_id || m.userId) === String(targetUserId)
       );
 
       if (unreadList.length > 0) {
@@ -815,12 +815,12 @@ export function DirectChatScreen({
               flatListRef.current?.scrollToIndex({
                 index: unreadIdx,
                 animated: true,
-                viewPosition: 0.5,
+                viewPosition: 0.5
               });
             } catch (e) {
               flatListRef.current?.scrollToOffset({
                 offset: unreadIdx * 75,
-                animated: true,
+                animated: true
               });
             }
           }, 250);
@@ -829,11 +829,11 @@ export function DirectChatScreen({
 
       msgs.forEach((m) => {
         if (
-          m.id &&
-          !m.read_at &&
-          m.isRead === false &&
-          String(m.sender_id || m.userId) === String(targetUserId)
-        ) {
+        m.id &&
+        !m.read_at &&
+        m.isRead === false &&
+        String(m.sender_id || m.userId) === String(targetUserId))
+        {
           api.messages.markRead(m.id).catch(() => {});
         }
       });
@@ -1371,12 +1371,12 @@ export function DirectChatScreen({
           String(mediaUrl || "").toLowerCase().endsWith(".mp4") ||
           String(mediaUrl || "").toLowerCase().includes("/videos/"));
           let isReelShare =
-            item.media_type === "REEL_SHARE" ||
-            item.media_type === "reel_share" ||
-            item.mediaType === "REEL_SHARE" ||
-            item.mediaType === "reel_share" ||
-            item.type === "reel_share" ||
-            item.type === "REEL_SHARE";
+          item.media_type === "REEL_SHARE" ||
+          item.media_type === "reel_share" ||
+          item.mediaType === "REEL_SHARE" ||
+          item.mediaType === "reel_share" ||
+          item.type === "reel_share" ||
+          item.type === "REEL_SHARE";
           let reelData = null;
           if (item.content) {
             if (typeof item.content === "object" && item.content !== null) {
@@ -1401,8 +1401,8 @@ export function DirectChatScreen({
 
           return (
             <View key={String(item.id)}>
-              {isFirstUnread && (
-                <View style={styles.unreadDividerContainer}>
+              {isFirstUnread &&
+              <View style={styles.unreadDividerContainer}>
                   <View style={[styles.unreadDividerLine, { backgroundColor: colors.border || "rgba(255, 255, 255, 0.12)" }]} />
                   <View style={[styles.unreadDividerBadge, { backgroundColor: colors.primary || "#0284c7" }]}>
                     <Feather name="bell" size={11} color="#ffffff" style={{ marginRight: 5 }} />
@@ -1410,228 +1410,228 @@ export function DirectChatScreen({
                   </View>
                   <View style={[styles.unreadDividerLine, { backgroundColor: colors.border || "rgba(255, 255, 255, 0.12)" }]} />
                 </View>
-              )}
+              }
 
-              {isSticker && mediaUrl && !(item.is_deleted || item.deleted_for_everyone) ? (
-                <View
-                  style={[
-                    styles.msgRow,
-                    isMe ? styles.msgRowMe : styles.msgRowOther,
-                    { marginVertical: 6 }
-                  ]}
-                >
+              {isSticker && mediaUrl && !(item.is_deleted || item.deleted_for_everyone) ?
+              <View
+                style={[
+                styles.msgRow,
+                isMe ? styles.msgRowMe : styles.msgRowOther,
+                { marginVertical: 6 }]
+                }>
+                
                   <VideoStickerMessage
-                    item={item}
-                    isMe={isMe}
-                    currentUser={currentUser}
-                    onLongPress={() => handleOpenContextMenu(item)}
-                    onDelete={() =>
-                      setDeleteModal({
-                        visible: true,
-                        message: item,
-                        forEveryone: isMe
-                      })
-                    }
-                  />
-                </View>
-              ) : (
-                <Pressable
+                  item={item}
+                  isMe={isMe}
+                  currentUser={currentUser}
                   onLongPress={() => handleOpenContextMenu(item)}
-                  delayLongPress={200}
-                  style={[
-                    styles.msgRow,
-                    isMe ? styles.msgRowMe : styles.msgRowOther
-                  ]}
-                >
+                  onDelete={() =>
+                  setDeleteModal({
+                    visible: true,
+                    message: item,
+                    forEveryone: isMe
+                  })
+                  } />
+                
+                </View> :
+
+              <Pressable
+                onLongPress={() => handleOpenContextMenu(item)}
+                delayLongPress={200}
+                style={[
+                styles.msgRow,
+                isMe ? styles.msgRowMe : styles.msgRowOther]
+                }>
+                
                   <View
-                    style={[
-                      styles.bubble,
-                      isMe ?
-                      [styles.bubbleMe, { backgroundColor: colors.primary || "#0284c7" }] :
-                      [
-                        styles.bubbleOther,
-                        {
-                          backgroundColor: colors.surfaceAlt || "#18181b",
-                          borderColor: colors.border || "rgba(255, 255, 255, 0.06)"
-                        }
-                      ]
-                    ]}
-                  >
-                    {item.is_deleted || item.deleted_for_everyone ? (
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  style={[
+                  styles.bubble,
+                  isMe ?
+                  [styles.bubbleMe, { backgroundColor: colors.primary || "#0284c7" }] :
+                  [
+                  styles.bubbleOther,
+                  {
+                    backgroundColor: colors.surfaceAlt || "#18181b",
+                    borderColor: colors.border || "rgba(255, 255, 255, 0.06)"
+                  }]]
+
+                  }>
+                  
+                    {item.is_deleted || item.deleted_for_everyone ?
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                         <Feather
-                          name="slash"
-                          size={14}
-                          color={isMe ? "rgba(255,255,255,0.7)" : colors.muted}
-                        />
+                      name="slash"
+                      size={14}
+                      color={isMe ? "rgba(255,255,255,0.7)" : colors.muted} />
+                    
                         <Text
-                          style={[
-                            styles.msgText,
-                            {
-                              color: isMe ? "rgba(255,255,255,0.7)" : colors.muted,
-                              fontStyle: "italic"
-                            }
-                          ]}
-                        >
+                      style={[
+                      styles.msgText,
+                      {
+                        color: isMe ? "rgba(255,255,255,0.7)" : colors.muted,
+                        fontStyle: "italic"
+                      }]
+                      }>
+                      
                           Esta mensagem foi apagada
                         </Text>
-                      </View>
-                    ) : (
-                      <>
-                        {hasStory && (
-                          <View
-                            style={[
-                              styles.storyCardPreview,
-                              {
-                                backgroundColor: isMe ?
-                                "rgba(0,0,0,0.25)" :
-                                "rgba(255,255,255,0.06)"
-                              }
-                            ]}
-                          >
+                      </View> :
+
+                  <>
+                        {hasStory &&
+                    <View
+                      style={[
+                      styles.storyCardPreview,
+                      {
+                        backgroundColor: isMe ?
+                        "rgba(0,0,0,0.25)" :
+                        "rgba(255,255,255,0.06)"
+                      }]
+                      }>
+                      
                             <View style={styles.storyCardHeader}>
                               <Feather
-                                name="film"
-                                size={12}
-                                color={isMe ? "#ffffff" : colors.primary || "#0284c7"}
-                              />
+                          name="film"
+                          size={12}
+                          color={isMe ? "#ffffff" : colors.primary || "#0284c7"} />
+                        
                               <Text
-                                style={[
-                                  styles.storyCardLabel,
-                                  {
-                                    color: isMe ?
-                                    "rgba(255,255,255,0.9)" :
-                                    colors.text
-                                  }
-                                ]}
-                              >
+                          style={[
+                          styles.storyCardLabel,
+                          {
+                            color: isMe ?
+                            "rgba(255,255,255,0.9)" :
+                            colors.text
+                          }]
+                          }>
+                          
                                 Story de @{targetUser?.username || "usuario"}
                               </Text>
                             </View>
-                            {storyData?.mediaUrl && (
-                              <Image
-                                source={{ uri: storyData.mediaUrl }}
-                                style={styles.storyCardThumbnail}
-                                resizeMode="cover"
-                              />
-                            )}
+                            {storyData?.mediaUrl &&
+                      <Image
+                        source={{ uri: storyData.mediaUrl }}
+                        style={styles.storyCardThumbnail}
+                        resizeMode="cover" />
+
+                      }
                           </View>
-                        )}
+                    }
 
-                        {isReelShare && !!reelData && (
-                          <ReelShareCard
-                            reelData={reelData}
-                            isMe={isMe}
-                            onPress={(data) => {
-                              const vId = data?.video_id || data?.videoId || data?.youtube_video_id;
-                              if (vId) {
-                                if (Platform.OS === "web" && typeof window !== "undefined") {
-                                  window.open(`https://www.youtube.com/shorts/${vId}`, "_blank");
-                                } else {
-                                  Linking.openURL(`https://www.youtube.com/shorts/${vId}`).catch(() => {});
-                                }
-                              }
-                            }}
-                          />
-                        )}
+                        {isReelShare && !!reelData &&
+                    <ReelShareCard
+                      reelData={reelData}
+                      isMe={isMe}
+                      onPress={(data) => {
+                        const vId = data?.video_id || data?.videoId || data?.youtube_video_id;
+                        if (vId) {
+                          if (Platform.OS === "web" && typeof window !== "undefined") {
+                            window.open(`https://www.youtube.com/shorts/${vId}`, "_blank");
+                          } else {
+                            Linking.openURL(`https://www.youtube.com/shorts/${vId}`).catch(() => {});
+                          }
+                        }
+                      }} />
 
-                        {isPhoto && (
-                          <Pressable
-                            onPress={() =>
-                              setViewerMedia({
-                                url: mediaUrl,
-                                type: "image",
-                                user: isMe ? currentUser : targetUser,
-                                created_at: item.createdAt || item.created_at,
-                                content: item.content || "",
-                                message: item
-                              })
-                            }
-                            onLongPress={() => handleOpenContextMenu(item)}
-                            delayLongPress={200}
-                            style={styles.mediaContainer}
-                          >
+                    }
+
+                        {isPhoto &&
+                    <Pressable
+                      onPress={() =>
+                      setViewerMedia({
+                        url: mediaUrl,
+                        type: "image",
+                        user: isMe ? currentUser : targetUser,
+                        created_at: item.createdAt || item.created_at,
+                        content: item.content || "",
+                        message: item
+                      })
+                      }
+                      onLongPress={() => handleOpenContextMenu(item)}
+                      delayLongPress={200}
+                      style={styles.mediaContainer}>
+                      
                             <Image
-                              source={{ uri: mediaUrl }}
-                              style={styles.chatImage}
-                              resizeMode="cover"
-                            />
+                        source={{ uri: mediaUrl }}
+                        style={styles.chatImage}
+                        resizeMode="cover" />
+                      
                           </Pressable>
-                        )}
+                    }
 
-                        {isVideo && (
-                          <ChatVideoThumbnail
-                            url={mediaUrl}
-                            onPress={() =>
-                              setViewerMedia({
-                                url: mediaUrl,
-                                type: "video",
-                                user: isMe ? currentUser : targetUser,
-                                created_at: item.createdAt || item.created_at,
-                                content: item.content || "",
-                                message: item
-                              })
-                            }
-                            onLongPress={() => handleOpenContextMenu(item)}
-                          />
-                        )}
+                        {isVideo &&
+                    <ChatVideoThumbnail
+                      url={mediaUrl}
+                      onPress={() =>
+                      setViewerMedia({
+                        url: mediaUrl,
+                        type: "video",
+                        user: isMe ? currentUser : targetUser,
+                        created_at: item.createdAt || item.created_at,
+                        content: item.content || "",
+                        message: item
+                      })
+                      }
+                      onLongPress={() => handleOpenContextMenu(item)} />
 
-                        {!!audioUrl && (
-                          <AudioMessagePlayer audioUrl={audioUrl} isMe={isMe} />
-                        )}
+                    }
 
-                        {!!item.content && !isReelShare && (
-                          <Text
-                            style={[
-                              styles.msgText,
-                              { color: isMe ? "#FFFFFF" : colors.text }
-                            ]}
-                          >
+                        {!!audioUrl &&
+                    <AudioMessagePlayer audioUrl={audioUrl} isMe={isMe} />
+                    }
+
+                        {!!item.content && !isReelShare &&
+                    <Text
+                      style={[
+                      styles.msgText,
+                      { color: isMe ? "#FFFFFF" : colors.text }]
+                      }>
+                      
                             {item.content}
                           </Text>
-                        )}
+                    }
                       </>
-                    )}
+                  }
 
                     <View style={styles.msgMetaRow}>
                       <Text
-                        style={[
-                          styles.msgTime,
-                          {
-                            color: isMe ?
-                            "rgba(255, 255, 255, 0.75)" :
-                            colors.muted || "#a1a1aa"
-                          }
-                        ]}
-                      >
+                      style={[
+                      styles.msgTime,
+                      {
+                        color: isMe ?
+                        "rgba(255, 255, 255, 0.75)" :
+                        colors.muted || "#a1a1aa"
+                      }]
+                      }>
+                      
                         {formatRelativeTime(item.createdAt || item.created_at)}
                         {(item.is_edited || item.isEdited) &&
-                        !(item.is_deleted || item.deleted_for_everyone) ?
-                        " (editada)" :
-                        ""}
+                      !(item.is_deleted || item.deleted_for_everyone) ?
+                      " (editada)" :
+                      ""}
                       </Text>
 
-                      {isMe && !(item.is_deleted || item.deleted_for_everyone) && (
-                        <View style={{ flexDirection: "row", marginLeft: 4 }}>
-                          {item.read_at || item.isRead ? (
-                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      {isMe && !(item.is_deleted || item.deleted_for_everyone) &&
+                    <View style={{ flexDirection: "row", marginLeft: 4 }}>
+                          {item.read_at || item.isRead ?
+                      <View style={{ flexDirection: "row", alignItems: "center" }}>
                               <Ionicons name="checkmark-done" size={15} color="#38bdf8" />
-                            </View>
-                          ) : (
-                            <Ionicons
-                              name="checkmark"
-                              size={14}
-                              color="rgba(255, 255, 255, 0.7)"
-                            />
-                          )}
+                            </View> :
+
+                      <Ionicons
+                        name="checkmark"
+                        size={14}
+                        color="rgba(255, 255, 255, 0.7)" />
+
+                      }
                         </View>
-                      )}
+                    }
                     </View>
                   </View>
                 </Pressable>
-              )}
-            </View>
-          );
+              }
+            </View>);
+
         }}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"

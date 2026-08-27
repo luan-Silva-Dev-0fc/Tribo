@@ -12,6 +12,7 @@ import {
   View
 } from "react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api } from "../../api";
 import { Avatar, VerificationBadge } from "../ui/ui";
 import { userName } from "../../lib/format";
@@ -24,6 +25,7 @@ export function ShareReelModal({
   onSent
 }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState("direct");
   const [conversations, setConversations] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -175,7 +177,8 @@ export function ShareReelModal({
             styles.sheetContainer,
             {
               backgroundColor: colors.surface || "#18181b",
-              borderColor: colors.border || "rgba(255, 255, 255, 0.1)"
+              borderColor: colors.border || "rgba(255, 255, 255, 0.1)",
+              paddingBottom: Math.max(insets.bottom, 16) + 6
             }
           ]}>
           <View style={styles.handleBar} />

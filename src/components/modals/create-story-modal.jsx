@@ -10,9 +10,11 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View } from
+  View,
+  StatusBar } from
 "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { api } from "../../api";
 import { IconButton } from "../ui/ui";
@@ -21,6 +23,8 @@ import { useTheme } from "../../theme";
 
 export function CreateStoryModal({ visible, onClose, onSuccess }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const topOffset = Math.max(insets.top, Platform.OS === "android" ? (StatusBar.currentHeight || 28) : 44);
   const [media, setMedia] = useState(null);
   const [caption, setCaption] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -118,7 +122,9 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
           styles.container,
           {
             backgroundColor: colors.card,
-            borderColor: colors.border
+            borderColor: colors.border,
+            marginTop: topOffset,
+            paddingBottom: Math.max(insets.bottom, 16)
           }]
           }>
           
@@ -269,7 +275,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     overflow: "hidden",
-    marginTop: Platform.OS === "ios" ? 44 : 20,
     borderTopWidth: 1
   },
   header: {

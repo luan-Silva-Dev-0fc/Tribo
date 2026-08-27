@@ -101,7 +101,7 @@ function TriboRoot() {
       });
     });
 
-    // Escuta em tempo real via WebSocket (Socket.io)
+
     const socket = getChatSocket();
     const handleStatusChangedSocket = (payload) => {
       if (payload?.platform_status && payload.platform_status !== "ACTIVE") {
@@ -120,7 +120,7 @@ function TriboRoot() {
       socket.on("platform_status_changed", handleStatusChangedSocket);
     }
 
-    // Checagem inicial e polling de heartbeat a cada 3.5 segundos
+
     checkPlatformStatus();
     const interval = setInterval(checkPlatformStatus, 3500);
 
@@ -339,9 +339,9 @@ function TriboRoot() {
         message={platformSuspended.message}
         reason={platformSuspended.reason}
         onRetry={checkPlatformStatus}
-        onAdminLogin={() => setShowAdminAuth(true)}
-      />
-    );
+        onAdminLogin={() => setShowAdminAuth(true)} />);
+
+
   }
 
   if (!user) {
@@ -350,9 +350,9 @@ function TriboRoot() {
         onAuthenticated={(current) => {
           setShowAdminAuth(false);
           authenticated(current);
-        }}
-      />
-    );
+        }} />);
+
+
   }
 
   if (showIntro) {
@@ -482,25 +482,25 @@ function TriboRoot() {
           
           <StatusBar style="light" />
 
-          {/* Banner de Bypass do Administrador Mestre */}
-          {platformSuspended && isMasterAdmin && (
-            <View style={{
-              backgroundColor: platformSuspended.status === "LEGAL_ORDER" ? "#ef4444" : "#f59e0b",
-              paddingVertical: 5,
-              paddingHorizontal: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6
-            }}>
+          {}
+          {platformSuspended && isMasterAdmin &&
+          <View style={{
+            backgroundColor: platformSuspended.status === "LEGAL_ORDER" ? "#ef4444" : "#f59e0b",
+            paddingVertical: 5,
+            paddingHorizontal: 12,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6
+          }}>
               <Feather name="shield" size={13} color="#000000" />
               <Text style={{ color: "#000000", fontSize: 11, fontFamily: "Poppins_700Bold" }}>
-                {platformSuspended.status === "LEGAL_ORDER"
-                  ? "Modo Ordem Legal Ativo • Acesso Master Liberado (luansilva@gmail.com)"
-                  : "Modo Manutenção Ativo • Acesso Master Liberado (luansilva@gmail.com)"}
+                {platformSuspended.status === "LEGAL_ORDER" ?
+              "Modo Ordem Legal Ativo • Acesso Master Liberado (luansilva@gmail.com)" :
+              "Modo Manutenção Ativo • Acesso Master Liberado (luansilva@gmail.com)"}
               </Text>
             </View>
-          )}
+          }
 
           {pages[screen]}
           <PublicProfile
@@ -519,8 +519,8 @@ function TriboRoot() {
             status={platformSuspended?.status}
             message={platformSuspended?.message}
             reason={platformSuspended?.reason}
-            onRetry={checkPlatformStatus}
-          />
+            onRetry={checkPlatformStatus} />
+          
         </SafeAreaView>
       </UserProvider>);
 
@@ -538,25 +538,25 @@ function TriboRoot() {
           <StatusBar style="light" />
         </SafeAreaView>
 
-        {/* Banner de Bypass do Administrador Mestre */}
-        {platformSuspended && isMasterAdmin && (
-          <View style={{
-            backgroundColor: platformSuspended.status === "LEGAL_ORDER" ? "#ef4444" : "#f59e0b",
-            paddingVertical: 5,
-            paddingHorizontal: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6
-          }}>
+        {}
+        {platformSuspended && isMasterAdmin &&
+        <View style={{
+          backgroundColor: platformSuspended.status === "LEGAL_ORDER" ? "#ef4444" : "#f59e0b",
+          paddingVertical: 5,
+          paddingHorizontal: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6
+        }}>
             <Feather name="shield" size={13} color="#000000" />
             <Text style={{ color: "#000000", fontSize: 11, fontFamily: "Poppins_700Bold" }}>
-              {platformSuspended.status === "LEGAL_ORDER"
-                ? "Modo Ordem Legal Ativo • Acesso Master Liberado (luansilva@gmail.com)"
-                : "Modo Manutenção Ativo • Acesso Master Liberado (luansilva@gmail.com)"}
+              {platformSuspended.status === "LEGAL_ORDER" ?
+            "Modo Ordem Legal Ativo • Acesso Master Liberado (luansilva@gmail.com)" :
+            "Modo Manutenção Ativo • Acesso Master Liberado (luansilva@gmail.com)"}
             </Text>
           </View>
-        )}
+        }
 
         <View
           style={{ flex: 1, backgroundColor: colors.card || colors.background }}>
@@ -591,8 +591,8 @@ function TriboRoot() {
             status={platformSuspended?.status}
             message={platformSuspended?.message}
             reason={platformSuspended?.reason}
-            onRetry={checkPlatformStatus}
-          />
+            onRetry={checkPlatformStatus} />
+          
         </View>
       </View>
     </UserProvider>);

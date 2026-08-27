@@ -14,6 +14,7 @@ import {
   ActivityIndicator
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../theme";
 
@@ -77,6 +78,7 @@ export function SavedReelsModal({
   onSelectReel
 }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [savedList, setSavedList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -135,7 +137,8 @@ export function SavedReelsModal({
             styles.sheetContainer,
             {
               backgroundColor: colors.surface || "#18181b",
-              borderColor: colors.border || "rgba(255, 255, 255, 0.1)"
+              borderColor: colors.border || "rgba(255, 255, 255, 0.1)",
+              paddingBottom: Math.max(insets.bottom, 16) + 6
             }
           ]}>
           <View style={styles.handleBar} />

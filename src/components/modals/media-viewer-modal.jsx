@@ -355,15 +355,15 @@ export function MediaViewerModal({
           }
         </View>
 
-        {/* Barra Superior */}
+        {}
         <Animated.View
           style={[
-            styles.topBar,
-            {
-              top: Math.max(insets.top, Platform.OS === "ios" ? 50 : 36) + 4,
-              opacity: controlsFadeAnim,
-            },
-          ]}
+          styles.topBar,
+          {
+            top: Math.max(insets.top, Platform.OS === "ios" ? 50 : 36) + 4,
+            opacity: controlsFadeAnim
+          }]
+          }
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
           <View style={styles.authorRow}>
@@ -439,15 +439,15 @@ export function MediaViewerModal({
           </View>
         </Animated.View>
 
-        {/* Barra Inferior com Safe Area */}
+        {}
         <Animated.View
           style={[
-            styles.bottomBar,
-            {
-              bottom: Math.max(insets.bottom, 20) + 12,
-              opacity: controlsFadeAnim,
-            },
-          ]}
+          styles.bottomBar,
+          {
+            bottom: Math.max(insets.bottom, 20) + 12,
+            opacity: controlsFadeAnim
+          }]
+          }
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
 
@@ -504,11 +504,11 @@ const styles = StyleSheet.create({
   },
   fullImage: {
     width: "100%",
-    height: "100%",
+    height: "100%"
   },
   fullVideo: {
     width: "100%",
-    height: "100%",
+    height: "100%"
   },
   centerLoader: {
     ...StyleSheet.absoluteFillObject,

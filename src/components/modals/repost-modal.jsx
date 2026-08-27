@@ -13,6 +13,7 @@ import {
   Platform } from
 "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../theme";
 import { IconButton, Avatar, VerificationBadge } from "../ui/ui";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -28,13 +29,13 @@ function QuoteVideo({ url, styles }) {
       player={player}
       style={styles.quoteMedia}
       contentFit="cover"
-      nativeControls={false} />);
-
-
+      nativeControls={false} />
+  );
 }
 
 export function RepostModal({ visible, post, currentUser, onClose, onRepost }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [content, setContent] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -225,7 +226,8 @@ export function RepostModal({ visible, post, currentUser, onClose, onRepost }) {
             styles.footer,
             {
               borderTopColor: colors.border || "rgba(255,255,255,0.08)",
-              backgroundColor: colors.card || colors.background
+              backgroundColor: colors.card || colors.background,
+              paddingBottom: Math.max(insets.bottom, 16) + 6
             }]
             }>
             

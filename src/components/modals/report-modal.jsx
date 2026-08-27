@@ -10,6 +10,7 @@ import {
   View } from
 "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api } from "../../api";
 import { errorMessage } from "../../lib/format";
 import { useTheme } from "../../theme";
@@ -35,6 +36,7 @@ export function ReportModal({
   onSuccess
 }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [selectedReason, setSelectedReason] = useState(REPORT_REASONS[0]);
   const [details, setDetails] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -111,7 +113,7 @@ export function ReportModal({
       onRequestClose={onClose}>
       
       <Pressable style={styles.overlay} onPress={onClose} />
-      <View style={[styles.sheet, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+      <View style={[styles.sheet, { backgroundColor: colors.surface, borderColor: colors.line, paddingBottom: Math.max(insets.bottom, 20) + 8 }]}>
         <View style={styles.handle} />
 
         <View style={styles.header}>

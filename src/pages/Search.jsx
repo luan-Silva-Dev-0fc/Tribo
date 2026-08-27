@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  KeyboardAvoidingView,
   Linking,
   Modal,
   Platform,
@@ -1016,6 +1017,10 @@ export function Settings({
   const [cancelingDeletion, setCancelingDeletion] = useState(false);
   const [deletionInfo, setDeletionInfo] = useState(null);
   const [alertConfig, setAlertConfig] = useState({ visible: false });
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const [verifyModalVisible, setVerifyModalVisible] = useState(false);
   const [verifyCode, setVerifyCode] = useState("");
   const [verifying, setVerifying] = useState(false);
@@ -1042,14 +1047,16 @@ export function Settings({
 
   useEffect(() => {
     if (visible) {
-      api.users.
-      deletionStatus().
-      then((res) => {
-        if (res) {
-          setDeletionInfo(res.data || res);
-        }
-      }).
-      catch(() => {});
+      const fetchStatus = api.users?.deletionStatus || api.deletionStatus;
+      if (typeof fetchStatus === "function") {
+        fetchStatus()
+          .then((res) => {
+            if (res) {
+              setDeletionInfo(res.data || res);
+            }
+          })
+          .catch(() => {});
+      }
     }
   }, [visible]);
 
@@ -1215,38 +1222,21 @@ export function Settings({
     }
   };
 
-  const handleExportData = async (shouldDeleteAfter = false) => {
+  const handleExportData = async () => {
     try {
       setDownloadingData(true);
       const res = await api.users.exportData();
       const payload = res?.data || res;
       await downloadUserData(user, payload);
 
-      if (shouldDeleteAfter) {setHasExported(true);
-        setAlertConfig({
-          visible: true,
-          type: "success",
-          title: "Download Concluído",
-          message: "Seus dados foram baixados com sucesso! Deseja continuar e excluir sua conta agora?",
-          buttonText: "Sim, excluir minha conta",
-          onClose: () => {
-            setAlertConfig({ visible: false });
-
-            setTimeout(() => handleRequestDeletion(), 500);
-          },
-          secondaryButtonText: "Cancelar",
-          onSecondaryPress: () => setAlertConfig({ visible: false })
-        });
-      } else {
-        setAlertConfig({
-          visible: true,
-          type: "success",
-          title: "Download Concluído",
-          message: "Seus dados foram baixados com sucesso!",
-          buttonText: "Entendido",
-          onClose: () => setAlertConfig({ visible: false })
-        });
-      }
+      setAlertConfig({
+        visible: true,
+        type: "success",
+        title: "Download Concluído",
+        message: "Seus dados foram baixados com sucesso!",
+        buttonText: "Entendido",
+        onClose: () => setAlertConfig({ visible: false })
+      });
     } catch (err) {
       setAlertConfig({
         visible: true,
@@ -1261,30 +1251,25 @@ export function Settings({
     }
   };
 
-  const [hasExported, setHasExported] = useState(false);
+  const deleteAccount = () => {
+    setDeletePassword("");
+    setShowDeletePassword(false);
+    setDeleteError("");
+    setDeleteModalVisible(true);
+  };
 
-  const handleRequestDeletion = async () => {
-    if (!hasExported) {
-      setAlertConfig({
-        visible: true,
-        type: "warning",
-        title: "Download Obrigatrio",
-        message:
-        "Ateno: Por questes de segurana e privacidade, voc precisa baixar seus dados antes de solicitar a excluso da sua conta.",
-        buttonText: "Baixar Meus Dados Agora",
-        onClose: () => {
-          setAlertConfig({ visible: false });
-          handleExportData(true);
-        },
-        secondaryButtonText: "Cancelar",
-        onSecondaryPress: () => setAlertConfig({ visible: false })
-      });
+  const handleConfirmDeleteWithPassword = async () => {
+    if (!deletePassword || !deletePassword.trim()) {
+      setDeleteError("Por favor, digite sua senha para confirmar a exclusão.");
       return;
     }
 
     try {
       setRequestingDeletion(true);
-      await api.users.requestDeletion();
+      setDeleteError("");
+      await api.users.requestDeletion({ password: deletePassword.trim() });
+      setDeleteModalVisible(false);
+      setDeletePassword("");
 
       setAlertConfig({
         visible: true,
@@ -1298,40 +1283,8 @@ export function Settings({
         }
       });
     } catch (err) {
-      const code = err?.payload?.code || err?.payload?.error;
-      const msg = errorMessage(err) || "";
-      const requiresExport =
-      code === "DATA_EXPORT_REQUIRED" ||
-      err?.status === 400 && (
-      msg.toLowerCase().includes("baixar") ||
-      msg.toLowerCase().includes("export") ||
-      msg.toLowerCase().includes("dados"));
-
-      if (requiresExport) {
-        setAlertConfig({
-          visible: true,
-          type: "warning",
-          title: "Download Obrigatório",
-          message:
-          "Atenção: Por questões de segurança e privacidade, você precisa baixar seus dados antes de solicitar a exclusão da sua conta.",
-          buttonText: "Baixar Meus Dados Agora",
-          onClose: () => {
-            setAlertConfig({ visible: false });
-            handleExportData(true);
-          },
-          secondaryButtonText: "Cancelar",
-          onSecondaryPress: () => setAlertConfig({ visible: false })
-        });
-      } else {
-        setAlertConfig({
-          visible: true,
-          type: "error",
-          title: "Erro ao Excluir",
-          message: msg || "Não foi possível solicitar a exclusão da conta.",
-          buttonText: "Fechar",
-          onClose: () => setAlertConfig({ visible: false })
-        });
-      }
+      const msg = errorMessage(err) || "Senha incorreta ou erro ao solicitar exclusão da conta.";
+      setDeleteError(msg);
     } finally {
       setRequestingDeletion(false);
     }
@@ -1364,26 +1317,6 @@ export function Settings({
     } finally {
       setCancelingDeletion(false);
     }
-  };
-
-  const deleteAccount = () => {
-    onClose();
-    setTimeout(() => {
-      showAlert?.({
-        visible: true,
-        type: "warning",
-        title: "Excluir Minha Conta",
-        message:
-        "Tem certeza de que deseja excluir sua conta permanentemente? Você perderá o acesso imediatamente e esta ação não poderá ser desfeita.",
-        buttonText: "Prosseguir com a Exclusão",
-        onClose: () => {
-          showAlert?.({ visible: false });
-          handleRequestDeletion();
-        },
-        secondaryButtonText: "Voltar",
-        onSecondaryPress: () => showAlert?.({ visible: false })
-      });
-    }, 100);
   };
 
   return (
@@ -1993,7 +1926,191 @@ export function Settings({
           </View>
         </Modal>
 
-        {}
+        <Modal
+          visible={deleteModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => {
+            if (!requestingDeletion) {
+              setDeleteModalVisible(false);
+              setDeletePassword("");
+              setDeleteError("");
+            }
+          }}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.75)"
+            }}>
+            <ScrollView
+              contentContainerStyle={{
+                flexGrow: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                padding: 20
+              }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
+              <View
+                style={{
+                  width: "100%",
+                  maxWidth: 400,
+                  backgroundColor: colors.surface || "#18181b",
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: "rgba(239, 68, 68, 0.3)",
+                  padding: 22,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 10 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 20,
+                  elevation: 10
+                }}>
+                <View style={{ alignItems: "center", marginBottom: 16 }}>
+                  <View
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: 26,
+                      backgroundColor: "rgba(239, 68, 68, 0.15)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 12
+                    }}>
+                    <Feather name="trash-2" size={26} color="#ef4444" />
+                  </View>
+                  <Text
+                    style={{
+                      color: colors.text,
+                      fontSize: 18,
+                      fontFamily: "Poppins_700Bold",
+                      textAlign: "center"
+                    }}>
+                    Excluir Minha Conta
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.muted || "#a1a1aa",
+                      fontSize: 13,
+                      fontFamily: "Poppins_400Regular",
+                      textAlign: "center",
+                      marginTop: 6,
+                      lineHeight: 18
+                    }}>
+                    Esta ação agendará a exclusão definitiva da sua conta. Para confirmar sua identidade, digite sua senha abaixo:
+                  </Text>
+                </View>
+
+                <View style={{ marginBottom: 16 }}>
+                  <Text
+                    style={{
+                      color: colors.text,
+                      fontSize: 13,
+                      fontFamily: "Poppins_600SemiBold",
+                      marginBottom: 6
+                    }}>
+                    Senha atual:
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: colors.surfaceAlt || "#27272a",
+                      borderWidth: 1,
+                      borderColor: deleteError ? "#ef4444" : colors.border || "rgba(255, 255, 255, 0.1)",
+                      borderRadius: 14,
+                      paddingHorizontal: 14
+                    }}>
+                    <Feather name="lock" size={16} color={colors.muted || "#71717a"} style={{ marginRight: 8 }} />
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        height: 48,
+                        color: colors.text,
+                        fontSize: 14.5,
+                        fontFamily: "Poppins_400Regular"
+                      }}
+                      placeholder="Digite sua senha"
+                      placeholderTextColor={colors.muted || "#71717a"}
+                      secureTextEntry={!showDeletePassword}
+                      value={deletePassword}
+                      onChangeText={(val) => {
+                        setDeletePassword(val);
+                        if (deleteError) setDeleteError("");
+                      }}
+                      autoFocus
+                      editable={!requestingDeletion}
+                    />
+                    <Pressable
+                      onPress={() => setShowDeletePassword((prev) => !prev)}
+                      style={{ padding: 6 }}>
+                      <Feather
+                        name={showDeletePassword ? "eye-off" : "eye"}
+                        size={18}
+                        color={colors.muted || "#71717a"}
+                      />
+                    </Pressable>
+                  </View>
+                  {Boolean(deleteError) && (
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6 }}>
+                      <Feather name="alert-circle" size={14} color="#ef4444" />
+                      <Text style={{ color: "#ef4444", fontSize: 12, fontFamily: "Poppins_400Regular", flex: 1 }}>
+                        {deleteError}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <Pressable
+                    onPress={() => {
+                      setDeleteModalVisible(false);
+                      setDeletePassword("");
+                      setDeleteError("");
+                    }}
+                    disabled={requestingDeletion}
+                    style={{
+                      flex: 1,
+                      height: 46,
+                      borderRadius: 14,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: colors.surfaceAlt || "#27272a",
+                      borderWidth: 1,
+                      borderColor: colors.border || "rgba(255, 255, 255, 0.08)"
+                    }}>
+                    <Text style={{ color: colors.text, fontSize: 14, fontFamily: "Poppins_600SemiBold" }}>
+                      Cancelar
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleConfirmDeleteWithPassword}
+                    disabled={requestingDeletion}
+                    style={{
+                      flex: 1.2,
+                      height: 46,
+                      borderRadius: 14,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "#ef4444",
+                      opacity: requestingDeletion ? 0.7 : 1
+                    }}>
+                    {requestingDeletion ? (
+                      <ActivityIndicator size="small" color="#ffffff" />
+                    ) : (
+                      <Text style={{ color: "#ffffff", fontSize: 14, fontFamily: "Poppins_700Bold" }}>
+                        Confirmar Exclusão
+                      </Text>
+                    )}
+                  </Pressable>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </Modal>
+
         <TriboAlertModal
           visible={alertConfig.visible}
           type={alertConfig.type}

@@ -8,15 +8,15 @@ import {
   ActivityIndicator,
   StatusBar,
   Animated,
-  Easing
-} from "react-native";
+  Easing } from
+"react-native";
 import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 
 const BACKGROUND_MUSIC_URL =
-  "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/manuntecao/Donnie%20Disco%20-%20Jeremy%20Korpas.mp3";
+"https://pub-34192334d7d14328ace69168b62cc510.r2.dev/manuntecao/Donnie%20Disco%20-%20Jeremy%20Korpas.mp3";
 
 export function PlatformSuspendedScreen({
   visible,
@@ -38,58 +38,58 @@ export function PlatformSuspendedScreen({
   const eqAnim2 = useRef(new Animated.Value(10)).current;
   const eqAnim3 = useRef(new Animated.Value(6)).current;
 
-  // Animação de pulso do cadeado e do glow neon
+
   useEffect(() => {
     if (!visible) return;
 
     const pulseLoop = Animated.loop(
       Animated.sequence([
-        Animated.parallel([
-          Animated.timing(pulseAnim, {
-            toValue: 1.06,
-            duration: 1800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true
-          }),
-          Animated.timing(glowAnim, {
-            toValue: 0.85,
-            duration: 1800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true
-          })
-        ]),
-        Animated.parallel([
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 1800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true
-          }),
-          Animated.timing(glowAnim, {
-            toValue: 0.35,
-            duration: 1800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true
-          })
-        ])
-      ])
+      Animated.parallel([
+      Animated.timing(pulseAnim, {
+        toValue: 1.06,
+        duration: 1800,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 0.85,
+        duration: 1800,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      })]
+      ),
+      Animated.parallel([
+      Animated.timing(pulseAnim, {
+        toValue: 1,
+        duration: 1800,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 0.35,
+        duration: 1800,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      })]
+      )]
+      )
     );
     pulseLoop.start();
 
-    // Animação de barras do Equalizador de som
+
     const eqLoop = Animated.loop(
       Animated.sequence([
-        Animated.parallel([
-          Animated.timing(eqAnim1, { toValue: 14, duration: 400, useNativeDriver: false }),
-          Animated.timing(eqAnim2, { toValue: 6, duration: 450, useNativeDriver: false }),
-          Animated.timing(eqAnim3, { toValue: 16, duration: 500, useNativeDriver: false })
-        ]),
-        Animated.parallel([
-          Animated.timing(eqAnim1, { toValue: 5, duration: 450, useNativeDriver: false }),
-          Animated.timing(eqAnim2, { toValue: 16, duration: 400, useNativeDriver: false }),
-          Animated.timing(eqAnim3, { toValue: 7, duration: 420, useNativeDriver: false })
-        ])
-      ])
+      Animated.parallel([
+      Animated.timing(eqAnim1, { toValue: 14, duration: 400, useNativeDriver: false }),
+      Animated.timing(eqAnim2, { toValue: 6, duration: 450, useNativeDriver: false }),
+      Animated.timing(eqAnim3, { toValue: 16, duration: 500, useNativeDriver: false })]
+      ),
+      Animated.parallel([
+      Animated.timing(eqAnim1, { toValue: 5, duration: 450, useNativeDriver: false }),
+      Animated.timing(eqAnim2, { toValue: 16, duration: 400, useNativeDriver: false }),
+      Animated.timing(eqAnim3, { toValue: 7, duration: 420, useNativeDriver: false })]
+      )]
+      )
     );
     eqLoop.start();
 
@@ -99,7 +99,7 @@ export function PlatformSuspendedScreen({
     };
   }, [visible, pulseAnim, glowAnim, eqAnim1, eqAnim2, eqAnim3]);
 
-  // Gerenciamento do Áudio de Fundo
+
   useEffect(() => {
     let isMounted = true;
 
@@ -187,22 +187,22 @@ export function PlatformSuspendedScreen({
   const accentColor = isLegalOrder ? "#ef4444" : "#f59e0b";
   const glowColor = isLegalOrder ? "rgba(239, 68, 68, 0.28)" : "rgba(245, 158, 11, 0.28)";
 
-  const title = isLegalOrder
-    ? "Plataforma Suspensa"
-    : "Plataforma em Manutenção";
+  const title = isLegalOrder ?
+  "Plataforma Suspensa" :
+  "Plataforma em Manutenção";
 
-  const subtitle = isLegalOrder
-    ? "Acesso Bloqueado por Ordem Legal"
-    : "Acesso Bloqueado para Manutenção";
+  const subtitle = isLegalOrder ?
+  "Acesso Bloqueado por Ordem Legal" :
+  "Acesso Bloqueado para Manutenção";
 
   const displayMessage =
-    reason && reason.trim()
-      ? reason.trim()
-      : message && message.trim()
-      ? message.trim()
-      : isLegalOrder
-      ? "O acesso à plataforma Tribo foi temporariamente interrompido em cumprimento a determinação de ordem legal ou judicial."
-      : "Estamos realizando manutenções e atualizações importantes em nossos servidores para aprimorar a sua experiência. Retornaremos em breve.";
+  reason && reason.trim() ?
+  reason.trim() :
+  message && message.trim() ?
+  message.trim() :
+  isLegalOrder ?
+  "O acesso à plataforma Tribo foi temporariamente interrompido em cumprimento a determinação de ordem legal ou judicial." :
+  "Estamos realizando manutenções e atualizações importantes em nossos servidores para aprimorar a sua experiência. Retornaremos em breve.";
 
   const handlePressRetry = async () => {
     if (checking) return;
@@ -227,111 +227,111 @@ export function PlatformSuspendedScreen({
       visible={visible}
       transparent={false}
       animationType="fade"
-      statusBarTranslucent={true}
-    >
+      statusBarTranslucent={true}>
+      
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
       <View
         style={[
-          styles.container,
-          {
-            paddingTop: insets.top + 16,
-            paddingBottom: Math.max(insets.bottom + 20, 28)
-          }
-        ]}
-      >
-        {/* Glow de Fundo Futurista */}
+        styles.container,
+        {
+          paddingTop: insets.top + 16,
+          paddingBottom: Math.max(insets.bottom + 20, 28)
+        }]
+        }>
+        
+        {}
         <Animated.View
           style={[
-            styles.glowDecorator,
-            {
-              backgroundColor: glowColor,
-              opacity: glowAnim
-            }
-          ]}
-        />
+          styles.glowDecorator,
+          {
+            backgroundColor: glowColor,
+            opacity: glowAnim
+          }]
+          } />
+        
 
-        {/* Barra Superior com Controles */}
+        {}
         <View style={styles.topHeader}>
           <View style={styles.secureBadge}>
             <Ionicons name="shield-checkmark" size={13} color="#22c55e" style={{ marginRight: 5 }} />
             <Text style={styles.secureBadgeText}>Sistema Protegido</Text>
           </View>
 
-          {/* Botão de Música de Fundo / Mudo */}
+          {}
           <Pressable
             onPress={handleToggleMute}
             style={({ pressed }) => [
-              styles.audioControlBtn,
-              pressed && { opacity: 0.75 }
-            ]}
-          >
-            {!isMuted && isPlaying ? (
-              <View style={styles.eqContainer}>
+            styles.audioControlBtn,
+            pressed && { opacity: 0.75 }]
+            }>
+            
+            {!isMuted && isPlaying ?
+            <View style={styles.eqContainer}>
                 <Animated.View style={[styles.eqBar, { height: eqAnim1, backgroundColor: accentColor }]} />
                 <Animated.View style={[styles.eqBar, { height: eqAnim2, backgroundColor: accentColor }]} />
                 <Animated.View style={[styles.eqBar, { height: eqAnim3, backgroundColor: accentColor }]} />
-              </View>
-            ) : null}
+              </View> :
+            null}
             <Feather
               name={isMuted ? "volume-x" : "volume-2"}
               size={16}
-              color={isMuted ? "#71717a" : "#ffffff"}
-            />
+              color={isMuted ? "#71717a" : "#ffffff"} />
+            
           </Pressable>
         </View>
 
-        {/* Conteúdo Central Principal */}
+        {}
         <View style={styles.content}>
-          {/* CADEADO MODERNO EM DESTAQUE COM ANIMAÇÃO */}
+          {}
           <Animated.View
             style={[
-              styles.lockContainer,
-              {
-                transform: [{ scale: pulseAnim }],
-                borderColor: accentColor,
-                shadowColor: accentColor
-              }
-            ]}
-          >
+            styles.lockContainer,
+            {
+              transform: [{ scale: pulseAnim }],
+              borderColor: accentColor,
+              shadowColor: accentColor
+            }]
+            }>
+            
             <View style={[styles.lockInnerRing, { backgroundColor: isLegalOrder ? "rgba(239, 68, 68, 0.14)" : "rgba(245, 158, 11, 0.14)" }]}>
               <MaterialCommunityIcons
                 name={isLegalOrder ? "lock-alert" : "lock"}
                 size={58}
-                color={accentColor}
-              />
+                color={accentColor} />
+              
             </View>
           </Animated.View>
 
-          {/* Badge de Modo */}
+          {}
           <View
             style={[
-              styles.statusPill,
-              {
-                borderColor: isLegalOrder ? "rgba(239, 68, 68, 0.4)" : "rgba(245, 158, 11, 0.4)",
-                backgroundColor: isLegalOrder ? "rgba(239, 68, 68, 0.1)" : "rgba(245, 158, 11, 0.1)"
-              }
-            ]}
-          >
+            styles.statusPill,
+            {
+              borderColor: isLegalOrder ? "rgba(239, 68, 68, 0.4)" : "rgba(245, 158, 11, 0.4)",
+              backgroundColor: isLegalOrder ? "rgba(239, 68, 68, 0.1)" : "rgba(245, 158, 11, 0.1)"
+            }]
+            }>
+            
             <View
               style={[
-                styles.livePulseDot,
-                { backgroundColor: accentColor }
-              ]}
-            />
+              styles.livePulseDot,
+              { backgroundColor: accentColor }]
+              } />
+            
             <Text style={[styles.statusPillText, { color: accentColor }]}>
               {subtitle}
             </Text>
           </View>
 
-          {/* Título Principal */}
+          {}
           <Text style={styles.titleText}>{title}</Text>
 
-          {/* Box de Motivo / Mensagem do Administrador */}
+          {}
           <View style={styles.glassCard}>
             <Text style={styles.messageText}>{displayMessage}</Text>
           </View>
 
-          {/* Informativo de Segurança */}
+          {}
           <View style={styles.subInfoRow}>
             <Feather name="shield" size={13} color="#a1a1aa" style={{ marginRight: 6 }} />
             <Text style={styles.subInfoText}>
@@ -340,47 +340,47 @@ export function PlatformSuspendedScreen({
           </View>
         </View>
 
-        {/* Rodapé com Botão e Identidade Visual */}
+        {}
         <View style={styles.footer}>
           <Pressable
             onPress={handlePressRetry}
             disabled={checking}
             style={({ pressed }) => [
-              styles.primaryButton,
-              {
-                backgroundColor: "#ffffff",
-                opacity: pressed || checking ? 0.85 : 1
-              }
-            ]}
-          >
-            {checking ? (
-              <ActivityIndicator size="small" color="#000000" />
-            ) : (
-              <>
+            styles.primaryButton,
+            {
+              backgroundColor: "#ffffff",
+              opacity: pressed || checking ? 0.85 : 1
+            }]
+            }>
+            
+            {checking ?
+            <ActivityIndicator size="small" color="#000000" /> :
+
+            <>
                 <Feather name="refresh-cw" size={16} color="#000000" style={{ marginRight: 8 }} />
                 <Text style={styles.primaryButtonText}>Verificar Novamente</Text>
               </>
-            )}
+            }
           </Pressable>
 
-          {Boolean(onAdminLogin) && (
-            <Pressable
-              onPress={onAdminLogin}
-              style={({ pressed }) => [
-                styles.adminAccessBtn,
-                pressed && { opacity: 0.6 }
-              ]}
-            >
+          {Boolean(onAdminLogin) &&
+          <Pressable
+            onPress={onAdminLogin}
+            style={({ pressed }) => [
+            styles.adminAccessBtn,
+            pressed && { opacity: 0.6 }]
+            }>
+            
               <Feather name="shield" size={12} color="#71717a" style={{ marginRight: 5 }} />
               <Text style={styles.adminAccessText}>Acesso Administrativo</Text>
             </Pressable>
-          )}
+          }
 
           <Text style={styles.brandFooter}>TRIBO NETWORK • 2026</Text>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>);
+
 }
 
 const styles = StyleSheet.create({

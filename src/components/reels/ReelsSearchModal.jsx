@@ -13,6 +13,7 @@ import {
   View
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../theme";
 
 const POPULAR_TAGS = ["#shitpost", "#memes", "#games", "#tech", "#musica", "#podcast", "#anime", "#cinema"];
@@ -24,6 +25,7 @@ export function ReelsSearchModal({
   onSelectReel
 }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -62,7 +64,8 @@ export function ReelsSearchModal({
             styles.sheetContainer,
             {
               backgroundColor: colors.surface || "#18181b",
-              borderColor: colors.border || "rgba(255, 255, 255, 0.1)"
+              borderColor: colors.border || "rgba(255, 255, 255, 0.1)",
+              paddingBottom: Math.max(insets.bottom, 16) + 6
             }
           ]}>
           <View style={styles.handleBar} />
