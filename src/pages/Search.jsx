@@ -524,12 +524,16 @@ export function EditProfile({ user, visible, onClose, onSaved, onUpdateUser }) {
         <AppHeader title="Editar perfil" onBack={onClose} />
 
         <ScrollView
+          style={{ flex: 1 }}
           contentContainerStyle={[
           styles.editForm,
-          { paddingBottom: Math.max((insets?.bottom || 0) + 24, 40) }]
+          { paddingBottom: Math.max((insets?.bottom || 0) + 32, 60) }]
           }
+          nestedScrollEnabled={true}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={true}
+          bounces={true}
+          overScrollMode="always">
           
           {}
           <View style={styles.avatarEditContainer}>
@@ -1324,10 +1328,16 @@ export function Settings({
       <View style={[styles.modalPage, { backgroundColor: colors.background }]}>
         <AppHeader title="Configurações" onBack={onClose} />
         <ScrollView
+          style={{ flex: 1 }}
           contentContainerStyle={[
           styles.settings,
-          { paddingBottom: Math.max((insets?.bottom || 0) + 24, 40) }]
-          }>
+          { paddingBottom: Math.max((insets?.bottom || 0) + 32, 60) }]
+          }
+          nestedScrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={true}
+          bounces={true}
+          overScrollMode="always">
           
           {}
           {deletionInfo?.isPendingDeletion &&

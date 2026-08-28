@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 
@@ -23,7 +23,12 @@ export function AppearanceScreen({ onBack }) {
         <View style={{ width: 40 }} />
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.content, { paddingBottom: 40 }]}
+        showsVerticalScrollIndicator={true}
+        bounces={true}
+        overScrollMode="always">
         <Text style={[styles.sectionTitle, { color: colors.subtext }]}>TEMA</Text>
         
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -58,7 +63,7 @@ export function AppearanceScreen({ onBack }) {
 
           })}
         </View>
-      </View>
+      </ScrollView>
     </View>);
 
 }
@@ -72,56 +77,53 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    height: 56,
     borderBottomWidth: 1
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "flex-start"
+    padding: 8
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold"
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 18
   },
   content: {
-    padding: 16
+    padding: 20
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 12,
     marginBottom: 8,
-    marginLeft: 4
+    letterSpacing: 1
   },
   card: {
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     overflow: "hidden"
   },
   optionRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16
+    padding: 16
   },
   optionIcon: {
-    width: 32
+    marginRight: 12
   },
   optionLabel: {
     flex: 1,
+    fontFamily: "Poppins_400Regular",
     fontSize: 15
   },
   radioContainer: {
-    marginLeft: 12
+    marginLeft: 8
   },
   radioOutline: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
-    justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "center"
   },
   radioFill: {
     width: 10,

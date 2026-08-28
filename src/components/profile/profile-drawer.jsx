@@ -7,7 +7,8 @@ import {
   View,
   TextInput,
   ActivityIndicator,
-  Alert } from
+  Alert,
+  ScrollView } from
 "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
@@ -199,7 +200,13 @@ export function ProfileDrawer({
           </View>
 
           {}
-          <View style={styles.menuList}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 16 }}
+            showsVerticalScrollIndicator={true}
+            nestedScrollEnabled={true}
+            bounces={true}
+            overScrollMode="always">
             {menuItems.filter((item) => !item.hidden).map((item) =>
               <Pressable
                 key={item.id}
@@ -233,7 +240,7 @@ export function ProfileDrawer({
                 </View>
               </Pressable>
               )}
-          </View>
+          </ScrollView>
 
           {}
           <View style={styles.footer}>

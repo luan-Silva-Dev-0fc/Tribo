@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 
@@ -23,7 +23,12 @@ export function AppearanceScreen({ onBack }) {
         <View style={{ width: 40 }} />
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.content, { paddingBottom: 40 }]}
+        showsVerticalScrollIndicator={true}
+        bounces={true}
+        overScrollMode="always">
         <Text style={[styles.sectionTitle, { color: colors.subtext }]}>TEMA</Text>
         
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -58,7 +63,7 @@ export function AppearanceScreen({ onBack }) {
 
           })}
         </View>
-      </View>
+      </ScrollView>
     </View>);
 
 }

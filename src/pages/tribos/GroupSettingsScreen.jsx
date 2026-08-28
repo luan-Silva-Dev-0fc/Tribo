@@ -502,8 +502,13 @@ export function GroupSettingsScreen({
       
 
       <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}>
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.content, { paddingBottom: Math.max((insets?.bottom || 0) + 32, 60) }]}
+        nestedScrollEnabled={true}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={true}
+        bounces={true}
+        overScrollMode="always">
         
         {}
         <View style={styles.imageSection}>
