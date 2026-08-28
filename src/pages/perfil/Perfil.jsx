@@ -480,86 +480,79 @@ export function ProfileScreen({
             )}
             </View>
           }
-
-          <EditProfile
-            user={user}
-            visible={editing}
-            onClose={() => setEditing(false)}
-            onUpdateUser={onUpdateUser}
-            onSaved={onRefresh} />
-          
-
-          <Settings
-            user={user}
-            visible={settings}
-            onClose={() => {
-              setSettings(false);
-              fetchDeletionStatus();
-            }}
-            onLogout={onLogout}
-            onUpdateUser={onUpdateUser}
-            onOpenAppearance={onOpenAppearance}
-            onOpenSavedPosts={onOpenSavedPosts}
-            onOpenArchivedPosts={onOpenArchivedPosts}
-            showAlert={setProfileAlert} />
-          
-
-          <FollowersModal
-            visible={followersVisible}
-            userId={user?.id}
-            initialTab={followersTab}
-            targetName={userName(user)}
-            onClose={() => setFollowersVisible(false)}
-            onOpenProfile={onOpenProfile} />
-          
-
-          {}
-          <SettingsDrawer
-            visible={drawerVisible}
-            onClose={() => setDrawerVisible(false)}
-            onLogout={() => {
-              setTimeout(() => {
-                setProfileAlert({
-                  visible: true,
-                  type: "warning",
-                  title: "Sair da Conta",
-                  message: "Você está prestes a desconectar da sua conta. Deseja continuar?",
-                  buttonText: "Sair",
-                  secondaryButtonText: "Cancelar",
-                  onSecondaryPress: () => setProfileAlert({ visible: false }),
-                  onClose: () => {
-                    setProfileAlert({ visible: false });
-                    onLogout();
-                  }
-                });
-              }, 100);
-            }}
-            onOpenSettings={() => {
-              setDrawerVisible(false);
-              setSettings(true);
-            }}
-            onOpenAppearance={onOpenAppearance}
-            onOpenSavedPosts={onOpenSavedPosts}
-            onOpenArchivedPosts={onOpenArchivedPosts}
-            user={user}
-            onUpdateUser={onUpdateUser} />
-          
-
-          {}
-          <TriboAlertModal
-            visible={profileAlert.visible}
-            type={profileAlert.type}
-            title={profileAlert.title}
-            message={profileAlert.message}
-            buttonText={profileAlert.buttonText}
-            onClose={() => {
-              if (profileAlert.onClose) profileAlert.onClose();
-              setProfileAlert({ visible: false });
-            }}
-            secondaryButtonText={profileAlert.secondaryButtonText}
-            onSecondaryPress={profileAlert.onSecondaryPress} />
-          
         </ScrollView>
+
+        <EditProfile
+          user={user}
+          visible={editing}
+          onClose={() => setEditing(false)}
+          onUpdateUser={onUpdateUser}
+          onSaved={onRefresh} />
+
+        <Settings
+          user={user}
+          visible={settings}
+          onClose={() => {
+            setSettings(false);
+            fetchDeletionStatus();
+          }}
+          onLogout={onLogout}
+          onUpdateUser={onUpdateUser}
+          onOpenAppearance={onOpenAppearance}
+          onOpenSavedPosts={onOpenSavedPosts}
+          onOpenArchivedPosts={onOpenArchivedPosts}
+          showAlert={setProfileAlert} />
+
+        <FollowersModal
+          visible={followersVisible}
+          userId={user?.id}
+          initialTab={followersTab}
+          targetName={userName(user)}
+          onClose={() => setFollowersVisible(false)}
+          onOpenProfile={onOpenProfile} />
+
+        <SettingsDrawer
+          visible={drawerVisible}
+          onClose={() => setDrawerVisible(false)}
+          onLogout={() => {
+            setTimeout(() => {
+              setProfileAlert({
+                visible: true,
+                type: "warning",
+                title: "Sair da Conta",
+                message: "Você está prestes a desconectar da sua conta. Deseja continuar?",
+                buttonText: "Sair",
+                secondaryButtonText: "Cancelar",
+                onSecondaryPress: () => setProfileAlert({ visible: false }),
+                onClose: () => {
+                  setProfileAlert({ visible: false });
+                  onLogout();
+                }
+              });
+            }, 100);
+          }}
+          onOpenSettings={() => {
+            setDrawerVisible(false);
+            setSettings(true);
+          }}
+          onOpenAppearance={onOpenAppearance}
+          onOpenSavedPosts={onOpenSavedPosts}
+          onOpenArchivedPosts={onOpenArchivedPosts}
+          user={user}
+          onUpdateUser={onUpdateUser} />
+
+        <TriboAlertModal
+          visible={profileAlert.visible}
+          type={profileAlert.type}
+          title={profileAlert.title}
+          message={profileAlert.message}
+          buttonText={profileAlert.buttonText}
+          onClose={() => {
+            if (profileAlert.onClose) profileAlert.onClose();
+            setProfileAlert({ visible: false });
+          }}
+          secondaryButtonText={profileAlert.secondaryButtonText}
+          onSecondaryPress={profileAlert.onSecondaryPress} />
       </AppLayout>
     </View>);
 

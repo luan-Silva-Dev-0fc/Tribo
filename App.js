@@ -22,19 +22,9 @@ function App() {
   useEffect(() => {
     if (hasCodePush && Platform.OS !== 'web') {
       try {
-        codePush.sync(
-          {
-            installMode: codePush.InstallMode?.ON_NEXT_RESTART ?? 1,
-            mandatoryInstallMode: codePush.InstallMode?.IMMEDIATE ?? 0,
-          },
-          (status) => {
-            if (status === codePush.SyncStatus?.DOWNLOADING_PACKAGE) {
-              console.log('[CodePush] Baixando atualização silenciosa...');
-            }
-          }
-        );
+        codePush.notifyAppReady();
       } catch (err) {
-        console.warn('[CodePush] Erro ao sincronizar:', err);
+        console.warn('[CodePush] notifyAppReady error:', err);
       }
     }
   }, []);
@@ -45,7 +35,7 @@ function App() {
 export default hasCodePush
   ? codePush({
       checkFrequency: codePush.CheckFrequency?.ON_APP_START ?? 0,
-      installMode: codePush.InstallMode?.ON_NEXT_RESTART ?? 1,
+      installMode: codePush.InstallMode?.IMMEDIATE ?? 0,
       mandatoryInstallMode: codePush.InstallMode?.IMMEDIATE ?? 0,
     })(App)
   : App;
