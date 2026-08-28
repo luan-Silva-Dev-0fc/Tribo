@@ -6,6 +6,7 @@ import {
   View,
   Text,
   BackHandler,
+  AppState,
   Platform } from
 "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -122,11 +123,21 @@ function TriboRoot() {
 
 
     checkPlatformStatus();
-    const interval = setInterval(checkPlatformStatus, 3500);
+
+    // Re-check when app returns from background / becomes active
+    const appStateSub = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        checkPlatformStatus();
+      }
+    });
+
+    // Gentle fallback check every 60s (WebSocket delivers instant updates)
+    const interval = setInterval(checkPlatformStatus, 60000);
 
     return () => {
       unsubBan();
       unsubSuspension();
+      appStateSub?.remove?.();
       clearInterval(interval);
       if (socket) {
         socket.off("platform-status-changed", handleStatusChangedSocket);
