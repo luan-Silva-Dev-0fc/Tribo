@@ -12,7 +12,15 @@ expo-env.d.ts
 
 # Native build folders
 /ios
-/android
+android/.gradle/
+android/build/
+android/app/build/
+android/app/.cxx/
+android/.cxx/
+android/local.properties
+android/app/build/outputs/apk/
+*.apk
+*.aab
 
 # Native files
 .kotlin/
@@ -37,14 +45,10 @@ yarn-error.*
 # certificates
 *.pem
 
-# environment variables (SENSÍVEL - nunca subir!)
+# environment variables
 .env
 .env.*
 .env*.local
-
-# Google Services (SENSÍVEL - contém API keys)
-google-services.json
-GoogleService-Info.plist
 
 # IDE / Editor
 .vscode/

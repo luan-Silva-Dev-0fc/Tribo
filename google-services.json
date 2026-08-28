@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1008322266494",
+    "project_id": "tribo-afa95",
+    "storage_bucket": "tribo-afa95.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008322266494:android:fba2e22ed72ec853e55f2f",
+        "android_client_info": {
+          "package_name": "tribo.network.com.br"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5rc2SNKKMDRAVs4K_Ls8aAFeDAVtlHio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
