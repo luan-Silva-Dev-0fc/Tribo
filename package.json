@@ -8,9 +8,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "release:prod": "revopush release-react tribo android -d Production",
-    "release:staging": "revopush release-react tribo android -d Staging",
-    "release:ios": "revopush release-react tribo ios -d Production"
+    "release:prod": "expo export:embed --entry-file index.js --platform android --dev false --bundle-output dist_codepush/index.android.bundle --assets-dest dist_codepush && revopush release tribo ./dist_codepush \"*\" -d Production -m --noDuplicateReleaseError",
+    "release:staging": "expo export:embed --entry-file index.js --platform android --dev false --bundle-output dist_codepush/index.android.bundle --assets-dest dist_codepush && revopush release tribo ./dist_codepush \"*\" -d Staging -m --noDuplicateReleaseError"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.4.1",
