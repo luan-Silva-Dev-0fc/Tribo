@@ -1327,25 +1327,24 @@ export function Settings({
     }
   };
 
-  return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <AppHeader title="Configurações" onBack={onClose} />
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingHorizontal: 16,
-            paddingTop: 12,
-            paddingBottom: Math.max((insets?.bottom || 0) + 40, 80),
-            gap: 12
-          }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          nestedScrollEnabled={true}
-          scrollEnabled={true}
-          bounces={true}
-          overScrollMode="always">
+  const screenContent = (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <AppHeader title="Configurações" onBack={onClose} />
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: Math.max((insets?.bottom || 0) + 40, 80),
+          gap: 12
+        }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
+        scrollEnabled={true}
+        bounces={true}
+        overScrollMode="always">
           
           {}
           {deletionInfo?.isPendingDeletion &&
@@ -2149,8 +2148,17 @@ export function Settings({
           onSecondaryPress={alertConfig.onSecondaryPress} />
         
       </View>
-    </Modal>);
+  );
 
+  if (visible !== undefined) {
+    return (
+      <Modal visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent={true}>
+        {screenContent}
+      </Modal>
+    );
+  }
+
+  return screenContent;
 }
 
 const styles = StyleSheet.create({

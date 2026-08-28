@@ -22,7 +22,7 @@ import { api, session } from "./api";
 import AuthScreen from "./pages/login/Login";
 import FeedScreen from "./pages/feed/Feed";
 import { ReelsScreen } from "./pages/reels/Reels";
-import { ProfileScreen, SearchScreen } from "./pages/perfil/Perfil";
+import { ProfileScreen, SearchScreen, Settings } from "./pages/perfil/Perfil";
 import IntroScreen from "./pages/login/Intro";
 import {
   TribosListScreen,
@@ -370,6 +370,7 @@ function TriboRoot() {
       onRefresh={refreshUser}
       onLogout={logout}
       onOpenProfile={setProfileToOpen}
+      onOpenSettings={() => setScreen("settings")}
       onOpenAppearance={() => setScreen("appearance")}
       onOpenSavedPosts={() => setScreen("saved_posts")}
       onOpenArchivedPosts={() => setScreen("archived_posts")}
@@ -377,6 +378,17 @@ function TriboRoot() {
       setUser(typeof next === "function" ? next : normalizeUser(next))
       } />,
 
+    settings:
+    <Settings
+      user={user}
+      onClose={() => setScreen("profile")}
+      onLogout={logout}
+      onOpenAppearance={() => setScreen("appearance")}
+      onOpenSavedPosts={() => setScreen("saved_posts")}
+      onOpenArchivedPosts={() => setScreen("archived_posts")}
+      onUpdateUser={(next) =>
+      setUser(typeof next === "function" ? next : normalizeUser(next))
+      } />,
 
     appearance: <AppearanceScreen onBack={() => setScreen("profile")} />,
     saved_posts:
@@ -471,7 +483,8 @@ function TriboRoot() {
   "tribe_invite",
   "conversations",
   "chat",
-  "appearance"].
+  "appearance",
+  "settings"].
   includes(screen))
   {
     return (

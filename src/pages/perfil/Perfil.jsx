@@ -141,7 +141,7 @@ function SearchUserOptionsModal({ user, visible, onClose, onBlock, onReport }) {
 
 }
 
-export { SearchScreen } from "../Search";
+export { SearchScreen, Settings } from "../Search";
 import { EditProfile, FeedbackModal, UpdateModal, SettingsDrawer, Settings } from "../Search";
 
 export function ProfileScreen({
@@ -150,6 +150,7 @@ export function ProfileScreen({
   onLogout,
   onUpdateUser,
   onOpenProfile,
+  onOpenSettings,
   onOpenAppearance,
   onOpenSavedPosts,
   onOpenArchivedPosts
@@ -533,7 +534,11 @@ export function ProfileScreen({
           }}
           onOpenSettings={() => {
             setDrawerVisible(false);
-            setSettings(true);
+            if (onOpenSettings) {
+              onOpenSettings();
+            } else {
+              setSettings(true);
+            }
           }}
           onOpenAppearance={onOpenAppearance}
           onOpenSavedPosts={onOpenSavedPosts}
