@@ -2,11 +2,6 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
-def codepushGradle = new File(rootDir, "../node_modules/react-native-code-push/android/codepush.gradle")
-if (codepushGradle.exists()) {
-    apply from: codepushGradle
-}
-
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 /**
