@@ -1325,14 +1325,16 @@ export function Settings({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={[styles.modalPage, { backgroundColor: colors.background }]}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
         <AppHeader title="Configurações" onBack={onClose} />
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={[
-          styles.settings,
-          { paddingBottom: Math.max((insets?.bottom || 0) + 32, 60) }]
-          }
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 12,
+            paddingBottom: Math.max((insets?.bottom || 0) + 40, 80),
+            gap: 12
+          }}
           nestedScrollEnabled={true}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={true}
