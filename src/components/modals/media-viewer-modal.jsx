@@ -321,8 +321,6 @@ export function MediaViewerModal({
     Platform.OS === "android" ? (StatusBar.currentHeight || 24) : 44
   ) + 6;
 
-  const bottomInset = Math.max(insets.bottom || 0, 16) + 12;
-
   return (
     <Modal
       visible={visible}
@@ -381,10 +379,10 @@ export function MediaViewerModal({
           )}
         </Animated.View>
 
-        {/* Top Floating Glass Header */}
+        {/* Top Floating Glass Header + Caption */}
         <Animated.View
           style={[
-            styles.topBar,
+            styles.topHeaderContainer,
             {
               top: topInset,
               opacity: controlsFadeAnim
@@ -392,100 +390,92 @@ export function MediaViewerModal({
           ]}
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
-          {/* Author Glass Pill */}
-          <View style={styles.authorPill}>
-            <Avatar user={author} size={36} style={styles.avatarBorder} />
-            <View style={styles.authorTexts}>
-              <View style={styles.nameLine}>
-                <Text style={styles.authorName} numberOfLines={1}>
-                  {authorName}
-                </Text>
-                <VerificationBadge user={author} size={13} />
-              </View>
-              <Text style={styles.authorHandle} numberOfLines={1}>
-                @{authorHandle}{postDate ? ` • ${postDate}` : ""}
-              </Text>
-            </View>
-          </View>
-
-          {/* Top Actions: Share, Download, Delete, Close */}
-          <View style={styles.topActions}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionCircle,
-                { transform: [{ scale: pressed ? 0.92 : 1 }] }
-              ]}
-              onPress={handleShare}
-              accessibilityLabel="Compartilhar">
-              <Feather name="share-2" size={18} color="#ffffff" />
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionCircle,
-                { transform: [{ scale: pressed ? 0.92 : 1 }] }
-              ]}
-              onPress={handleDownload}
-              disabled={isDownloading}
-              accessibilityLabel="Baixar mídia">
-              {isDownloading ? (
-                <ActivityIndicator size="small" color="#F59E0B" />
-              ) : (
-                <View style={styles.downloadContent}>
-                  <Feather name="download" size={18} color="#ffffff" />
-                  {downloadsCount > 0 && (
-                    <Text style={styles.downloadCountText}>
-                      {downloadsCount}
-                    </Text>
-                  )}
+          {/* Row 1: Author Pill + Actions */}
+          <View style={styles.topBarRow}>
+            {/* Author Glass Pill */}
+            <View style={styles.authorPill}>
+              <Avatar user={author} size={36} style={styles.avatarBorder} />
+              <View style={styles.authorTexts}>
+                <View style={styles.nameLine}>
+                  <Text style={styles.authorName} numberOfLines={1}>
+                    {authorName}
+                  </Text>
+                  <VerificationBadge user={author} size={13} />
                 </View>
-              )}
-            </Pressable>
+                <Text style={styles.authorHandle} numberOfLines={1}>
+                  @{authorHandle}{postDate ? ` • ${postDate}` : ""}
+                </Text>
+              </View>
+            </View>
 
-            {Boolean(onDelete) && (
+            {/* Top Actions: Share, Download, Delete, Close */}
+            <View style={styles.topActions}>
               <Pressable
                 style={({ pressed }) => [
                   styles.actionCircle,
-                  styles.deleteCircle,
                   { transform: [{ scale: pressed ? 0.92 : 1 }] }
                 ]}
-                onPress={() => onDelete(effectiveMedia)}
-                accessibilityLabel="Excluir mídia">
-                <Feather name="trash-2" size={17} color="#ef4444" />
+                onPress={handleShare}
+                accessibilityLabel="Compartilhar">
+                <Feather name="share-2" size={18} color="#ffffff" />
               </Pressable>
-            )}
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionCircle,
-                styles.closeCircle,
-                { transform: [{ scale: pressed ? 0.92 : 1 }] }
-              ]}
-              onPress={handleClose}
-              accessibilityLabel="Fechar visualizador">
-              <Feather name="x" size={20} color="#ffffff" />
-            </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.actionCircle,
+                  { transform: [{ scale: pressed ? 0.92 : 1 }] }
+                ]}
+                onPress={handleDownload}
+                disabled={isDownloading}
+                accessibilityLabel="Baixar mídia">
+                {isDownloading ? (
+                  <ActivityIndicator size="small" color="#F59E0B" />
+                ) : (
+                  <View style={styles.downloadContent}>
+                    <Feather name="download" size={18} color="#ffffff" />
+                    {downloadsCount > 0 && (
+                      <Text style={styles.downloadCountText}>
+                        {downloadsCount}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              </Pressable>
+
+              {Boolean(onDelete) && (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.actionCircle,
+                    styles.deleteCircle,
+                    { transform: [{ scale: pressed ? 0.92 : 1 }] }
+                  ]}
+                  onPress={() => onDelete(effectiveMedia)}
+                  accessibilityLabel="Excluir mídia">
+                  <Feather name="trash-2" size={17} color="#ef4444" />
+                </Pressable>
+              )}
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.actionCircle,
+                  styles.closeCircle,
+                  { transform: [{ scale: pressed ? 0.92 : 1 }] }
+                ]}
+                onPress={handleClose}
+                accessibilityLabel="Fechar visualizador">
+                <Feather name="x" size={20} color="#ffffff" />
+              </Pressable>
+            </View>
           </View>
-        </Animated.View>
 
-        {/* Bottom Floating Glass Caption */}
-        <Animated.View
-          style={[
-            styles.bottomBar,
-            {
-              bottom: bottomInset,
-              opacity: controlsFadeAnim
-            }
-          ]}
-          pointerEvents={controlsVisible ? "auto" : "none"}>
-          
+          {/* Row 2: Caption Card at the Top (Cleanly positioned under Author & Actions) */}
           {!!postContent && (
             <Pressable
               onPress={() => setExpandedText(!expandedText)}
-              style={styles.captionCard}>
+              style={styles.topCaptionCard}>
               <Text
                 style={styles.captionText}
-                numberOfLines={expandedText ? undefined : 2}>
+                numberOfLines={expandedText ? undefined : 3}>
                 <Text style={styles.captionAuthor}>@{authorHandle} </Text>
                 {postContent}
               </Text>
@@ -540,20 +530,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  topBar: {
+  topHeaderContainer: {
     position: "absolute",
     left: 14,
     right: 14,
+    zIndex: 20,
+    gap: 10
+  },
+  topBarRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    zIndex: 20
+    justifyContent: "space-between"
   },
   authorPill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 9,
-    backgroundColor: "rgba(22, 22, 26, 0.82)",
+    backgroundColor: "rgba(22, 22, 26, 0.85)",
     paddingVertical: 5,
     paddingHorizontal: 9,
     borderRadius: 26,
@@ -598,7 +591,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(22, 22, 26, 0.82)",
+    backgroundColor: "rgba(22, 22, 26, 0.85)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
@@ -627,17 +620,11 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     fontFamily: "Poppins_600SemiBold"
   },
-  bottomBar: {
-    position: "absolute",
-    left: 14,
-    right: 14,
-    zIndex: 20
-  },
-  captionCard: {
+  topCaptionCard: {
     backgroundColor: "rgba(20, 20, 24, 0.85)",
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 11,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.12)",
     shadowColor: "#000",
