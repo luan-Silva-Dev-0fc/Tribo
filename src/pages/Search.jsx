@@ -527,11 +527,15 @@ export function EditProfile({ user, visible, onClose, onSaved, onUpdateUser }) {
           style={{ flex: 1 }}
           contentContainerStyle={[
           styles.editForm,
-          { paddingBottom: Math.max((insets?.bottom || 0) + 32, 60) }]
+          {
+            flexGrow: 1,
+            paddingBottom: Math.max((insets?.bottom || 0) + 40, 80)
+          }]
           }
           nestedScrollEnabled={true}
+          scrollEnabled={true}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={true}
+          showsVerticalScrollIndicator={false}
           bounces={true}
           overScrollMode="always">
           
@@ -1330,14 +1334,16 @@ export function Settings({
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{
+            flexGrow: 1,
             paddingHorizontal: 16,
             paddingTop: 12,
             paddingBottom: Math.max((insets?.bottom || 0) + 40, 80),
             gap: 12
           }}
-          nestedScrollEnabled={true}
+          showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
+          scrollEnabled={true}
           bounces={true}
           overScrollMode="always">
           
@@ -1790,338 +1796,344 @@ export function Settings({
           </Pressable>
         </ScrollView>
 
-        <FeedbackModal
-          visible={feedbackVisible}
-          onClose={() => setFeedbackVisible(false)} />
-        
+        {feedbackVisible && (
+          <FeedbackModal
+            visible={feedbackVisible}
+            onClose={() => setFeedbackVisible(false)} />
+        )}
 
-        <UpdateModal
-          visible={!!updateInfo}
-          updateInfo={updateInfo}
-          onClose={() => setUpdateInfo(null)} />
-        
+        {Boolean(updateInfo) && (
+          <UpdateModal
+            visible={!!updateInfo}
+            updateInfo={updateInfo}
+            onClose={() => setUpdateInfo(null)} />
+        )}
 
-        {}
-        <Modal
-          visible={verifyModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setVerifyModalVisible(false)}>
-          
-          <View style={styles.ageModalOverlay}>
-            <View style={[styles.ageModalCard, { backgroundColor: colors.card || colors.surface, borderColor: colors.border || colors.line }]}>
-              <View style={[styles.ageModalIconWrap, { backgroundColor: "rgba(59, 130, 246, 0.15)" }]}>
-                <Feather name="mail" size={26} color="#3b82f6" />
-              </View>
-              <Text style={[styles.ageModalTitle, { color: colors.text }]}>
-                Verifique seu E-mail
-              </Text>
-              <Text style={[styles.ageModalDescription, { color: colors.muted, textAlign: "center" }]}>
-                Enviamos um código para {user?.email}. Digite-o abaixo para confirmar sua conta.
-              </Text>
-              <TextInput
-                maxLength={6}
-                style={[
-                styles.bioInput,
-                {
-                  borderWidth: 1, borderColor: colors.line, borderRadius: 12,
-                  textAlign: "center", fontSize: 24, letterSpacing: 10,
-                  paddingVertical: 12, marginBottom: 16, color: colors.text, backgroundColor: colors.background
-                }]
-                }
-                value={verifyCode}
-                onChangeText={setVerifyCode}
-                keyboardType="number-pad"
-                placeholder="000000"
-                placeholderTextColor={colors.muted}
-                autoFocus />
-              
-              <Pressable
-                onPress={handleConfirmVerify}
-                disabled={verifying}
-                style={[styles.ageModalButton, { backgroundColor: colors.primary || colors.accent, marginBottom: 8 }]}>
-                
-                {verifying ? <ActivityIndicator color="#fff" /> : <Text style={styles.ageModalButtonText}>Confirmar</Text>}
-              </Pressable>
-              <Pressable
-                onPress={handleResendVerify}
-                disabled={resendingCode}
-                style={{ paddingVertical: 12, alignItems: "center" }}>
-                
-                <Text style={{ color: colors.primary || colors.accent, fontWeight: "600" }}>
-                  {resendingCode ? "Reenviando..." : "Reenviar código"}
+        {verifyModalVisible && (
+          <Modal
+            visible={verifyModalVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setVerifyModalVisible(false)}>
+            
+            <View style={styles.ageModalOverlay}>
+              <View style={[styles.ageModalCard, { backgroundColor: colors.card || colors.surface, borderColor: colors.border || colors.line }]}>
+                <View style={[styles.ageModalIconWrap, { backgroundColor: "rgba(59, 130, 246, 0.15)" }]}>
+                  <Feather name="mail" size={26} color="#3b82f6" />
+                </View>
+                <Text style={[styles.ageModalTitle, { color: colors.text }]}>
+                  Verifique seu E-mail
                 </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setVerifyModalVisible(false)}
-                style={[styles.ageModalSecondaryButton, { borderColor: colors.border || colors.line, marginTop: 8 }]}>
-                
-                <Text style={[styles.ageModalSecondaryButtonText, { color: colors.text }]}>Cancelar</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-
-        {}
-        <Modal
-          visible={ageConfirmModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setAgeConfirmModalVisible(false)}>
-          
-          <View style={styles.ageModalOverlay}>
-            <View
-              style={[
-              styles.ageModalCard,
-              {
-                backgroundColor: colors.card || colors.surface,
-                borderColor: colors.border || colors.line
-              }]
-              }>
-              
-              <View
-                style={[
-                styles.ageModalIconWrap,
-                { backgroundColor: colors.accentSoft || "rgba(29, 155, 240, 0.15)" }]
-                }>
-                
-                <Feather
-                  name="shield"
-                  size={26}
-                  color={colors.primary || colors.accent} />
-                
-              </View>
-              <Text style={[styles.ageModalTitle, { color: colors.text }]}>
-                Confirmação de Maioridade (+18)
-              </Text>
-              <Text
-                style={[
-                styles.ageModalDescription,
-                { color: colors.subtext || colors.muted }]
-                }>
-                
-                Você confirma que possui 18 anos ou mais e deseja visualizar publicações com conteúdos sensíveis ou adultos na Tribo?
-              </Text>
-              <View style={styles.ageModalButtons}>
-                <Pressable
+                <Text style={[styles.ageModalDescription, { color: colors.muted, textAlign: "center" }]}>
+                  Enviamos um código para {user?.email}. Digite-o abaixo para confirmar sua conta.
+                </Text>
+                <TextInput
+                  maxLength={6}
                   style={[
-                  styles.ageModalBtnCancel,
+                  styles.bioInput,
                   {
-                    borderColor: colors.border || colors.line,
-                    backgroundColor: colors.surfaceAlt || colors.background
+                    borderWidth: 1, borderColor: colors.line, borderRadius: 12,
+                    textAlign: "center", fontSize: 24, letterSpacing: 10,
+                    paddingVertical: 12, marginBottom: 16, color: colors.text, backgroundColor: colors.background
                   }]
                   }
-                  onPress={() => setAgeConfirmModalVisible(false)}>
+                  value={verifyCode}
+                  onChangeText={setVerifyCode}
+                  keyboardType="number-pad"
+                  placeholder="000000"
+                  placeholderTextColor={colors.muted}
+                  autoFocus />
+                
+                <Pressable
+                  onPress={handleConfirmVerify}
+                  disabled={verifying}
+                  style={[styles.ageModalButton, { backgroundColor: colors.primary || colors.accent, marginBottom: 8 }]}>
                   
-                  <Text
-                    style={[
-                    styles.ageModalBtnCancelText,
-                    { color: colors.subtext || colors.muted }]
-                    }>
-                    
-                    Cancelar
+                  {verifying ? <ActivityIndicator color="#fff" /> : <Text style={styles.ageModalButtonText}>Confirmar</Text>}
+                </Pressable>
+                <Pressable
+                  onPress={handleResendVerify}
+                  disabled={resendingCode}
+                  style={{ paddingVertical: 12, alignItems: "center" }}>
+                  
+                  <Text style={{ color: colors.primary || colors.accent, fontWeight: "600" }}>
+                    {resendingCode ? "Reenviando..." : "Reenviar código"}
                   </Text>
                 </Pressable>
                 <Pressable
-                  style={[
-                  styles.ageModalBtnConfirm,
-                  { backgroundColor: colors.primary || colors.accent }]
-                  }
-                  onPress={handleConfirmAge}>
+                  onPress={() => setVerifyModalVisible(false)}
+                  style={[styles.ageModalSecondaryButton, { borderColor: colors.border || colors.line, marginTop: 8 }]}>
                   
-                  <Text style={styles.ageModalBtnConfirmText}>
-                    Confirmar (+18)
-                  </Text>
+                  <Text style={[styles.ageModalSecondaryButtonText, { color: colors.text }]}>Cancelar</Text>
                 </Pressable>
               </View>
             </View>
-          </View>
-        </Modal>
+          </Modal>
+        )}
 
-        <Modal
-          visible={deleteModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => {
-            if (!requestingDeletion) {
-              setDeleteModalVisible(false);
-              setDeletePassword("");
-              setDeleteError("");
-            }
-          }}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{
-              flex: 1,
-              backgroundColor: "rgba(0, 0, 0, 0.75)"
-            }}>
-            <ScrollView
-              contentContainerStyle={{
-                flexGrow: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 20
-              }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}>
+        {ageConfirmModalVisible && (
+          <Modal
+            visible={ageConfirmModalVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setAgeConfirmModalVisible(false)}>
+            
+            <View style={styles.ageModalOverlay}>
               <View
-                style={{
-                  width: "100%",
-                  maxWidth: 400,
-                  backgroundColor: colors.surface || "#18181b",
-                  borderRadius: 24,
-                  borderWidth: 1,
-                  borderColor: "rgba(239, 68, 68, 0.3)",
-                  padding: 22,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 10 },
-                  shadowOpacity: 0.5,
-                  shadowRadius: 20,
-                  elevation: 10
-                }}>
-                <View style={{ alignItems: "center", marginBottom: 16 }}>
-                  <View
-                    style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 26,
-                      backgroundColor: "rgba(239, 68, 68, 0.15)",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: 12
-                    }}>
-                    <Feather name="trash-2" size={26} color="#ef4444" />
-                  </View>
-                  <Text
-                    style={{
-                      color: colors.text,
-                      fontSize: 18,
-                      fontFamily: "Poppins_700Bold",
-                      textAlign: "center"
-                    }}>
-                    Excluir Minha Conta
-                  </Text>
-                  <Text
-                    style={{
-                      color: colors.muted || "#a1a1aa",
-                      fontSize: 13,
-                      fontFamily: "Poppins_400Regular",
-                      textAlign: "center",
-                      marginTop: 6,
-                      lineHeight: 18
-                    }}>
-                    Esta ação agendará a exclusão definitiva da sua conta. Para confirmar sua identidade, digite sua senha abaixo:
-                  </Text>
+                style={[
+                styles.ageModalCard,
+                {
+                  backgroundColor: colors.card || colors.surface,
+                  borderColor: colors.border || colors.line
+                }]
+                }>
+                
+                <View
+                  style={[
+                  styles.ageModalIconWrap,
+                  { backgroundColor: colors.accentSoft || "rgba(29, 155, 240, 0.15)" }]
+                  }>
+                  
+                  <Feather
+                    name="shield"
+                    size={26}
+                    color={colors.primary || colors.accent} />
+                  
                 </View>
-
-                <View style={{ marginBottom: 16 }}>
-                  <Text
-                    style={{
-                      color: colors.text,
-                      fontSize: 13,
-                      fontFamily: "Poppins_600SemiBold",
-                      marginBottom: 6
-                    }}>
-                    Senha atual:
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      backgroundColor: colors.surfaceAlt || "#27272a",
-                      borderWidth: 1,
-                      borderColor: deleteError ? "#ef4444" : colors.border || "rgba(255, 255, 255, 0.1)",
-                      borderRadius: 14,
-                      paddingHorizontal: 14
-                    }}>
-                    <Feather name="lock" size={16} color={colors.muted || "#71717a"} style={{ marginRight: 8 }} />
-                    <TextInput
-                      style={{
-                        flex: 1,
-                        height: 48,
-                        color: colors.text,
-                        fontSize: 14.5,
-                        fontFamily: "Poppins_400Regular"
-                      }}
-                      placeholder="Digite sua senha"
-                      placeholderTextColor={colors.muted || "#71717a"}
-                      secureTextEntry={!showDeletePassword}
-                      value={deletePassword}
-                      onChangeText={(val) => {
-                        setDeletePassword(val);
-                        if (deleteError) setDeleteError("");
-                      }}
-                      autoFocus
-                      editable={!requestingDeletion}
-                    />
-                    <Pressable
-                      onPress={() => setShowDeletePassword((prev) => !prev)}
-                      style={{ padding: 6 }}>
-                      <Feather
-                        name={showDeletePassword ? "eye-off" : "eye"}
-                        size={18}
-                        color={colors.muted || "#71717a"}
-                      />
-                    </Pressable>
-                  </View>
-                  {Boolean(deleteError) && (
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6 }}>
-                      <Feather name="alert-circle" size={14} color="#ef4444" />
-                      <Text style={{ color: "#ef4444", fontSize: 12, fontFamily: "Poppins_400Regular", flex: 1 }}>
-                        {deleteError}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                <View style={{ flexDirection: "row", gap: 10 }}>
+                <Text style={[styles.ageModalTitle, { color: colors.text }]}>
+                  Confirmação de Maioridade (+18)
+                </Text>
+                <Text
+                  style={[
+                  styles.ageModalDescription,
+                  { color: colors.subtext || colors.muted }]
+                  }>
+                  
+                  Você confirma que possui 18 anos ou mais e deseja visualizar publicações com conteúdos sensíveis ou adultos na Tribo?
+                </Text>
+                <View style={styles.ageModalButtons}>
                   <Pressable
-                    onPress={() => {
-                      setDeleteModalVisible(false);
-                      setDeletePassword("");
-                      setDeleteError("");
-                    }}
-                    disabled={requestingDeletion}
-                    style={{
-                      flex: 1,
-                      height: 46,
-                      borderRadius: 14,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: colors.surfaceAlt || "#27272a",
-                      borderWidth: 1,
-                      borderColor: colors.border || "rgba(255, 255, 255, 0.08)"
-                    }}>
-                    <Text style={{ color: colors.text, fontSize: 14, fontFamily: "Poppins_600SemiBold" }}>
+                    style={[
+                    styles.ageModalBtnCancel,
+                    {
+                      borderColor: colors.border || colors.line,
+                      backgroundColor: colors.surfaceAlt || colors.background
+                    }]
+                    }
+                    onPress={() => setAgeConfirmModalVisible(false)}>
+                    
+                    <Text
+                      style={[
+                      styles.ageModalBtnCancelText,
+                      { color: colors.subtext || colors.muted }]
+                      }>
+                      
                       Cancelar
                     </Text>
                   </Pressable>
-
                   <Pressable
-                    onPress={handleConfirmDeleteWithPassword}
-                    disabled={requestingDeletion}
-                    style={{
-                      flex: 1.2,
-                      height: 46,
-                      borderRadius: 14,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "#ef4444",
-                      opacity: requestingDeletion ? 0.7 : 1
-                    }}>
-                    {requestingDeletion ? (
-                      <ActivityIndicator size="small" color="#ffffff" />
-                    ) : (
-                      <Text style={{ color: "#ffffff", fontSize: 14, fontFamily: "Poppins_700Bold" }}>
-                        Confirmar Exclusão
-                      </Text>
-                    )}
+                    style={[
+                    styles.ageModalBtnConfirm,
+                    { backgroundColor: colors.primary || colors.accent }]
+                    }
+                    onPress={handleConfirmAge}>
+                    
+                    <Text style={styles.ageModalBtnConfirmText}>
+                      Confirmar (+18)
+                    </Text>
                   </Pressable>
                 </View>
               </View>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        </Modal>
+            </View>
+          </Modal>
+        )}
+
+        {deleteModalVisible && (
+          <Modal
+            visible={deleteModalVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => {
+              if (!requestingDeletion) {
+                setDeleteModalVisible(false);
+                setDeletePassword("");
+                setDeleteError("");
+              }
+            }}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(0, 0, 0, 0.75)"
+              }}>
+              <ScrollView
+                contentContainerStyle={{
+                  flexGrow: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: 20
+                }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}>
+                <View
+                  style={{
+                    width: "100%",
+                    maxWidth: 400,
+                    backgroundColor: colors.surface || "#18181b",
+                    borderRadius: 24,
+                    borderWidth: 1,
+                    borderColor: "rgba(239, 68, 68, 0.3)",
+                    padding: 22,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 10 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 20,
+                    elevation: 10
+                  }}>
+                  <View style={{ alignItems: "center", marginBottom: 16 }}>
+                    <View
+                      style={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: 26,
+                        backgroundColor: "rgba(239, 68, 68, 0.15)",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: 12
+                      }}>
+                      <Feather name="trash-2" size={26} color="#ef4444" />
+                    </View>
+                    <Text
+                      style={{
+                        color: colors.text,
+                        fontSize: 18,
+                        fontFamily: "Poppins_700Bold",
+                        textAlign: "center"
+                      }}>
+                      Excluir Minha Conta
+                    </Text>
+                    <Text
+                      style={{
+                        color: colors.muted || "#a1a1aa",
+                        fontSize: 13,
+                        fontFamily: "Poppins_400Regular",
+                        textAlign: "center",
+                        marginTop: 6,
+                        lineHeight: 18
+                      }}>
+                      Esta ação agendará a exclusão definitiva da sua conta. Para confirmar sua identidade, digite sua senha abaixo:
+                    </Text>
+                  </View>
+
+                  <View style={{ marginBottom: 16 }}>
+                    <Text
+                      style={{
+                        color: colors.text,
+                        fontSize: 13,
+                        fontFamily: "Poppins_600SemiBold",
+                        marginBottom: 6
+                      }}>
+                      Senha atual:
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        backgroundColor: colors.surfaceAlt || "#27272a",
+                        borderWidth: 1,
+                        borderColor: deleteError ? "#ef4444" : colors.border || "rgba(255, 255, 255, 0.1)",
+                        borderRadius: 14,
+                        paddingHorizontal: 14
+                      }}>
+                      <Feather name="lock" size={16} color={colors.muted || "#71717a"} style={{ marginRight: 8 }} />
+                      <TextInput
+                        style={{
+                          flex: 1,
+                          height: 48,
+                          color: colors.text,
+                          fontSize: 14.5,
+                          fontFamily: "Poppins_400Regular"
+                        }}
+                        placeholder="Digite sua senha"
+                        placeholderTextColor={colors.muted || "#71717a"}
+                        secureTextEntry={!showDeletePassword}
+                        value={deletePassword}
+                        onChangeText={(val) => {
+                          setDeletePassword(val);
+                          if (deleteError) setDeleteError("");
+                        }}
+                        autoFocus
+                        editable={!requestingDeletion}
+                      />
+                      <Pressable
+                        onPress={() => setShowDeletePassword((prev) => !prev)}
+                        style={{ padding: 6 }}>
+                        <Feather
+                          name={showDeletePassword ? "eye-off" : "eye"}
+                          size={18}
+                          color={colors.muted || "#71717a"}
+                        />
+                      </Pressable>
+                    </View>
+                    {Boolean(deleteError) && (
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6 }}>
+                        <Feather name="alert-circle" size={14} color="#ef4444" />
+                        <Text style={{ color: "#ef4444", fontSize: 12, fontFamily: "Poppins_400Regular", flex: 1 }}>
+                          {deleteError}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={{ flexDirection: "row", gap: 10 }}>
+                    <Pressable
+                      onPress={() => {
+                        setDeleteModalVisible(false);
+                        setDeletePassword("");
+                        setDeleteError("");
+                      }}
+                      disabled={requestingDeletion}
+                      style={{
+                        flex: 1,
+                        height: 46,
+                        borderRadius: 14,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: colors.surfaceAlt || "#27272a",
+                        borderWidth: 1,
+                        borderColor: colors.border || "rgba(255, 255, 255, 0.08)"
+                      }}>
+                      <Text style={{ color: colors.text, fontSize: 14, fontFamily: "Poppins_600SemiBold" }}>
+                        Cancelar
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      onPress={handleConfirmDeleteWithPassword}
+                      disabled={requestingDeletion}
+                      style={{
+                        flex: 1.2,
+                        height: 46,
+                        borderRadius: 14,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#ef4444",
+                        opacity: requestingDeletion ? 0.7 : 1
+                      }}>
+                      {requestingDeletion ? (
+                        <ActivityIndicator size="small" color="#ffffff" />
+                      ) : (
+                        <Text style={{ color: "#ffffff", fontSize: 14, fontFamily: "Poppins_700Bold" }}>
+                          Confirmar Exclusão
+                        </Text>
+                      )}
+                    </Pressable>
+                  </View>
+                </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
+          </Modal>
+        )}
 
         <TriboAlertModal
           visible={alertConfig.visible}
