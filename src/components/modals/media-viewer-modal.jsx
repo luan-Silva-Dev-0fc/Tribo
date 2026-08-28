@@ -12,8 +12,8 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  View } from
-"react-native";
+  View
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -32,9 +32,9 @@ function SafeMediaVideoView({ url, style, nativeControls = true }) {
     <ActiveMediaVideoViewInner
       url={url}
       style={style}
-      nativeControls={nativeControls} />);
-
-
+      nativeControls={nativeControls}
+    />
+  );
 }
 
 function ActiveMediaVideoViewInner({ url, style, nativeControls = true }) {
@@ -66,9 +66,9 @@ function ActiveMediaVideoViewInner({ url, style, nativeControls = true }) {
       style={style}
       contentFit="contain"
       nativeControls={nativeControls}
-      fullscreenOptions={{ enable: true }} />);
-
-
+      fullscreenOptions={{ enable: true }}
+    />
+  );
 }
 
 export function MediaViewerModal({
@@ -86,10 +86,9 @@ export function MediaViewerModal({
   const [isDownloading, setIsDownloading] = useState(false);
   const [expandedText, setExpandedText] = useState(false);
 
-  const videoRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const controlsFadeAnim = useRef(new Animated.Value(1)).current;
-
+  const dismissTranslateY = useRef(new Animated.Value(0)).current;
 
   const scale = useRef(new Animated.Value(1)).current;
   const pan = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
@@ -98,45 +97,45 @@ export function MediaViewerModal({
 
   const effectiveMedia = media || post || null;
   const effectiveMediaUrl =
-  mediaUrl ||
-  effectiveMedia?.url ||
-  effectiveMedia?.media_url ||
-  effectiveMedia?.mediaUrl ||
-  effectiveMedia?.videoUrl ||
-  effectiveMedia?.video_url ||
-  effectiveMedia?.imageUrl ||
-  effectiveMedia?.image_url;
+    mediaUrl ||
+    effectiveMedia?.url ||
+    effectiveMedia?.media_url ||
+    effectiveMedia?.mediaUrl ||
+    effectiveMedia?.videoUrl ||
+    effectiveMedia?.video_url ||
+    effectiveMedia?.imageUrl ||
+    effectiveMedia?.image_url;
 
   const isVideo =
-  mediaType === "video" ||
-  effectiveMedia?.type === "video" ||
-  effectiveMedia?.media_type === "VIDEO" ||
-  effectiveMedia?.mediaType === "VIDEO" ||
-  effectiveMedia?.videoUrl ||
-  effectiveMedia?.video_url ||
-  typeof effectiveMediaUrl === "string" && (
-  effectiveMediaUrl.endsWith(".mp4") ||
-  effectiveMediaUrl.endsWith(".mov") ||
-  effectiveMediaUrl.endsWith(".webm") ||
-  effectiveMediaUrl.includes("video"));
+    mediaType === "video" ||
+    effectiveMedia?.type === "video" ||
+    effectiveMedia?.media_type === "VIDEO" ||
+    effectiveMedia?.mediaType === "VIDEO" ||
+    effectiveMedia?.videoUrl ||
+    effectiveMedia?.video_url ||
+    (typeof effectiveMediaUrl === "string" && (
+      effectiveMediaUrl.endsWith(".mp4") ||
+      effectiveMediaUrl.endsWith(".mov") ||
+      effectiveMediaUrl.endsWith(".webm") ||
+      effectiveMediaUrl.includes("video")
+    ));
 
   const author =
-  effectiveMedia?.user ||
-  effectiveMedia?.author ||
-  effectiveMedia?.sender ||
-  null;
+    effectiveMedia?.user ||
+    effectiveMedia?.author ||
+    effectiveMedia?.sender ||
+    null;
   const authorName = author ?
-  userName(author) || author.name || author.username :
-  "Membro";
+    (userName(author) || author.name || author.username) :
+    "Membro";
   const authorHandle = author?.username ? `${author.username.replace(/^@/, '')}` : "membro";
   const postDate =
-  effectiveMedia?.created_at || effectiveMedia?.createdAt ?
-  formatRelativeTime(effectiveMedia.created_at || effectiveMedia.createdAt) :
-  "";
+    effectiveMedia?.created_at || effectiveMedia?.createdAt ?
+    formatRelativeTime(effectiveMedia.created_at || effectiveMedia.createdAt) :
+    "";
   const postContent = effectiveMedia?.content || "";
   const isGroupPost = !!effectiveMedia?.group_id;
   const downloadsCount = effectiveMedia?.downloads_count || 0;
-
 
   useEffect(() => {
     if (visible) {
@@ -146,32 +145,31 @@ export function MediaViewerModal({
       currentScale.current = 1;
       scale.setValue(1);
       pan.setValue({ x: 0, y: 0 });
+      dismissTranslateY.setValue(0);
 
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 250,
+        duration: 220,
         useNativeDriver: true
       }).start();
     } else {
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 200,
+        duration: 180,
         useNativeDriver: true
       }).start();
     }
-  }, [visible, fadeAnim, scale, pan]);
-
+  }, [visible, fadeAnim, scale, pan, dismissTranslateY]);
 
   const toggleControls = useCallback(() => {
     const nextState = !controlsVisible;
     setControlsVisible(nextState);
     Animated.timing(controlsFadeAnim, {
       toValue: nextState ? 1 : 0,
-      duration: 200,
+      duration: 180,
       useNativeDriver: true
     }).start();
   }, [controlsVisible, controlsFadeAnim]);
-
 
   const handleDoubleTap = useCallback(() => {
     const now = Date.now();
@@ -180,12 +178,12 @@ export function MediaViewerModal({
       if (currentScale.current > 1) {
         currentScale.current = 1;
         Animated.parallel([
-        Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-        Animated.spring(pan, { toValue: { x: 0, y: 0 }, useNativeDriver: true })]
-        ).start();
+          Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+          Animated.spring(pan, { toValue: { x: 0, y: 0 }, useNativeDriver: true })
+        ]).start();
       } else {
-        currentScale.current = 2.2;
-        Animated.spring(scale, { toValue: 2.2, useNativeDriver: true }).start();
+        currentScale.current = 2.4;
+        Animated.spring(scale, { toValue: 2.4, useNativeDriver: true }).start();
       }
       lastTap.current = null;
     } else {
@@ -194,37 +192,52 @@ export function MediaViewerModal({
     }
   }, [scale, pan, toggleControls]);
 
+  const handleClose = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true
+      }),
+      Animated.timing(dismissTranslateY, {
+        toValue: SCREEN_HEIGHT * 0.4,
+        duration: 180,
+        useNativeDriver: true
+      })
+    ]).start(() => {
+      dismissTranslateY.setValue(0);
+      onClose?.();
+    });
+  };
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, gesture) =>
-      currentScale.current > 1 || Math.abs(gesture.dy) > 10,
+        currentScale.current > 1 || Math.abs(gesture.dy) > 8,
       onPanResponderMove: (_, gesture) => {
         if (currentScale.current > 1) {
           pan.setValue({ x: gesture.dx, y: gesture.dy });
+        } else if (gesture.dy > 0) {
+          dismissTranslateY.setValue(gesture.dy);
+          const newOpacity = Math.max(0.3, 1 - gesture.dy / (SCREEN_HEIGHT * 0.7));
+          fadeAnim.setValue(newOpacity);
         }
       },
       onPanResponderRelease: (_, gesture) => {
         if (currentScale.current > 1) {
           Animated.spring(pan, { toValue: { x: 0, y: 0 }, useNativeDriver: true }).start();
-        } else if (Math.abs(gesture.dy) > 120 && Math.abs(gesture.dx) < 80) {
-
+        } else if (gesture.dy > 110 || gesture.vy > 0.8) {
           handleClose();
+        } else {
+          Animated.parallel([
+            Animated.spring(dismissTranslateY, { toValue: 0, useNativeDriver: true }),
+            Animated.spring(fadeAnim, { toValue: 1, useNativeDriver: true })
+          ]).start();
         }
       }
     })
   ).current;
-
-  const handleClose = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true
-    }).start(() => {
-      onClose?.();
-    });
-  };
 
   const handleShare = async () => {
     if (!effectiveMediaUrl) return;
@@ -243,8 +256,8 @@ export function MediaViewerModal({
       } else {
         await Share.share({
           message: postContent ?
-          `${postContent}\n\n${effectiveMediaUrl}` :
-          effectiveMediaUrl,
+            `${postContent}\n\n${effectiveMediaUrl}` :
+            effectiveMediaUrl,
           url: effectiveMediaUrl
         });
       }
@@ -270,7 +283,6 @@ export function MediaViewerModal({
           window.URL.revokeObjectURL(url);
           document.body.removeChild(a);
         } catch (e) {
-
           window.open(effectiveMediaUrl, "_blank");
         }
       } else {
@@ -288,7 +300,6 @@ export function MediaViewerModal({
         alert("Mídia salva na galeria!");
       }
 
-
       if (post?.id) {
         if (isGroupPost) {
           await api.groups.downloadPostMedia(post.group_id, post.id).catch(() => {});
@@ -296,7 +307,6 @@ export function MediaViewerModal({
           await api.posts.download(post.id).catch(() => {});
         }
       }
-
     } catch (err) {
       console.warn("Erro ao baixar mídia:", err);
     } finally {
@@ -304,183 +314,198 @@ export function MediaViewerModal({
     }
   };
 
-
-
   if (!visible) return null;
+
+  const topInset = Math.max(
+    insets.top || 0,
+    Platform.OS === "android" ? (StatusBar.currentHeight || 24) : 44
+  ) + 6;
+
+  const bottomInset = Math.max(insets.bottom || 0, 16) + 12;
 
   return (
     <Modal
       visible={visible}
-      transparent
-      animationType="none"
+      transparent={false}
+      animationType="fade"
       onRequestClose={handleClose}
       statusBarTranslucent>
       
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
-      <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
-        {}
-        <View style={styles.mediaContainer} {...panResponder.panHandlers}>
-          {isVideo && visible && !!effectiveMediaUrl ?
-          <Pressable style={styles.videoTouch} onPress={toggleControls}>
-              <SafeMediaVideoView
-              url={effectiveMediaUrl}
-              style={styles.fullVideo}
-              nativeControls={true} />
-            
-            </Pressable> :
-
-          <Pressable style={styles.imageTouch} onPress={handleDoubleTap}>
-              <Animated.Image
-              source={{ uri: effectiveMediaUrl }}
-              style={[
-              styles.fullImage,
-              {
-                transform: [
-                { scale: scale },
-                { translateX: pan.x },
-                { translateY: pan.y }]
-
-              }]
-              }
-              resizeMode="contain"
-              onLoadStart={() => setImageLoading(true)}
-              onLoadEnd={() => setImageLoading(false)} />
-            
-              {imageLoading &&
-            <View style={styles.centerLoader}>
-                  <ActivityIndicator size="large" color="#ffffff" />
-                </View>
-            }
-            </Pressable>
-          }
-        </View>
-
-        {}
+      <StatusBar barStyle="light-content" backgroundColor="#000000" translucent />
+      
+      <View style={styles.overlay}>
+        {/* Media Container */}
         <Animated.View
           style={[
-          styles.topBar,
-          {
-            top: Math.max(insets.top, Platform.OS === "ios" ? 50 : 36) + 4,
-            opacity: controlsFadeAnim
-          }]
-          }
+            styles.mediaContainer,
+            {
+              transform: [
+                { translateY: dismissTranslateY }
+              ]
+            }
+          ]}
+          {...panResponder.panHandlers}>
+          {isVideo && visible && !!effectiveMediaUrl ? (
+            <Pressable style={styles.videoTouch} onPress={toggleControls}>
+              <SafeMediaVideoView
+                url={effectiveMediaUrl}
+                style={styles.fullVideo}
+                nativeControls={true}
+              />
+            </Pressable>
+          ) : (
+            <Pressable style={styles.imageTouch} onPress={handleDoubleTap}>
+              <Animated.Image
+                source={{ uri: effectiveMediaUrl }}
+                style={[
+                  styles.fullImage,
+                  {
+                    transform: [
+                      { scale: scale },
+                      { translateX: pan.x },
+                      { translateY: pan.y }
+                    ]
+                  }
+                ]}
+                resizeMode="contain"
+                onLoadStart={() => setImageLoading(true)}
+                onLoadEnd={() => setImageLoading(false)}
+              />
+
+              {imageLoading && (
+                <View style={styles.centerLoader}>
+                  <ActivityIndicator size="large" color="#F59E0B" />
+                </View>
+              )}
+            </Pressable>
+          )}
+        </Animated.View>
+
+        {/* Top Floating Glass Header */}
+        <Animated.View
+          style={[
+            styles.topBar,
+            {
+              top: topInset,
+              opacity: controlsFadeAnim
+            }
+          ]}
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
-          <View style={styles.authorRow}>
-            <Avatar user={author} size={38} />
+          {/* Author Glass Pill */}
+          <View style={styles.authorPill}>
+            <Avatar user={author} size={36} style={styles.avatarBorder} />
             <View style={styles.authorTexts}>
               <View style={styles.nameLine}>
                 <Text style={styles.authorName} numberOfLines={1}>
                   {authorName}
                 </Text>
-                <VerificationBadge user={author} size={14} />
+                <VerificationBadge user={author} size={13} />
               </View>
               <Text style={styles.authorHandle} numberOfLines={1}>
-                @{authorHandle} • {postDate}
+                @{authorHandle}{postDate ? ` • ${postDate}` : ""}
               </Text>
             </View>
           </View>
 
+          {/* Top Actions: Share, Download, Delete, Close */}
           <View style={styles.topActions}>
             <Pressable
-              style={styles.iconButtonPill}
+              style={({ pressed }) => [
+                styles.actionCircle,
+                { transform: [{ scale: pressed ? 0.92 : 1 }] }
+              ]}
               onPress={handleShare}
               accessibilityLabel="Compartilhar">
-              
-              <Feather name="share-2" size={19} color="#ffffff" />
+              <Feather name="share-2" size={18} color="#ffffff" />
             </Pressable>
 
             <Pressable
-              style={styles.iconButtonPill}
+              style={({ pressed }) => [
+                styles.actionCircle,
+                { transform: [{ scale: pressed ? 0.92 : 1 }] }
+              ]}
               onPress={handleDownload}
               disabled={isDownloading}
               accessibilityLabel="Baixar mídia">
-              
-              {isDownloading ?
-              <ActivityIndicator size="small" color="#ffffff" /> :
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Feather name="download" size={19} color="#ffffff" />
-                  {downloadsCount > 0 &&
-                <Text style={{ color: "#ffffff", fontSize: 11, fontFamily: "Poppins_600SemiBold" }}>
+              {isDownloading ? (
+                <ActivityIndicator size="small" color="#F59E0B" />
+              ) : (
+                <View style={styles.downloadContent}>
+                  <Feather name="download" size={18} color="#ffffff" />
+                  {downloadsCount > 0 && (
+                    <Text style={styles.downloadCountText}>
                       {downloadsCount}
                     </Text>
-                }
+                  )}
                 </View>
-              }
+              )}
             </Pressable>
 
-            {Boolean(onDelete) &&
-            <Pressable
-              style={[
-              styles.iconButtonPill,
-              {
-                backgroundColor: "rgba(239, 68, 68, 0.25)",
-                borderColor: "rgba(239, 68, 68, 0.4)",
-                borderWidth: 1
-              }]
-              }
-              onPress={() => {
-                onDelete(effectiveMedia);
-              }}
-              accessibilityLabel="Opções de exclusão">
-              
-                <Feather name="trash-2" size={18} color="#ef4444" />
+            {Boolean(onDelete) && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.actionCircle,
+                  styles.deleteCircle,
+                  { transform: [{ scale: pressed ? 0.92 : 1 }] }
+                ]}
+                onPress={() => onDelete(effectiveMedia)}
+                accessibilityLabel="Excluir mídia">
+                <Feather name="trash-2" size={17} color="#ef4444" />
               </Pressable>
-            }
+            )}
 
             <Pressable
-              style={[styles.iconButtonPill, styles.closePill]}
+              style={({ pressed }) => [
+                styles.actionCircle,
+                styles.closeCircle,
+                { transform: [{ scale: pressed ? 0.92 : 1 }] }
+              ]}
               onPress={handleClose}
               accessibilityLabel="Fechar visualizador">
-              
-              <Feather name="x" size={22} color="#ffffff" />
+              <Feather name="x" size={20} color="#ffffff" />
             </Pressable>
           </View>
         </Animated.View>
 
-        {}
+        {/* Bottom Floating Glass Caption */}
         <Animated.View
           style={[
-          styles.bottomBar,
-          {
-            bottom: Math.max(insets.bottom, 20) + 12,
-            opacity: controlsFadeAnim
-          }]
-          }
+            styles.bottomBar,
+            {
+              bottom: bottomInset,
+              opacity: controlsFadeAnim
+            }
+          ]}
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
-
-
-          {!!postContent &&
-          <Pressable
-            onPress={() => setExpandedText(!expandedText)}
-            style={styles.captionContainer}>
-            
+          {!!postContent && (
+            <Pressable
+              onPress={() => setExpandedText(!expandedText)}
+              style={styles.captionCard}>
               <Text
-              style={styles.captionText}
-              numberOfLines={expandedText ? undefined : 2}>
-              
+                style={styles.captionText}
+                numberOfLines={expandedText ? undefined : 2}>
                 <Text style={styles.captionAuthor}>@{authorHandle} </Text>
                 {postContent}
               </Text>
-              {postContent.length > 90 &&
-            <Text style={styles.seeMoreText}>
-                  {expandedText ? "Menos" : "Mais"}
+              {postContent.length > 80 && (
+                <Text style={styles.seeMoreText}>
+                  {expandedText ? "Ver menos" : "Ver mais"}
                 </Text>
-            }
+              )}
             </Pressable>
-          }
+          )}
         </Animated.View>
-      </Animated.View>
-    </Modal>);
-
+      </View>
+    </Modal>
+  );
 }
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.96)",
+    backgroundColor: "#000000",
     justifyContent: "center",
     alignItems: "center"
   },
@@ -517,25 +542,33 @@ const styles = StyleSheet.create({
   },
   topBar: {
     position: "absolute",
-    top: Platform.OS === "ios" ? 54 : 32,
-    left: 16,
-    right: 16,
+    left: 14,
+    right: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     zIndex: 20
   },
-  authorRow: {
+  authorPill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    backgroundColor: "rgba(20, 20, 20, 0.75)",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 24,
+    gap: 9,
+    backgroundColor: "rgba(22, 22, 26, 0.82)",
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+    borderRadius: 26,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.12)",
-    maxWidth: SCREEN_WIDTH * 0.55
+    maxWidth: SCREEN_WIDTH * 0.54,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6
+  },
+  avatarBorder: {
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.2)"
   },
   authorTexts: {
     flexShrink: 1
@@ -548,77 +581,70 @@ const styles = StyleSheet.create({
   authorName: {
     color: "#ffffff",
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13
+    fontSize: 12.5,
+    letterSpacing: 0.1
   },
   authorHandle: {
     color: "rgba(255, 255, 255, 0.65)",
     fontFamily: "Poppins_400Regular",
-    fontSize: 11
+    fontSize: 10.5
   },
   topActions: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8
   },
-  iconButtonPill: {
-    paddingHorizontal: 12,
+  actionCircle: {
+    width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(20, 20, 20, 0.75)",
+    backgroundColor: "rgba(22, 22, 26, 0.82)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.12)"
+    borderColor: "rgba(255, 255, 255, 0.12)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6
   },
-  closePill: {
-    paddingHorizontal: 0,
-    width: 40,
-    backgroundColor: "rgba(239, 68, 68, 0.8)",
-    borderColor: "rgba(239, 68, 68, 0.9)"
+  closeCircle: {
+    backgroundColor: "rgba(35, 35, 40, 0.88)",
+    borderColor: "rgba(255, 255, 255, 0.18)"
+  },
+  deleteCircle: {
+    backgroundColor: "rgba(239, 68, 68, 0.2)",
+    borderColor: "rgba(239, 68, 68, 0.4)"
+  },
+  downloadContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3
+  },
+  downloadCountText: {
+    color: "#ffffff",
+    fontSize: 10.5,
+    fontFamily: "Poppins_600SemiBold"
   },
   bottomBar: {
     position: "absolute",
-    bottom: Platform.OS === "ios" ? 36 : 24,
-    left: 16,
-    right: 16,
-    zIndex: 20,
-    gap: 12
+    left: 14,
+    right: 14,
+    zIndex: 20
   },
-  videoControlsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(20, 20, 20, 0.75)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+  captionCard: {
+    backgroundColor: "rgba(20, 20, 24, 0.85)",
+    paddingHorizontal: 16,
+    paddingVertical: 13,
     borderRadius: 20,
-    gap: 12,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.12)"
-  },
-  videoControlBtn: {
-    width: 32,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  progressBarTrack: {
-    flex: 1,
-    height: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
-    borderRadius: 2,
-    overflow: "hidden"
-  },
-  progressBarFill: {
-    height: "100%",
-    backgroundColor: "#1D9BF0",
-    borderRadius: 2
-  },
-  captionContainer: {
-    backgroundColor: "rgba(20, 20, 20, 0.8)",
-    padding: 14,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.12)"
+    borderColor: "rgba(255, 255, 255, 0.12)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6
   },
   captionAuthor: {
     color: "#ffffff",
@@ -632,9 +658,9 @@ const styles = StyleSheet.create({
     lineHeight: 19
   },
   seeMoreText: {
-    color: "#1D9BF0",
+    color: "#F59E0B",
     fontFamily: "Poppins_600SemiBold",
     fontSize: 12,
-    marginTop: 4
+    marginTop: 5
   }
 });
