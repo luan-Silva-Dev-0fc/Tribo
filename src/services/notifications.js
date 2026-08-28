@@ -21,12 +21,21 @@ Notifications.setNotificationHandler({
 export async function setupNotificationChannels() {
   if (Platform.OS === "android") {
     try {
-      await Notifications.setNotificationChannelAsync("default", {
+      await Notifications.setNotificationChannelAsync("tribo_notifications", {
         name: "Tribo Notificações",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF6B00",
-        showBadge: true
+        lightColor: "#F59E0B",
+        showBadge: true,
+        sound: "default"
+      });
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "Geral",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#F59E0B",
+        showBadge: true,
+        sound: "default"
       });
     } catch (e) {
       console.warn("[PushNotifications] Erro ao criar canal Android:", e);

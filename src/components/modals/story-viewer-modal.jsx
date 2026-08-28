@@ -580,7 +580,15 @@ export function StoryViewerModal({
         {menuVisible && (
           <View style={[StyleSheet.absoluteFill, { zIndex: 9998 }]}>
             <Pressable style={styles.modalOverlay} onPress={() => setMenuVisible(false)}>
-              <View style={[styles.menuSheet, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View
+                style={[
+                  styles.menuSheet,
+                  {
+                    backgroundColor: colors.card || "#18181b",
+                    borderColor: colors.border || "rgba(255,255,255,0.1)",
+                    paddingBottom: Math.max(insets.bottom + 12, 34)
+                  }
+                ]}>
                 <Pressable
                   style={styles.menuItem}
                   onPress={() => {
@@ -605,7 +613,16 @@ export function StoryViewerModal({
         {shareModalVisible && (
           <View style={[StyleSheet.absoluteFill, { zIndex: 9997 }]}>
             <View style={styles.modalOverlay}>
-              <View style={[styles.shareSheet, { backgroundColor: colors.card, borderColor: colors.border, borderTopWidth: 1 }]}>
+              <View
+                style={[
+                  styles.shareSheet,
+                  {
+                    backgroundColor: colors.card || "#18181b",
+                    borderColor: colors.border || "rgba(255,255,255,0.1)",
+                    borderTopWidth: 1,
+                    paddingBottom: Math.max(insets.bottom + 12, 34)
+                  }
+                ]}>
                 <View style={styles.shareSheetHeader}>
                   <Text style={[styles.shareSheetTitle, { color: colors.text }]}>Enviar para...</Text>
                   <IconButton name="x" color={colors.text} onPress={() => setShareModalVisible(false)} />

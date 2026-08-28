@@ -122,5 +122,14 @@ export const NativeOptimization = {
     try {
       await TriboNativeModule.prefetchReelsMedia(videoIds);
     } catch (_) {}
+  },
+
+  async prewarm(url) {
+    if (!TriboNativeModule?.prewarmConnection || !url) return false;
+    try {
+      return await TriboNativeModule.prewarmConnection(url);
+    } catch (_) {
+      return false;
+    }
   }
 };

@@ -1,9 +1,22 @@
+# EAS Build Ignore File
 node_modules/
 .expo/
+.git/
 dist/
 web-build/
-/ios
-.git/
-*.log
-.vscode/
+
+# Ignore local build artifacts inside android directory
+android/.gradle/
+android/build/
+android/app/build/
+android/.cxx/
+android/app/.cxx/
+android/app/build/outputs/apk/
+*.apk
+*.aab
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
 .idea/
+.vscode/

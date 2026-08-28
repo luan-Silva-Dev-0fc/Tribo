@@ -25,6 +25,10 @@
       "barStyle": "light-content",
       "backgroundColor": "#000000"
     },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#F59E0B"
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },
