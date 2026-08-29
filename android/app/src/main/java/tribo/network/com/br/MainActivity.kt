@@ -1,13 +1,7 @@
 package tribo.network.com.br
 
-import android.graphics.Color
-import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.view.Display
-import android.view.View
-import android.view.WindowManager
-import androidx.core.view.WindowCompat
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -18,54 +12,23 @@ import expo.modules.ReactActivityDelegateWrapper
 
 class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
-    setTheme(R.style.AppTheme)
+    // Set the theme to AppTheme BEFORE onCreate to support
+    // coloring the background, status bar, and navigation bar.
+    // This is required for expo-splash-screen.
+    setTheme(R.style.AppTheme);
     super.onCreate(null)
-
-    // Hardware Acceleration flag
-    window.setFlags(
-      WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-      WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-    )
-
-    // Direciona teclas de volume para controlar mídia de áudio e vídeo
-    volumeControlStream = AudioManager.STREAM_MUSIC
-
-    // Fundo preto puro para evitar qualquer piscada de tela
-    window.decorView.setBackgroundColor(Color.BLACK)
-
-    // Configura a barra de navegação transparente Edge-to-Edge
-    window.navigationBarColor = Color.TRANSPARENT
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      window.isNavigationBarContrastEnforced = false
-    }
-
-    // Ativa taxa de atualização alta (90Hz / 120Hz) nativamente para rolagem fluida
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      try {
-        val display = window.windowManager.defaultDisplay
-        val modes = display.supportedModes
-        var bestMode: Display.Mode? = null
-        var maxRate = 60f
-
-        for (mode in modes) {
-          if (mode.refreshRate > maxRate) {
-            maxRate = mode.refreshRate
-            bestMode = mode
-          }
-        }
-
-        if (bestMode != null) {
-          val params = window.attributes
-          params.preferredDisplayModeId = bestMode.modeId
-          window.attributes = params
-        }
-      } catch (_: Exception) {}
-    }
   }
 
+  /**
+   * Returns the name of the main component registered from JavaScript. This is used to schedule
+   * rendering of the component.
+   */
   override fun getMainComponentName(): String = "main"
 
+  /**
+   * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
+   * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
+   */
   override fun createReactActivityDelegate(): ReactActivityDelegate {
     return ReactActivityDelegateWrapper(
           this,
@@ -77,13 +40,22 @@ class MainActivity : ReactActivity() {
           ){})
   }
 
+  /**
+    * Align the back button behavior with Android S
+    * where moving root activities to background instead of finishing activities.
+    * @see <a href="https://developer.android.com/reference/android/app/Activity#onBackPressed()">onBackPressed</a>
+    */
   override fun invokeDefaultOnBackPressed() {
       if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
           if (!moveTaskToBack(false)) {
+              // For non-root activities, use the default implementation to finish them.
               super.invokeDefaultOnBackPressed()
           }
           return
       }
+
+      // Use the default back button implementation on Android S
+      // because it's doing more than [Activity.moveTaskToBack] in fact.
       super.invokeDefaultOnBackPressed()
   }
 }

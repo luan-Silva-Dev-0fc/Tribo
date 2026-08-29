@@ -1,5 +1,3 @@
 <resources>
   <string name="app_name">Tribo</string>
-  <string moduleConfig="true" name="CodePushDeploymentKey">YC1w71voeacrBX8ZiAdyVCbhJUyYEJ_rh3uD4g</string>
-  <string name="CodePushServerUrl">https://api.revopush.org</string>
 </resources>

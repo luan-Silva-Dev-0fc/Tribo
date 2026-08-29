@@ -249,17 +249,6 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
   ref
 ) {
   const insets = useSafeAreaInsets();
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-  useEffect(() => {
-    if (Platform.OS !== "android") return;
-    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardHeight(0);
-    });
-    return () => { showSub.remove(); hideSub.remove(); };
-  }, []);
 
   const { isDark: themeIsDark, mode, colors: themeColors } = useTheme();
   const colors = propColors || themeColors;
@@ -1532,7 +1521,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#000000", marginBottom: Platform.OS === "android" ? keyboardHeight : 0 }}
+      style={{ flex: 1, backgroundColor: "#000000" }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
@@ -2028,7 +2017,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
           style={{
             paddingHorizontal: 12,
             paddingTop: 6,
-            paddingBottom: Platform.OS === "android" && keyboardHeight > 0 ? 8 : Math.max(insets.bottom, 12),
+            paddingBottom: Math.max(insets.bottom, 12),
             backgroundColor: "#000000",
             borderTopWidth: 1,
             borderColor: "rgba(255, 255, 255, 0.08)",
@@ -2287,6 +2276,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
     </KeyboardAvoidingView>
   );
 });
+
 
 
 

@@ -1,7 +1,6 @@
 package tribo.network.com.br
 
 import android.app.Application
-import android.content.ComponentCallbacks2
 import android.content.res.Configuration
 
 import com.facebook.react.PackageList
@@ -24,7 +23,8 @@ class MainApplication : Application(), ReactApplication {
       object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
-              add(TriboNativePackage())
+              // Packages that cannot be autolinked yet can be added manually here, for example:
+              // add(MyReactNativePackage())
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"
@@ -47,16 +47,6 @@ class MainApplication : Application(), ReactApplication {
     }
     loadReactNative(this)
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
-  }
-
-  override fun onTrimMemory(level: Int) {
-    super.onTrimMemory(level)
-    // Limpeza inteligente de memória nativa quando o Android estiver sob pressão de RAM
-    if (level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
-      try {
-        com.facebook.drawee.backends.pipeline.Fresco.getImagePipeline().clearMemoryCaches()
-      } catch (_: Exception) {}
-    }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
