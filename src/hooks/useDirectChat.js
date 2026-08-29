@@ -110,9 +110,8 @@ export function useDirectChat(targetUser, currentUser) {
       const cached = ChatCache.getMessagesSync(targetUserId);
       if (cached && cached.length > 0) {
         setMessages(cached);
-      } else {
-        setLoading(true);
       }
+
       let msgs = [];
       try {
         const res = await api.messages.getHistory(targetUserId);
@@ -126,61 +125,65 @@ export function useDirectChat(targetUser, currentUser) {
           );
           return;
         }
-        const fallbackRes = await api.messages.conversation(
-          String(targetUserId)
-        );
-        msgs = listFrom(fallbackRes, ["messages"]);
+        try {
+          const fallbackRes = await api.messages.conversation(
+            String(targetUserId)
+          );
+          msgs = listFrom(fallbackRes, ["messages"]);
+        } catch (_) {}
       }
 
       setMutualBlocked(false);
 
-      const reversedMsgs = msgs.slice().reverse();
-      setMessages(reversedMsgs);
-      ChatCache.setMessagesSync(targetUserId, reversedMsgs);
+      if (Array.isArray(msgs) && msgs.length > 0) {
+        const uniqueMsgs = [];
+        const seenIds = new Set();
+        for (const m of msgs) {
+          const idStr = String(m.id || m._id || "");
+          if (idStr && !seenIds.has(idStr)) {
+            seenIds.add(idStr);
+            uniqueMsgs.push(m);
+          } else if (!idStr) {
+            uniqueMsgs.push(m);
+          }
+        }
 
-      const unreadList = msgs.filter(
-        (m) =>
-          !m.read_at &&
-          m.isRead !== true &&
-          String(m.sender_id || m.userId) === String(targetUserId)
-      );
+        const reversedMsgs = uniqueMsgs.reverse();
+        setMessages((prev) => {
+          // Preserva mensagens pendentes que ainda estão sendo enviadas
+          const pending = prev.filter(
+            (m) =>
+              (String(m.id).startsWith("temp_") || m.sending === true) &&
+              !seenIds.has(String(m.id))
+          );
+          const finalMsgs = [...pending, ...reversedMsgs];
+          ChatCache.setMessagesSync(targetUserId, finalMsgs);
+          return finalMsgs;
+        });
 
-      if (unreadList.length > 0) {
-        const oldestUnread = unreadList[0];
-        setFirstUnreadId(oldestUnread.id);
-        const unreadIdx = reversedMsgs.findIndex(
-          (m) => String(m.id) === String(oldestUnread.id)
+        const unreadList = msgs.filter(
+          (m) =>
+            !m.read_at &&
+            m.isRead !== true &&
+            String(m.sender_id || m.userId) === String(targetUserId)
         );
 
-        if (!initialScrollDoneRef.current && unreadIdx > 0) {
-          initialScrollDoneRef.current = true;
-          setTimeout(() => {
-            try {
-              flatListRef.current?.scrollToIndex({
-                index: unreadIdx,
-                animated: true,
-                viewPosition: 0.5
-              });
-            } catch (e) {
-              flatListRef.current?.scrollToOffset({
-                offset: unreadIdx * 75,
-                animated: true
-              });
-            }
-          }, 250);
+        if (unreadList.length > 0) {
+          const oldestUnread = unreadList[0];
+          setFirstUnreadId(oldestUnread.id);
         }
-      }
 
-      msgs.forEach((m) => {
-        if (
-          m.id &&
-          !m.read_at &&
-          m.isRead === false &&
-          String(m.sender_id || m.userId) === String(targetUserId)
-        ) {
-          api.messages.markRead(m.id).catch(() => {});
-        }
-      });
+        msgs.forEach((m) => {
+          if (
+            m.id &&
+            !m.read_at &&
+            m.isRead === false &&
+            String(m.sender_id || m.userId) === String(targetUserId)
+          ) {
+            api.messages.markRead(m.id).catch(() => {});
+          }
+        });
+      }
     } catch (err) {
       if (err?.status === 403) {
         setMutualBlocked(true);
@@ -220,20 +223,95 @@ export function useDirectChat(targetUser, currentUser) {
       if (senderId === targetStr || receiverId === targetStr) {
         const msgId = String(payload?.id || payload?._id || "");
         const tempId = payload?.tempId || payload?.temp_id;
+        const myId = String(currentUser?.id || "");
+        const isFromMe = senderId === myId;
 
         setMessages((prev) => {
-          const existingIdx = prev.findIndex(
-            (m) =>
-              (msgId && String(m.id || m._id) === msgId) ||
-              (tempId && (m.tempId === tempId || m.id === tempId))
-          );
+          // 1. Verifica se já existe pelo id exato do servidor
+          const existingByIdx = msgId
+            ? prev.findIndex((m) => String(m.id || m._id) === msgId)
+            : -1;
+
+          if (existingByIdx >= 0) {
+            const updated = [...prev];
+            updated[existingByIdx] = {
+              ...updated[existingByIdx],
+              ...payload,
+              sending: false
+            };
+            ChatCache.setMessagesSync(targetUserId, updated);
+            return updated;
+          }
+
+          // 2. Se for uma mensagem enviada por mim, encontra o item temporário/otimista
+          let pendingIdx = -1;
+          if (tempId) {
+            pendingIdx = prev.findIndex(
+              (m) => m.tempId === tempId || m.id === tempId || m._id === tempId
+            );
+          }
+          if (pendingIdx < 0 && isFromMe) {
+            pendingIdx = prev.findIndex((m) => {
+              const isPending =
+                String(m.id).startsWith("temp_") ||
+                m.is_sending === true ||
+                m.sending === true;
+              if (!isPending) return false;
+              const isMsgAudio =
+                Boolean(payload.audio_url || payload.audioUrl) ||
+                payload.media_type === "AUDIO" ||
+                payload.mediaType === "AUDIO";
+              const isMAudio =
+                Boolean(m.audio_url || m.audioUrl) ||
+                m.media_type === "AUDIO" ||
+                m.mediaType === "AUDIO" ||
+                String(m.id).startsWith("temp_audio_");
+              if (isMsgAudio && isMAudio) {
+                return true;
+              }
+              const isMsgSticker =
+                payload.media_type === "STICKER" ||
+                payload.mediaType === "STICKER" ||
+                Boolean(payload.sticker_id || payload.stickerId);
+              const isMSticker =
+                m.media_type === "STICKER" ||
+                m.mediaType === "STICKER" ||
+                Boolean(m.sticker_id || m.stickerId) ||
+                String(m.id).startsWith("temp_stk_");
+              if (isMsgSticker && isMSticker) {
+                return true;
+              }
+              const msgMedia =
+                payload.media_url || payload.mediaUrl || payload.audio_url || payload.audioUrl;
+              const mMedia =
+                m.media_url || m.mediaUrl || m.audio_url || m.audioUrl;
+              if (
+                msgMedia &&
+                mMedia &&
+                (msgMedia === mMedia ||
+                  msgMedia.includes(mMedia) ||
+                  mMedia.includes(msgMedia))
+              ) {
+                return true;
+              }
+              if (
+                payload.content &&
+                m.content &&
+                payload.content.trim() === m.content.trim()
+              ) {
+                return true;
+              }
+              return false;
+            });
+          }
 
           let updated;
-          if (existingIdx >= 0) {
+          if (pendingIdx >= 0) {
             updated = [...prev];
-            updated[existingIdx] = {
-              ...updated[existingIdx],
+            updated[pendingIdx] = {
+              ...updated[pendingIdx],
               ...payload,
+              id: msgId || updated[pendingIdx].id,
               sending: false
             };
           } else {
@@ -302,7 +380,7 @@ export function useDirectChat(targetUser, currentUser) {
   };
 
   const handleSend = async () => {
-    if ((!content.trim() && !selectedMedia) || sending || mutualBlocked) return;
+    if ((!content.trim() && !selectedMedia) || mutualBlocked) return;
     const msgText = content.trim();
     const mediaToSend = selectedMedia;
     const viewOnceToSend = isViewOnce;
@@ -395,8 +473,21 @@ export function useDirectChat(targetUser, currentUser) {
 
       if (realId) {
         setMessages((prev) => {
+          const alreadyHasReal = prev.some(
+            (m) =>
+              String(m.id || m._id) === String(realId) &&
+              m.id !== tempId &&
+              m.tempId !== tempId
+          );
+          if (alreadyHasReal) {
+            const filtered = prev.filter(
+              (m) => m.id !== tempId && m.tempId !== tempId
+            );
+            ChatCache.setMessagesSync(targetUserId, filtered);
+            return filtered;
+          }
           const updated = prev.map((m) =>
-            m.id === tempId
+            m.id === tempId || m.tempId === tempId
               ? { ...m, ...serverMsg, id: realId, sending: false }
               : m
           );
@@ -411,7 +502,7 @@ export function useDirectChat(targetUser, currentUser) {
   };
 
   const handleSelectSticker = async (sticker) => {
-    if (!sticker || sending || mutualBlocked) return;
+    if (!sticker || mutualBlocked) return;
     const media_url =
       sticker.video_url ||
       sticker.videoUrl ||
@@ -435,6 +526,17 @@ export function useDirectChat(targetUser, currentUser) {
       content: "",
       media_url,
       media_type: "STICKER",
+      sticker_name:
+        sticker.sticker_name ||
+        sticker.stickerName ||
+        sticker.name ||
+        "Figurinha",
+      pack_name: sticker.pack_name || sticker.packName || "Gerais",
+      author_name:
+        sticker.author_name ||
+        sticker.authorName ||
+        currentUser?.name ||
+        "Tribo",
       sender_id: currentUser?.id,
       senderId: currentUser?.id,
       receiver_id: targetUserId,
@@ -443,7 +545,7 @@ export function useDirectChat(targetUser, currentUser) {
       createdAt: new Date().toISOString(),
       is_view_once: viewOnceToSend,
       user: currentUser,
-      sending: true
+      sending: false
     };
 
     setMessages((prev) => {
@@ -452,33 +554,50 @@ export function useDirectChat(targetUser, currentUser) {
       return updated;
     });
 
-    try {
-      const sendRes = await api.messages.send({
-        receiver_id: targetUserId,
-        content: "",
-        media_url,
-        media_type: "STICKER",
-        is_view_once: viewOnceToSend
-      });
-
-      const serverMsg = sendRes?.message || sendRes?.data || sendRes;
-      const realId = serverMsg?.id || serverMsg?._id;
-
-      if (realId) {
-        setMessages((prev) => {
-          const updated = prev.map((m) =>
-            m.id === tempId
-              ? { ...m, ...serverMsg, id: realId, sending: false }
-              : m
-          );
-          ChatCache.setMessagesSync(targetUserId, updated);
-          return updated;
+    (async () => {
+      try {
+        const sendRes = await api.messages.send({
+          receiver_id: targetUserId,
+          content: "",
+          media_url,
+          media_type: "STICKER",
+          is_view_once: viewOnceToSend
         });
+
+        const serverMsg = sendRes?.message || sendRes?.data || sendRes;
+        const realId = serverMsg?.id || serverMsg?._id;
+
+        if (realId) {
+          setMessages((prev) => {
+            const alreadyHasReal = prev.some(
+              (m) =>
+                String(m.id || m._id) === String(realId) &&
+                m.id !== tempId &&
+                m.tempId !== tempId
+            );
+            if (alreadyHasReal) {
+              const filtered = prev.filter(
+                (m) => m.id !== tempId && m.tempId !== tempId
+              );
+              ChatCache.setMessagesSync(targetUserId, filtered);
+              return filtered;
+            }
+            const updated = prev.map((m) =>
+              m.id === tempId || m.tempId === tempId
+                ? { ...m, ...serverMsg, id: realId, sending: false }
+                : m
+            );
+            ChatCache.setMessagesSync(targetUserId, updated);
+            return updated;
+          });
+        }
+      } catch (err) {
+        setMessages((prev) =>
+          prev.filter((m) => m.id !== tempId && m.tempId !== tempId)
+        );
+        showToast(errorMessage(err) || "Falha ao enviar figurinha.", "error");
       }
-    } catch (err) {
-      setMessages((prev) => prev.filter((m) => m.id !== tempId));
-      showToast(errorMessage(err) || "Falha ao enviar figurinha.", "error");
-    }
+    })();
   };
 
   const startRecording = async () => {
@@ -630,8 +749,21 @@ export function useDirectChat(targetUser, currentUser) {
 
           if (realId) {
             setMessages((prev) => {
+              const alreadyHasReal = prev.some(
+                (m) =>
+                  String(m.id || m._id) === String(realId) &&
+                  m.id !== tempId &&
+                  m.tempId !== tempId
+              );
+              if (alreadyHasReal) {
+                const filtered = prev.filter(
+                  (m) => m.id !== tempId && m.tempId !== tempId
+                );
+                ChatCache.setMessagesSync(targetUserId, filtered);
+                return filtered;
+              }
               const updated = prev.map((m) =>
-                m.id === tempId
+                m.id === tempId || m.tempId === tempId
                   ? {
                       ...m,
                       ...serverMsg,
@@ -724,42 +856,86 @@ export function useDirectChat(targetUser, currentUser) {
 
   const confirmDeleteMessage = async () => {
     const { message, forEveryone } = deleteModal;
-    if (!message?.id) return;
+    if (!message) return;
     setDeleteModal({ visible: false, message: null, forEveryone: false });
 
-    const msgId = message.id;
-    try {
+    const msgId = String(message.id || message._id || "");
+    const tempId = message.tempId || message.temp_id;
+
+    // IMEDIATAMENTE (0ms) atualiza o estado local e o storage persistente
+    setMessages((prev) => {
+      let updated;
       if (forEveryone) {
-        setMessages((prev) => {
-          const updated = prev.map((m) =>
-            m.id === msgId || String(m.id) === String(msgId)
-              ? {
-                  ...m,
-                  is_deleted: true,
-                  deleted_for_everyone: true,
-                  content: ""
-                }
-              : m
-          );
-          ChatCache.setMessagesSync(targetUserId, updated);
-          return updated;
+        updated = prev.map((m) => {
+          const currentId = String(m.id || m._id || "");
+          const isTarget =
+            (msgId && currentId === msgId) ||
+            (tempId &&
+              (m.tempId === tempId ||
+                m.id === tempId ||
+                currentId === tempId));
+
+          if (isTarget) {
+            return {
+              ...m,
+              is_deleted: true,
+              deleted_for_everyone: true,
+              content: "",
+              media_url: null,
+              mediaUrl: null,
+              video_url: null,
+              videoUrl: null,
+              audio_url: null,
+              audioUrl: null
+            };
+          }
+          return m;
         });
-        await api.messages.delete(msgId, { forEveryone: true });
-        showToast("Mensagem apagada para todos!");
       } else {
-        setMessages((prev) => {
-          const updated = prev.filter(
-            (m) => m.id !== msgId && String(m.id) !== String(msgId)
-          );
-          ChatCache.setMessagesSync(targetUserId, updated);
-          return updated;
+        updated = prev.filter((m) => {
+          const currentId = String(m.id || m._id || "");
+          const isTarget =
+            (msgId && currentId === msgId) ||
+            (tempId &&
+              (m.tempId === tempId ||
+                m.id === tempId ||
+                currentId === tempId));
+          return !isTarget;
         });
-        await api.messages.delete(msgId, { forEveryone: false });
-        showToast("Mensagem apagada para você");
       }
-    } catch (err) {
-      showToast(errorMessage(err) || "Falha ao apagar mensagem", "error");
+      ChatCache.setMessagesSync(targetUserId, updated);
+      return updated;
+    });
+
+    // Notifica o outro usuário via WebSockets em tempo real
+    try {
+      const socket = getChatSocket();
+      if (socket && forEveryone && msgId) {
+        socket.emit("delete-message", {
+          messageId: msgId,
+          targetUserId,
+          forEveryone: true
+        });
+        socket.emit("message-deleted", {
+          messageId: msgId,
+          targetUserId,
+          forEveryone: true
+        });
+      }
+    } catch (_) {}
+
+    // Executa no servidor em segundo plano
+    if (msgId && !msgId.startsWith("temp_")) {
+      api.messages.delete(msgId, { forEveryone }).catch((err) => {
+        console.warn("Erro ao apagar mensagem no servidor:", err);
+      });
     }
+
+    showToast(
+      forEveryone
+        ? "Mensagem apagada para todos!"
+        : "Mensagem apagada para você"
+    );
   };
 
   return {

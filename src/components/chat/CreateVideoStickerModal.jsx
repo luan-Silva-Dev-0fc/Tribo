@@ -162,12 +162,6 @@ export function CreateVideoStickerModal({
   }, [visible, initialVideoAsset]);
 
   const pickVideo = async () => {
-    if (!isUserGold) {
-      onClose();
-      onShowGoldModal?.();
-      return;
-    }
-
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
@@ -225,15 +219,6 @@ export function CreateVideoStickerModal({
   const handleCreateSticker = async () => {
     if (!selectedVideo || uploading) return;
 
-    if (!isUserGold) {
-      showAlert({
-        title: "Recurso Exclusivo",
-        message: "Apenas usuários com Selo Dourado VIP podem criar figurinhas de vídeo.",
-        type: "warning"
-      });
-      return;
-    }
-
     try {
       setUploading(true);
       setTrimmingStatus("Cortando vídeo no dispositivo...");
@@ -275,14 +260,8 @@ export function CreateVideoStickerModal({
         };
       }
 
-      try {
-        if (stickerRecord?.id) {
-          await api.stickers.favorite(stickerRecord.id);
-        }
-      } catch (_) {}
-
-      onStickerCreated?.({
-        id: stickerRecord?.id,
+      const newStickerObj = {
+        id: stickerRecord?.id || `stk_${Date.now()}`,
         video_url: videoUrl,
         media_url: videoUrl,
         media_type: "STICKER",
@@ -290,7 +269,14 @@ export function CreateVideoStickerModal({
         sticker_name: stickerPayload.sticker_name,
         pack_name: stickerPayload.pack_name,
         author_name: stickerPayload.author_name
-      });
+      };
+
+      try {
+        const { saveStickerToInventory } = require("../../services/stickerInventory");
+        await saveStickerToInventory(newStickerObj);
+      } catch (_) {}
+
+      onStickerCreated?.(newStickerObj);
 
       handleClose();
     } catch (err) {

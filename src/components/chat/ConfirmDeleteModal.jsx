@@ -5,19 +5,22 @@ import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 export function ConfirmDeleteModal({
   visible,
   mode = "me",
+  forEveryone = false,
   onConfirm,
-  onCancel
+  onCancel,
+  onClose
 }) {
-  const isEveryone = mode === "everyone";
+  const handleCancel = onCancel || onClose;
+  const isEveryone = Boolean(forEveryone || mode === "everyone");
 
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onCancel}>
+      onRequestClose={handleCancel}>
       
-      <Pressable style={styles.overlay} onPress={onCancel}>
+      <Pressable style={styles.overlay} onPress={handleCancel}>
         <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
           {}
           <View style={styles.iconOuter}>
@@ -46,7 +49,7 @@ export function ConfirmDeleteModal({
               styles.btnCancel,
               { opacity: pressed ? 0.8 : 1 }]
               }
-              onPress={onCancel}>
+              onPress={handleCancel}>
               
               <Text style={styles.btnCancelText}>Cancelar</Text>
             </Pressable>

@@ -143,5 +143,14 @@ export const ChatCache = {
         writeStorage(`group:${t.id}`, t);
       }
     }
+  },
+
+  getAudioSpeedSync() {
+    const data = readStorage("settings:audio_speed");
+    return typeof data === "number" && data > 0 ? data : 1.0;
+  },
+
+  setAudioSpeedSync(speed) {
+    writeStorage("settings:audio_speed", speed);
   }
 };

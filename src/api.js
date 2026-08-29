@@ -1,4 +1,4 @@
-import Constants from "expo-constants";
+﻿import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { NativeOptimization } from "./services/nativeOptimization";
@@ -890,6 +890,34 @@ export const api = {
     get: (id) => request(`/stickers/${id}`)
   },
 
+  tracks: {
+    list: (query = "") =>
+      request(`/users/me/tracks${query ? `?query=${encodeURIComponent(query)}` : ""}`),
+    upload: async ({ uri, name, type, title, artist, duration }) => {
+      const form = new FormData();
+      const cleanUri =
+        Platform.OS === "ios" && typeof uri === "string" && uri.startsWith("file://")
+          ? uri.replace("file://", "")
+          : uri;
+
+      form.append("file", {
+        uri: cleanUri,
+        name: name || "audio.mp3",
+        type: type || "audio/mpeg"
+      });
+      if (title) form.append("title", title);
+      if (artist) form.append("artist", artist);
+      if (duration) form.append("duration", String(duration));
+
+      return request("/users/me/tracks", {
+        method: "POST",
+        body: form
+      });
+    },
+    remove: (id) => request(`/users/me/tracks/${id}`, { method: "DELETE" }),
+    getGroupQueue: (groupId) => request(`/groups/${groupId}/queue`)
+  },
+
   onBan: onAccountBanned,
   onPlatformSuspended: onPlatformSuspended
 };
@@ -937,3 +965,5 @@ export function getUploadUrl(payload) {
   const root = BASE_URL.replace(/\/api\/?$/, "").replace(/\/$/, "");
   return `${root}${url.startsWith("/") ? "" : "/"}${url}`;
 }
+export { request };
+

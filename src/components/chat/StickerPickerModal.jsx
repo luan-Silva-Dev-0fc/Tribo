@@ -46,6 +46,32 @@ const StickerGridItem = React.memo(function StickerGridItem({
 
 });
 
+class VideoViewSafeGuard extends React.Component {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error) {
+    // Silencia erros de unmount
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View
+          style={[
+            this.props.fallbackStyle || {
+              width: "100%",
+              height: "100%",
+              backgroundColor: "#1e1e1e"
+            }
+          ]}
+        />
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function SafeGridVideo({ url }) {
   const isMountedRef = useRef(true);
 
@@ -67,14 +93,16 @@ function SafeGridVideo({ url }) {
   }
 
   return (
-    <VideoView
-      key={url}
-      player={player}
-      nativeControls={false}
-      contentFit="cover"
-      style={styles.gridVideo} />);
-
-
+    <VideoViewSafeGuard fallbackStyle={styles.gridVideo}>
+      <VideoView
+        key={url}
+        player={player}
+        nativeControls={false}
+        contentFit="cover"
+        style={styles.gridVideo}
+      />
+    </VideoViewSafeGuard>
+  );
 }
 
 export function StickerPickerModal({

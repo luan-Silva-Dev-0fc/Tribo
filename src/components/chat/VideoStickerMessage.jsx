@@ -21,6 +21,31 @@ import { useStickerSpatialAudio } from "../../services/audioRecordingDucking";
 
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
+class VideoViewSafeGuard extends React.Component {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error) {
+    // Silencia erros de player liberado pelo expo-video durante unmount
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View
+          style={[
+            this.props.fallbackStyle || {
+              width: "100%",
+              height: "100%",
+              backgroundColor: "#18181b"
+            }
+          ]}
+        />
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const SafeStickerVideo = React.memo(function SafeStickerVideo({
   url,
@@ -31,12 +56,14 @@ const SafeStickerVideo = React.memo(function SafeStickerVideo({
     return <View style={[style, { backgroundColor: "#18181b" }]} />;
   }
   return (
-    <ActiveStickerVideoInner
-      url={url}
-      style={style}
-      externalRef={externalRef} />);
-
-
+    <VideoViewSafeGuard fallbackStyle={style}>
+      <ActiveStickerVideoInner
+        url={url}
+        style={style}
+        externalRef={externalRef}
+      />
+    </VideoViewSafeGuard>
+  );
 });
 
 function ActiveStickerVideoInner({ url, style, externalRef }) {
@@ -51,7 +78,7 @@ function ActiveStickerVideoInner({ url, style, externalRef }) {
     };
   }, []);
 
-  const player = useVideoPlayer(url, (p) => {
+  const player = useVideoPlayer(url || "", (p) => {
     p.loop = true;
     p.muted = false;
     p.volume = 1.0;
@@ -64,28 +91,33 @@ function ActiveStickerVideoInner({ url, style, externalRef }) {
 
   return (
     <View ref={localRef} style={style} collapsable={false}>
-      {isMountedRef.current && player ?
-      <VideoView
-        key={url}
-        player={player}
-        nativeControls={false}
-        contentFit="cover"
-        style={{ width: "100%", height: "100%" }} /> :
-
-
-      <View style={{ width: "100%", height: "100%", backgroundColor: "#18181b" }} />
-      }
-    </View>);
-
+      {isMountedRef.current && player ? (
+        <VideoViewSafeGuard fallbackStyle={{ width: "100%", height: "100%", backgroundColor: "#18181b" }}>
+          <VideoView
+            key={url}
+            player={player}
+            nativeControls={false}
+            contentFit="cover"
+            style={{ width: "100%", height: "100%" }}
+          />
+        </VideoViewSafeGuard>
+      ) : (
+        <View style={{ width: "100%", height: "100%", backgroundColor: "#18181b" }} />
+      )}
+    </View>
+  );
 }
-
 
 const SafeIsolatedStickerPlayer = React.memo(
   function SafeIsolatedStickerPlayer({ url, style }) {
     if (!url || typeof url !== "string" || !url.trim()) {
       return <View style={[style, { backgroundColor: "#18181b" }]} />;
     }
-    return <ActiveIsolatedStickerPlayerInner url={url} style={style} />;
+    return (
+      <VideoViewSafeGuard fallbackStyle={style}>
+        <ActiveIsolatedStickerPlayerInner url={url} style={style} />
+      </VideoViewSafeGuard>
+    );
   }
 );
 
@@ -99,7 +131,7 @@ function ActiveIsolatedStickerPlayerInner({ url, style }) {
     };
   }, []);
 
-  const modalPlayer = useVideoPlayer(url, (p) => {
+  const modalPlayer = useVideoPlayer(url || "", (p) => {
     p.loop = true;
     p.muted = false;
     p.volume = 1.0;
@@ -115,14 +147,16 @@ function ActiveIsolatedStickerPlayerInner({ url, style }) {
   }
 
   return (
-    <VideoView
-      key={url}
-      player={modalPlayer}
-      nativeControls={false}
-      contentFit="cover"
-      style={style} />);
-
-
+    <VideoViewSafeGuard fallbackStyle={style}>
+      <VideoView
+        key={url}
+        player={modalPlayer}
+        nativeControls={false}
+        contentFit="cover"
+        style={style}
+      />
+    </VideoViewSafeGuard>
+  );
 }
 
 export const VideoStickerMessage = React.memo(function VideoStickerMessage({
@@ -217,14 +251,20 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
       style={[styles.container, isMe ? styles.alignRight : styles.alignLeft]}>
       
       <Pressable
-        onPress={() => {}}
-        onLongPress={() => setOptionsVisible(true)}
+        onPress={() => setOptionsVisible(true)}
+        onLongPress={() => {
+          if (onLongPress) {
+            onLongPress(item);
+          } else {
+            setOptionsVisible(true);
+          }
+        }}
         style={({ pressed }) => [
         styles.stickerFrame,
         {
-          backgroundColor: "transparent",
+          backgroundColor: "#18181b",
           borderColor: colors.border || "#27272a",
-          opacity: pressed ? 0.92 : 1,
+          opacity: pressed ? 0.95 : 1,
           transform: [{ scale: pressed ? 0.98 : 1 }]
         }]
         }>
@@ -235,32 +275,34 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
           externalRef={containerRef} />
         
 
-        {}
+        {/* Botão rápido de favoritar/salvar */}
         <Pressable
           onPress={(e) => {
             e.stopPropagation();
             handleToggleSave();
           }}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           disabled={saving}
           style={({ pressed }) => [
           styles.quickFavoriteBtn,
           {
             backgroundColor: isSaved ?
-            "rgba(245, 158, 11, 0.95)" :
-            "rgba(0, 0, 0, 0.65)",
+            "#f59e0b" :
+            "rgba(0, 0, 0, 0.75)",
             opacity: pressed || saving ? 0.8 : 1
           }]
-          }>
+          }
+          accessibilityLabel={isSaved ? "Remover figurinha" : "Salvar figurinha"}>
           
           <Ionicons
             name={isSaved ? "star" : "star-outline"}
-            size={16}
-            color={isSaved ? "#000000" : "#ffffff"} />
+            size={18}
+            color="#ffffff" />
           
         </Pressable>
 
-        {}
-        <View style={styles.badgeContainer}>
+        {/* Badge da Figurinha */}
+        <View style={styles.badgeContainer} pointerEvents="none">
           <View style={styles.badgePill}>
             <MaterialCommunityIcons
               name="sticker-emoji"
@@ -520,8 +562,7 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 4,
-    maxWidth: "80%"
+    marginVertical: 2
   },
   alignRight: {
     alignSelf: "flex-end"
@@ -532,14 +573,14 @@ const styles = StyleSheet.create({
   stickerFrame: {
     width: 190,
     height: 190,
-    borderRadius: 24,
+    borderRadius: 22,
     overflow: "hidden",
     borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.12,
     shadowRadius: 6,
-    elevation: 3,
+    elevation: 4,
     position: "relative"
   },
   video: {
@@ -550,16 +591,19 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 8,
     right: 8,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    zIndex: 9999,
+    elevation: 15,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.3)",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.45,
+    shadowRadius: 4
   },
   badgeContainer: {
     position: "absolute",

@@ -796,7 +796,7 @@ export function DirectChatScreen({
                   value={content}
                   onChangeText={setContent}
                   style={[styles.textInputMain, { color: colors.text }]}
-                  editable={!mutualBlocked && !sending}
+                  editable={!mutualBlocked}
                   multiline
                 />
               </View>
@@ -812,19 +812,15 @@ export function DirectChatScreen({
                   }
                 ]}
                 onPress={handleSend}
-                disabled={mutualBlocked || sending}
+                disabled={mutualBlocked}
                 accessibilityLabel="Enviar mensagem"
               >
-                {sending ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Feather
-                    name="send"
-                    size={18}
-                    color="#ffffff"
-                    style={{ marginLeft: -1, marginTop: 1 }}
-                  />
-                )}
+                <Feather
+                  name="send"
+                  size={18}
+                  color="#ffffff"
+                  style={{ marginLeft: -1, marginTop: 1 }}
+                />
               </Pressable>
             ) : (
               <Pressable
@@ -838,7 +834,7 @@ export function DirectChatScreen({
                   }
                 ]}
                 onPress={startRecording}
-                disabled={mutualBlocked || sending}
+                disabled={mutualBlocked}
                 accessibilityLabel="Gravar mensagem de voz"
               >
                 <Feather

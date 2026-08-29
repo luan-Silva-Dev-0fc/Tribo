@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import { useTheme } from "../../theme";
+import { ChatCache } from "../../services/chatCache";
+import { duckGroupAudio } from "../../hooks/useGroupAudioSync";
 
 function formatAudioTime(millis) {
   if (!millis || isNaN(millis) || millis < 0) return "0:00";
@@ -12,6 +14,16 @@ function formatAudioTime(millis) {
   return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 }
 
+const speedListeners = new Set();
+function notifySpeedChange(speed) {
+  ChatCache.setAudioSpeedSync(speed);
+  speedListeners.forEach((listener) => {
+    try {
+      listener(speed);
+    } catch (_) {}
+  });
+}
+
 export function AudioMessagePlayer({ audioUrl, isMe }) {
   const { colors } = useTheme();
   const soundRef = useRef(null);
@@ -19,14 +31,16 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
   const [isLoading, setIsLoading] = useState(false);
   const [positionMillis, setPositionMillis] = useState(0);
   const [durationMillis, setDurationMillis] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(
+    () => ChatCache.getAudioSpeedSync() || 1.0
+  );
 
   const SPEEDS = [1.0, 1.5, 2.0, 3.0, 5.0];
 
   const handleToggleSpeed = async () => {
     const nextIdx = (SPEEDS.indexOf(playbackSpeed) + 1) % SPEEDS.length;
     const nextSpeed = SPEEDS[nextIdx];
-    setPlaybackSpeed(nextSpeed);
+    notifySpeedChange(nextSpeed);
     if (soundRef.current) {
       try {
         await soundRef.current.setRateAsync(nextSpeed, true);
@@ -57,10 +71,20 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
   };
 
   useEffect(() => {
+    const onSpeedUpdate = (newSpeed) => {
+      setPlaybackSpeed(newSpeed);
+      if (soundRef.current) {
+        soundRef.current.setRateAsync(newSpeed, true).catch(() => {});
+      }
+    };
+    speedListeners.add(onSpeedUpdate);
+
     return () => {
+      speedListeners.delete(onSpeedUpdate);
       if (soundRef.current) {
         soundRef.current.unloadAsync().catch(() => {});
         soundRef.current = null;
+        duckGroupAudio(false).catch(() => {});
       }
     };
   }, [audioUrl]);
@@ -70,6 +94,7 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
       if (status.error) {
         setIsLoading(false);
         setIsPlaying(false);
+        duckGroupAudio(false).catch(() => {});
       }
       return;
     }
@@ -81,6 +106,7 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
     if (status.didJustFinish) {
       setIsPlaying(false);
       setPositionMillis(0);
+      duckGroupAudio(false).catch(() => {});
     }
   };
 
@@ -91,6 +117,7 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
     try {
       if (!soundRef.current) {
         setIsLoading(true);
+        await duckGroupAudio(true);
         const { sound } = await Audio.Sound.createAsync(
           { uri: targetUri },
           { shouldPlay: true, rate: playbackSpeed, shouldCorrectPitch: true },
@@ -105,7 +132,9 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
         if (status.isLoaded) {
           if (status.isPlaying) {
             await soundRef.current.pauseAsync();
+            await duckGroupAudio(false);
           } else {
+            await duckGroupAudio(true);
             try {
               await soundRef.current.setRateAsync(playbackSpeed, true);
             } catch (e) {}
@@ -120,6 +149,7 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
     } catch (err) {
       setIsLoading(false);
       setIsPlaying(false);
+      await duckGroupAudio(false);
     }
   };
 
@@ -156,20 +186,11 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
         )}
       </Pressable>
 
-      <View style={styles.audioProgressWrapper}>
-        <View
-          style={[
-            styles.audioTrack,
-            {
-              backgroundColor: isMe
-                ? "rgba(255, 255, 255, 0.25)"
-                : "rgba(255, 255, 255, 0.12)"
-            }
-          ]}
-        >
+      <View style={styles.audioTrackWrapper}>
+        <View style={styles.audioWaveform}>
           <View
             style={[
-              styles.audioFill,
+              styles.audioWaveProgress,
               {
                 width: `${progress * 100}%`,
                 backgroundColor: isMe ? "#ffffff" : colors.primary || "#0284c7"
@@ -177,72 +198,42 @@ export function AudioMessagePlayer({ audioUrl, isMe }) {
             ]}
           />
         </View>
-        <View style={styles.audioTimeRow}>
+
+        <View style={styles.audioMetaRow}>
           <Text
             style={[
               styles.audioTimeText,
+              { color: isMe ? "rgba(255,255,255,0.7)" : colors.muted }
+            ]}
+          >
+            {isPlaying
+              ? formatAudioTime(positionMillis)
+              : formatAudioTime(durationMillis)}
+          </Text>
+
+          <Pressable
+            onPress={handleToggleSpeed}
+            hitSlop={8}
+            style={[
+              styles.audioSpeedBadge,
               {
-                color: isMe
-                  ? "rgba(255, 255, 255, 0.85)"
-                  : colors.muted || "#a1a1aa"
+                backgroundColor: isMe
+                  ? "rgba(255,255,255,0.2)"
+                  : colors.surfaceAlt || "#e2e8f0"
               }
             ]}
           >
-            {formatAudioTime(isPlaying ? positionMillis : durationMillis || 0)}
-          </Text>
-          <Feather
-            name="mic"
-            size={12}
-            color={
-              isMe ? "rgba(255, 255, 255, 0.7)" : colors.muted || "#a1a1aa"
-            }
-          />
+            <Text
+              style={[
+                styles.audioSpeedText,
+                { color: isMe ? "#ffffff" : colors.text }
+              ]}
+            >
+              {playbackSpeed}x
+            </Text>
+          </Pressable>
         </View>
       </View>
-
-      <Pressable
-        onPress={handleToggleSpeed}
-        hitSlop={6}
-        style={({ pressed }) => [
-          styles.audioSpeedPill,
-          {
-            backgroundColor: isMe
-              ? playbackSpeed > 1.0
-                ? "rgba(255, 255, 255, 0.3)"
-                : "rgba(255, 255, 255, 0.15)"
-              : playbackSpeed > 1.0
-              ? "rgba(2, 132, 199, 0.3)"
-              : "rgba(255, 255, 255, 0.08)",
-            borderColor: isMe
-              ? playbackSpeed > 1.0
-                ? "#ffffff"
-                : "rgba(255, 255, 255, 0.2)"
-              : playbackSpeed > 1.0
-              ? colors.primary || "#0284c7"
-              : "rgba(255, 255, 255, 0.1)",
-            opacity: pressed ? 0.75 : 1
-          }
-        ]}
-      >
-        <Text
-          style={[
-            styles.audioSpeedText,
-            {
-              color: isMe
-                ? "#ffffff"
-                : playbackSpeed > 1.0
-                ? colors.primary || "#0284c7"
-                : colors.muted || "#a1a1aa",
-              fontFamily:
-                playbackSpeed > 1.0
-                  ? "Poppins_700Bold"
-                  : "Poppins_600SemiBold"
-            }
-          ]}
-        >
-          {playbackSpeed === 1.0 ? "1x" : `${playbackSpeed}x`}
-        </Text>
-      </Pressable>
     </View>
   );
 }
@@ -251,57 +242,48 @@ const styles = StyleSheet.create({
   audioPlayerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    minWidth: 210,
-    maxWidth: 270,
-    gap: 8
+    width: 220,
+    paddingVertical: 4
   },
   audioPlayBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginRight: 10
   },
-  audioProgressWrapper: {
+  audioTrackWrapper: {
     flex: 1,
     justifyContent: "center"
   },
-  audioTrack: {
+  audioWaveform: {
     height: 4,
+    backgroundColor: "rgba(150, 150, 150, 0.3)",
     borderRadius: 2,
-    width: "100%",
-    position: "relative",
-    justifyContent: "center",
-    marginBottom: 4
+    overflow: "hidden",
+    marginBottom: 6
   },
-  audioFill: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
+  audioWaveProgress: {
+    height: "100%",
     borderRadius: 2
   },
-  audioTimeRow: {
+  audioMetaRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"
   },
   audioTimeText: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 10.5
+    fontSize: 11,
+    fontFamily: "Poppins_400Regular"
   },
-  audioSpeedPill: {
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 10,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: 32
+  audioSpeedBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 8
   },
   audioSpeedText: {
-    fontSize: 10.5
+    fontSize: 10,
+    fontFamily: "Poppins_700Bold"
   }
 });
