@@ -187,7 +187,7 @@ export function FollowRequestsModal({
       icon = "users";
       iconBg = "#f59e0b";
       notifType = "tribo";
-      actionLabel = "interagiu na sua tribo";
+      actionLabel = "participou da sua tribo";
     }
 
     const timeAgo = formatRelativeTime(item.created_at || item.createdAt);
