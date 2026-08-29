@@ -60,10 +60,32 @@ function App() {
             mandatoryInstallMode: codePush.InstallMode?.ON_NEXT_RESUME ?? 2,
           },
           (status) => {
-            // Status do CodePush
+            switch (status) {
+              case codePush.SyncStatus?.CHECKING_FOR_UPDATE:
+                console.log('[CodePush] Verificando atualizações no Revopush...');
+                break;
+              case codePush.SyncStatus?.DOWNLOADING_PACKAGE:
+                console.log('[CodePush] ⬇ Baixando pacote de atualização em segundo plano...');
+                break;
+              case codePush.SyncStatus?.INSTALLING_UPDATE:
+                console.log('[CodePush]  Instalando atualização...');
+                break;
+              case codePush.SyncStatus?.UP_TO_DATE:
+                console.log('[CodePush] Aplicativo já está na versão mais recente.');
+                break;
+              case codePush.SyncStatus?.UPDATE_INSTALLED:
+                console.log('[CodePush]  Atualização instalada com sucesso! Será aplicada no próximo reinício.');
+                break;
+              case codePush.SyncStatus?.UNKNOWN_ERROR:
+                console.log('[CodePush] Erro desconhecido durante o sync.');
+                break;
+            }
           },
           ({ receivedBytes, totalBytes }) => {
-            // Progresso de download
+            if (totalBytes > 0) {
+              const progress = Math.round((receivedBytes / totalBytes) * 100);
+              console.log(`[CodePush]  Progresso do download: ${progress}%`);
+            }
           }
         ).catch((err) => {
           console.warn('[CodePush] Falha ao verificar atualizações (seguro ignorar):', err?.message || err);
