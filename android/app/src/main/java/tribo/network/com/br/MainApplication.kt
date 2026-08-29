@@ -19,18 +19,41 @@ import com.microsoft.codepush.react.CodePush
 
 class MainApplication : Application(), ReactApplication {
 
+  private var codePushInstance: CodePush? = null
+
+  private fun getCodePush(): CodePush {
+    if (codePushInstance == null) {
+      val serverUrl = try {
+        resources.getString(R.string.CodePushServerUrl)
+      } catch (e: Exception) {
+        null
+      }
+      codePushInstance = if (serverUrl != null) {
+        CodePush(resources.getString(R.string.CodePushDeploymentKey), applicationContext, BuildConfig.DEBUG, serverUrl)
+      } else {
+        CodePush(resources.getString(R.string.CodePushDeploymentKey), applicationContext, BuildConfig.DEBUG)
+      }
+    }
+    return codePushInstance!!
+  }
+
   override val reactNativeHost: ReactNativeHost = ReactNativeHostWrapper(
       this,
       object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
-              add(CodePush(resources.getString(R.string.CodePushDeploymentKey), applicationContext, BuildConfig.DEBUG))
+              add(getCodePush())
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"
 
           override fun getJSBundleFile(): String? {
-              return CodePush.getJSBundleFile()
+              return try {
+                  getCodePush()
+                  CodePush.getJSBundleFile()
+              } catch (e: Exception) {
+                  null
+              }
           }
 
           override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG

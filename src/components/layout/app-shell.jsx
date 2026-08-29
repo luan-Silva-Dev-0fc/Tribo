@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -20,18 +20,11 @@ export function AppShell({
   onNavigate,
   onCreateTribo,
   onOpenMessages,
-  onOpenProfile
+  onOpenProfile,
+  user
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const barBg = colors.card || "#121214";
-
-  const tabs = [
-    ["feed", "home", "Feed"],
-    ["reels", "movie-play", "Reels"],
-    ["search", "search", "Busca"],
-    ["profile", "user", "Perfil"]
-  ];
 
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const [followRequestsVisible, setFollowRequestsVisible] = useState(false);
@@ -58,13 +51,14 @@ export function AppShell({
     }
   }, [active, fetchRequests]);
 
+  const avatarUrl = user?.avatar_url || user?.avatar || user?.photo_url || user?.profile_photo;
+
   return (
-    <View style={[styles.root, { backgroundColor: barBg }]}>
+    <View style={styles.root}>
       {/* Header Superior */}
       <View
         style={[
           styles.header,
-          { backgroundColor: "#000000" },
           active === "reels" && {
             position: "absolute",
             top: 0,
@@ -86,109 +80,155 @@ export function AppShell({
               style={styles.iconButton}
               onPress={() => setFollowRequestsVisible(true)}
             >
-              <Feather name="bell" size={20} color="#ffffff" />
+              <Feather name="bell" size={19} color="#ffffff" />
               {pendingRequestsCount > 0 && <View style={styles.badge} />}
             </Pressable>
 
             <Pressable style={styles.iconButton} onPress={onOpenMessages}>
-              <Feather name="message-square" size={20} color="#ffffff" />
+              <Feather name="message-square" size={19} color="#ffffff" />
             </Pressable>
 
             <Pressable style={styles.iconButton} onPress={onCreateTribo}>
-              <Feather name="plus" size={20} color="#ffffff" />
+              <Feather name="plus" size={19} color="#ffffff" />
             </Pressable>
           </View>
         </View>
       </View>
 
       {/* Conteúdo Principal */}
-      <View style={[styles.content, { backgroundColor: "#000000" }]}>
+      <View style={styles.content}>
         {children}
       </View>
 
-      {/* Footer / Barra de Navegação Inferior (Cinza Escuro da Interface) */}
-      <View
-        style={[
-          styles.footerContainer,
-          {
-            backgroundColor: barBg,
-            borderTopWidth: 1,
-            borderTopColor: "rgba(255, 255, 255, 0.08)"
-          }
-        ]}
-      >
+      {/* Bottom Navigation Bar */}
+      <View style={styles.footerContainer}>
         <View
           style={[
             styles.navBar,
             {
-              backgroundColor: barBg,
-              paddingBottom: Math.max(
-                insets.bottom,
-                Platform.OS === "android" ? 12 : 8
-              )
+              paddingBottom: Math.max(insets.bottom, Platform.OS === "android" ? 10 : 8)
             }
           ]}
         >
-          {tabs.map(([id, icon, label]) => {
-            const isActive = active === id;
-            const activeColor = "#FFFFFF";
-            const inactiveColor = "#71717A";
-
-            return (
-              <Pressable
-                key={id}
-                onPress={() => onNavigate(id)}
-                style={styles.tab}
-              >
-                {({ pressed }) => (
-                  <View
-                    style={[styles.tabContent, { opacity: pressed ? 0.6 : 1 }]}
+          {/* Feed Tab */}
+          <Pressable
+            onPress={() => onNavigate("feed")}
+            style={styles.tab}
+          >
+            {({ pressed }) => {
+              const isActive = active === "feed";
+              return (
+                <View style={[styles.tabContent, { opacity: pressed ? 0.6 : 1 }]}>
+                  <Feather
+                    name="home"
+                    size={22}
+                    color={isActive ? "#FFFFFF" : "#8E8E93"}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: isActive ? "#FFFFFF" : "#8E8E93",
+                        fontFamily: isActive ? "Poppins_600SemiBold" : "Poppins_400Regular"
+                      }
+                    ]}
                   >
-                    <View style={styles.tabIcon}>
-                      {id === "trends" ? (
-                        <Image
-                          source={{
-                            uri: "https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/jornal.png"
-                          }}
-                          style={{
-                            width: 22,
-                            height: 22,
-                            tintColor: isActive ? activeColor : inactiveColor
-                          }}
-                          resizeMode="contain"
-                        />
-                      ) : id === "reels" ? (
-                        <MaterialCommunityIcons
-                          name={isActive ? "movie-play" : "movie-play-outline"}
-                          size={24}
-                          color={isActive ? activeColor : inactiveColor}
-                        />
-                      ) : (
-                        <Feather
-                          name={icon}
-                          size={22}
-                          color={isActive ? activeColor : inactiveColor}
-                        />
-                      )}
-                    </View>
-                    <Text
-                      style={[
-                        styles.tabText,
-                        {
-                          color: isActive ? activeColor : inactiveColor,
-                          fontFamily: isActive
-                            ? "Poppins_600SemiBold"
-                            : "Poppins_400Regular"
-                        }
-                      ]}
-                    >
-                      {label}
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
-            );
-          })}
+                    Feed
+                  </Text>
+                </View>
+              );
+            }}
+          </Pressable>
+
+          {/* Reels Tab */}
+          <Pressable
+            onPress={() => onNavigate("reels")}
+            style={styles.tab}
+          >
+            {({ pressed }) => {
+              const isActive = active === "reels";
+              return (
+                <View style={[styles.tabContent, { opacity: pressed ? 0.6 : 1 }]}>
+                  <MaterialCommunityIcons
+                    name={isActive ? "movie-play" : "movie-play-outline"}
+                    size={24}
+                    color={isActive ? "#FFFFFF" : "#8E8E93"}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: isActive ? "#FFFFFF" : "#8E8E93",
+                        fontFamily: isActive ? "Poppins_600SemiBold" : "Poppins_400Regular"
+                      }
+                    ]}
+                  >
+                    Reels
+                  </Text>
+                </View>
+              );
+            }}
+          </Pressable>
+
+          {/* Busca Tab */}
+          <Pressable
+            onPress={() => onNavigate("search")}
+            style={styles.tab}
+          >
+            {({ pressed }) => {
+              const isActive = active === "search";
+              return (
+                <View style={[styles.tabContent, { opacity: pressed ? 0.6 : 1 }]}>
+                  <Feather
+                    name="search"
+                    size={22}
+                    color={isActive ? "#FFFFFF" : "#8E8E93"}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: isActive ? "#FFFFFF" : "#8E8E93",
+                        fontFamily: isActive ? "Poppins_600SemiBold" : "Poppins_400Regular"
+                      }
+                    ]}
+                  >
+                    Busca
+                  </Text>
+                </View>
+              );
+            }}
+          </Pressable>
+
+          {/* Perfil Tab */}
+          <Pressable
+            onPress={() => onNavigate("profile")}
+            style={styles.tab}
+          >
+            {({ pressed }) => {
+              const isActive = active === "profile";
+              return (
+                <View style={[styles.tabContent, { opacity: pressed ? 0.6 : 1 }]}>
+                  <Feather
+                    name="user"
+                    size={22}
+                    color={isActive ? "#FFFFFF" : "#8E8E93"}
+                  />
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: isActive ? "#FFFFFF" : "#8E8E93",
+                        fontFamily: isActive ? "Poppins_600SemiBold" : "Poppins_400Regular"
+                      }
+                    ]}
+                  >
+                    Perfil
+                  </Text>
+                </View>
+              );
+            }}
+          </Pressable>
         </View>
       </View>
 
@@ -206,13 +246,14 @@ export function AppShell({
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1
+    flex: 1,
+    backgroundColor: "#121214"
   },
   header: {
-    height: 140,
+    height: 120,
     backgroundColor: "#000000",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 16,
     flexDirection: "row",
     alignItems: "flex-start",
     zIndex: 1
@@ -222,7 +263,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 10
+    marginTop: 8
   },
   logoContainer: {
     flexDirection: "row",
@@ -233,7 +274,7 @@ const styles = StyleSheet.create({
   wordmark: {
     color: "#ffffff",
     fontFamily: "Poppins_700Bold",
-    fontSize: 28,
+    fontSize: 26,
     letterSpacing: -0.5
   },
   headerActions: {
@@ -241,35 +282,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
-    gap: 6
+    gap: 8
   },
   iconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "#222222",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#1c1c20",
     alignItems: "center",
     justifyContent: "center",
-    position: "relative"
+    position: "relative",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.08)"
   },
   badge: {
     position: "absolute",
     top: 6,
-    right: 8,
+    right: 7,
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: "#ef4444",
     borderWidth: 1.5,
-    borderColor: "#222222"
+    borderColor: "#1c1c20"
   },
   content: {
     flex: 1,
     zIndex: 5,
-    backgroundColor: "#000000"
+    backgroundColor: "#121214"
   },
   footerContainer: {
     width: "100%",
+    backgroundColor: "#121214",
+    borderTopWidth: 0,
+    elevation: 0,
+    shadowOpacity: 0,
     zIndex: 100
   },
   navBar: {
@@ -277,7 +324,8 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingTop: 8
+    paddingTop: 8,
+    backgroundColor: "#121214"
   },
   tab: {
     flex: 1,
@@ -288,11 +336,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 3
-  },
-  tabIcon: {
-    height: 26,
-    alignItems: "center",
-    justifyContent: "center"
   },
   tabText: {
     fontSize: 11,

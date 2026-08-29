@@ -70,26 +70,53 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
 
 
     try {
-      if (idToken) {
-        const backendRes = await api.auth.google(idToken);
-        token =
+      const googlePayload = {
+        idToken,
+        token: idToken,
+        email: profileData.email,
+        name: profileData.fullName,
+        fullName: profileData.fullName,
+        avatar: profileData.avatarUrl,
+        photo: profileData.avatarUrl,
+        provider: "google"
+      };
+
+      const backendRes = await api.auth.google(googlePayload).catch(async (err) => {
+        console.warn("[GoogleAuth] api.auth.google falhou, tentando api.loginGoogle:", err?.message);
+        return await api.loginGoogle(googlePayload);
+      });
+
+      token =
         backendRes?.token ||
         backendRes?.data?.token ||
-        backendRes?.accessToken;
-        if (token) {
-          await session.save(token);
-        }
-        authenticatedUser =
+        backendRes?.accessToken ||
+        backendRes?.data?.accessToken ||
+        backendRes?.session?.access_token;
+
+      if (token) {
+        await session.save(token);
+      }
+
+      authenticatedUser =
         unwrap(backendRes, "user") ||
         backendRes?.user ||
-        backendRes?.data?.user;
+        backendRes?.data?.user ||
+        backendRes?.data;
+
+      // Se retornou token mas não veio o objeto de usuário completo, busca via api.me()
+      if (token && (!authenticatedUser || !authenticatedUser.id)) {
+        try {
+          const meRes = await api.me();
+          authenticatedUser = unwrap(meRes, "user") || meRes?.user || meRes?.data || meRes;
+        } catch (meErr) {
+          console.warn("[GoogleAuth] api.me() falhou após login Google:", meErr?.message);
+        }
       }
     } catch (backendError) {
       console.warn(
         "[GoogleAuth] api.auth.google falhou, tentando Supabase fallback:",
         backendError?.message
       );
-
 
       if (idToken && supabase?.auth?.signInWithIdToken) {
         try {
@@ -112,11 +139,12 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
       }
     }
 
-    if (authenticatedUser && onAuthenticated) {
-      onAuthenticated(authenticatedUser);
+    if ((authenticatedUser || token) && onAuthenticated) {
+      const finalUser = authenticatedUser || { email: profileData.email, name: profileData.fullName };
+      onAuthenticated(finalUser);
       return {
         idToken,
-        user: authenticatedUser,
+        user: finalUser,
         token,
         googleProfile: profileData
       };

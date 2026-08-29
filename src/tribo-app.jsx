@@ -380,11 +380,12 @@ function TriboRoot() {
   );
 
   if (booting)
-  return (
-    <View style={[styles.loading, { backgroundColor: colors.ink }]}>
+    return (
+      <View style={[styles.loading, { backgroundColor: colors.background || "#000000" }]}>
         <StatusBar style="light" />
-        <ActivityIndicator size="large" color={colors.accent} />
-      </View>);
+        <ActivityIndicator size="large" color={colors.accent || "#0284c7"} />
+      </View>
+    );
 
   if (platformSuspended && !isMasterAdmin && !showAdminAuth) {
     return (
@@ -599,7 +600,7 @@ function TriboRoot() {
       <View
         style={[
         styles.safe,
-        { backgroundColor: colors.card || colors.background }]
+        { backgroundColor: "#121214" }]
         }>
         
         <SafeAreaView style={{ backgroundColor: "#000000" }} edges={["top"]}>
@@ -630,6 +631,7 @@ function TriboRoot() {
           style={{ flex: 1, backgroundColor: colors.card || colors.background }}>
           
           <AppShell
+            user={user}
             active={screen}
             onNavigate={setScreen}
             onCreateTribo={() => setScreen("tribes_list")}
@@ -638,6 +640,7 @@ function TriboRoot() {
             
             {pages[screen]}
           </AppShell>
+          
           <PublicProfile
             user={profileToOpen}
             currentUserId={user.id}
@@ -668,20 +671,29 @@ function TriboRoot() {
 }
 
 export default function TriboApp() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
     Poppins_700Bold
   });
-  if (!fontsLoaded) return null;
+
+  if (!fontsLoaded && !fontError) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center' }}>
+        <StatusBar style="light" />
+        <ActivityIndicator size="large" color="#0284c7" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <TriboRoot />
       </ThemeProvider>
-    </SafeAreaProvider>);
-
+    </SafeAreaProvider>
+  );
 }
 
 const styles = StyleSheet.create({

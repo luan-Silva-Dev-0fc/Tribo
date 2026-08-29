@@ -97,9 +97,11 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <TriboApp />
-    </ErrorBoundary>
+    <View style={{ flex: 1, backgroundColor: '#121214' }}>
+      <ErrorBoundary>
+        <TriboApp />
+      </ErrorBoundary>
+    </View>
   );
 }
 

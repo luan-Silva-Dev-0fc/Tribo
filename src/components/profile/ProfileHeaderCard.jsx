@@ -100,7 +100,7 @@ export function ProfileHeaderCard({
 
       <View style={styles.nameBlock}>
         <View style={styles.nameRow}>
-          <Text selectable style={[styles.profileName, { color: colors.text }]}>
+          <Text style={[styles.profileName, { color: colors.text }]}>
             {userName(profile)}
           </Text>
           <VerificationBadge user={profile} size={18} />
@@ -112,12 +112,12 @@ export function ProfileHeaderCard({
           )}
         </View>
 
-        <Text selectable style={[styles.profileHandle, { color: colors.subtext }]}>
+        <Text style={[styles.profileHandle, { color: colors.subtext }]}>
           @{profile?.username || "tribo"}
         </Text>
 
         {!!profile?.bio && (
-          <Text selectable style={[styles.profileBio, { color: colors.text }]}>
+          <Text style={[styles.profileBio, { color: colors.text }]}>
             {profile?.bio}
           </Text>
         )}

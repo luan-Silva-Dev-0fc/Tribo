@@ -1,4 +1,4 @@
-﻿import Constants from "expo-constants";
+import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { NativeOptimization } from "./services/nativeOptimization";
@@ -305,11 +305,14 @@ export const api = {
   request("/register", { method: "POST", body: formData }),
   login: (email, password) =>
   request("/login", { method: "POST", body: { email, password } }),
-  loginGoogle: (idToken) =>
-  request("/auth/google", {
-    method: "POST",
-    body: { idToken, token: idToken }
-  }),
+  loginGoogle: (payload) =>
+    request("/auth/google", {
+      method: "POST",
+      body:
+        typeof payload === "object"
+          ? payload
+          : { idToken: payload, token: payload }
+    }),
   me: () => request("/me"),
 
   auth: {
@@ -323,11 +326,14 @@ export const api = {
       method: "POST",
       body: { email }
     }),
-    google: (idToken) =>
-    request("/auth/google", {
-      method: "POST",
-      body: { idToken, token: idToken }
-    })
+    google: (payload) =>
+      request("/auth/google", {
+        method: "POST",
+        body:
+          typeof payload === "object"
+            ? payload
+            : { idToken: payload, token: payload }
+      })
   },
 
   users: {

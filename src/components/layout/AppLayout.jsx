@@ -28,7 +28,7 @@ export function AppLayout({
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }, style]}>
+    <View style={[styles.container, { backgroundColor: colors.card }, style]}>
       <View
         style={[
         styles.card,

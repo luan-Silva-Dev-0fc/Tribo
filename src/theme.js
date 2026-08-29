@@ -75,7 +75,7 @@ const THEME_STORAGE_KEY = "@tribo_theme_mode";
 
 export function ThemeProvider({ children }) {
   const [preference, setPreferenceState] = useState("dark");
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(true);
 
   useEffect(() => {
     async function loadTheme() {
@@ -85,7 +85,6 @@ export function ThemeProvider({ children }) {
           setPreferenceState(saved);
         }
       } catch (err) {}
-      setIsReady(true);
     }
     loadTheme();
   }, []);

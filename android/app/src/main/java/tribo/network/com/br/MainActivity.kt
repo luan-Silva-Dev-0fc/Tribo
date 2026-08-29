@@ -15,8 +15,37 @@ class MainActivity : ReactActivity() {
     // Set the theme to AppTheme BEFORE onCreate to support
     // coloring the background, status bar, and navigation bar.
     // This is required for expo-splash-screen.
-    setTheme(R.style.AppTheme);
+    setTheme(R.style.AppTheme)
     super.onCreate(null)
+    applyNavigationBarColor()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    applyNavigationBarColor()
+  }
+
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    super.onWindowFocusChanged(hasFocus)
+    if (hasFocus) {
+      applyNavigationBarColor()
+    }
+  }
+
+  private fun applyNavigationBarColor() {
+    try {
+      window.navigationBarColor = android.graphics.Color.parseColor("#121214")
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        window.insetsController?.setSystemBarsAppearance(
+          0,
+          android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+        )
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility =
+          window.decorView.systemUiVisibility and android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+      }
+    } catch (_: Exception) {}
   }
 
   /**

@@ -1,4 +1,4 @@
-﻿{
+{
     "expo":  {
                  "name":  "Tribo",
                  "slug":  "tribo",
@@ -29,7 +29,7 @@
                              },
                  "androidNavigationBar":  {
                                               "barStyle":  "light-content",
-                                              "backgroundColor":  "#000000"
+                                              "backgroundColor":  "#121214"
                                           },
                  "notification":  {
                                       "icon":  "./assets/notification-icon.png",
