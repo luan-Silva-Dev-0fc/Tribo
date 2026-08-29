@@ -153,6 +153,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-code-push')
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
@@ -182,3 +183,5 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
+

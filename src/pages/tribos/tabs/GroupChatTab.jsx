@@ -19,8 +19,8 @@ import {
   TextInput,
   View,
   Platform,
-  KeyboardAvoidingView,
-  Keyboard
+  Keyboard,
+  LayoutAnimation
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -249,6 +249,32 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
   ref
 ) {
   const insets = useSafeAreaInsets();
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      try {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      } catch (_) {}
+      setKeyboardHeight(e?.endCoordinates?.height || 0);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      try {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      } catch (_) {}
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const { isDark: themeIsDark, mode, colors: themeColors } = useTheme();
   const colors = propColors || themeColors;
@@ -1520,11 +1546,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#000000" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-    >
+    <View style={{ flex: 1, backgroundColor: "#000000" }}>
       {/* Barra de Voz ao Vivo (Discreta, Compacta e Moderna) */}
       <View style={{ alignItems: "center", marginVertical: 4, paddingHorizontal: 12 }}>
         <Pressable
@@ -2017,7 +2039,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
           style={{
             paddingHorizontal: 12,
             paddingTop: 6,
-            paddingBottom: Math.max(insets.bottom, 12),
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 8 : Math.max(insets.bottom, 12),
             backgroundColor: "#000000",
             borderTopWidth: 1,
             borderColor: "rgba(255, 255, 255, 0.08)",
@@ -2273,9 +2295,11 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
         }}
         onClose={() => setViewerMedia(null)}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 });
+
+
 
 
 

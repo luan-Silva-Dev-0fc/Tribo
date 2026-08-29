@@ -1,3 +1,4 @@
 <resources>
   <string name="app_name">Tribo</string>
+  <string name="CodePushDeploymentKey" moduleConfig="true">YC1w71voeacrBX8ZiAdyVCbhJUyYEJ_rh3uD4g</string>
 </resources>

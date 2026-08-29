@@ -15,6 +15,7 @@ import com.facebook.react.defaults.DefaultReactNativeHost
 
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
+import com.microsoft.codepush.react.CodePush
 
 class MainApplication : Application(), ReactApplication {
 
@@ -23,11 +24,14 @@ class MainApplication : Application(), ReactApplication {
       object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
-              // Packages that cannot be autolinked yet can be added manually here, for example:
-              // add(MyReactNativePackage())
+              add(CodePush(resources.getString(R.string.CodePushDeploymentKey), applicationContext, BuildConfig.DEBUG))
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"
+
+          override fun getJSBundleFile(): String? {
+              return CodePush.getJSBundleFile()
+          }
 
           override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 

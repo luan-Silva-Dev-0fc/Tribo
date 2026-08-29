@@ -1,15 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
+﻿import React, { useState, useEffect, useCallback } from "react";
 import {
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
   View,
-  Platform } from
-"react-native";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+  Text,
+  StyleSheet,
+  Pressable,
+  Platform,
+  Image
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
+import { api } from "../../api";
 import { listFrom } from "../../lib/format";
 import { FollowRequestsModal } from "../modals/follow-requests-modal";
 
@@ -23,17 +24,14 @@ export function AppShell({
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const bottomOffset = Math.max(
-    insets.bottom,
-    Platform.OS === "android" ? 14 : 10
-  );
+  const barBg = colors.card || "#121214";
 
   const tabs = [
-  ["feed", "home", "Feed"],
-  ["reels", "movie-play", "Reels"],
-  ["search", "search", "Busca"],
-  ["profile", "user", "Perfil"]];
-
+    ["feed", "home", "Feed"],
+    ["reels", "movie-play", "Reels"],
+    ["search", "search", "Busca"],
+    ["profile", "user", "Perfil"]
+  ];
 
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const [followRequestsVisible, setFollowRequestsVisible] = useState(false);
@@ -41,19 +39,17 @@ export function AppShell({
   const fetchRequests = useCallback(async () => {
     try {
       const [reqRes, notRes] = await Promise.all([
-      api.users.followRequests().catch(() => null),
-      api.notifications.list().catch(() => null)]
-      );
+        api.users.followRequests().catch(() => null),
+        api.notifications.list().catch(() => null)
+      ]);
       const listReq = listFrom(reqRes, ["requests", "users", "data"]);
       const listNotif =
-      listFrom(notRes, ["notifications", "data"]) || notRes || [];
-      const unreadNotif = Array.isArray(listNotif) ?
-      listNotif.filter((n) => !n.is_read && !n.isRead) :
-      [];
+        listFrom(notRes, ["notifications", "data"]) || notRes || [];
+      const unreadNotif = Array.isArray(listNotif)
+        ? listNotif.filter((n) => !n.is_read && !n.isRead)
+        : [];
       setPendingRequestsCount(listReq.length + unreadNotif.length);
-    } catch (err) {
-
-    }
+    } catch (err) {}
   }, []);
 
   useEffect(() => {
@@ -63,28 +59,23 @@ export function AppShell({
   }, [active, fetchRequests]);
 
   return (
-    <View
-      style={[
-      styles.root,
-      { backgroundColor: colors.card || colors.background }]
-      }>
-      
-      {}
+    <View style={[styles.root, { backgroundColor: barBg }]}>
+      {/* Header Superior */}
       <View
         style={[
-        styles.header,
-        { backgroundColor: "#000000" },
-        active === "reels" && {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: "transparent",
-          borderBottomWidth: 0,
-          height: 100
-        }]
-        }>
-        
+          styles.header,
+          { backgroundColor: "#000000" },
+          active === "reels" && {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: "transparent",
+            borderBottomWidth: 0,
+            height: 100
+          }
+        ]}
+      >
         <View style={styles.headerContent}>
           <View style={styles.logoContainer}>
             <Ionicons name="people" size={28} color="#ffffff" />
@@ -93,8 +84,8 @@ export function AppShell({
           <View style={styles.headerActions}>
             <Pressable
               style={styles.iconButton}
-              onPress={() => setFollowRequestsVisible(true)}>
-              
+              onPress={() => setFollowRequestsVisible(true)}
+            >
               <Feather name="bell" size={20} color="#ffffff" />
               {pendingRequestsCount > 0 && <View style={styles.badge} />}
             </Pressable>
@@ -110,93 +101,93 @@ export function AppShell({
         </View>
       </View>
 
-      {}
-      <View style={[styles.content, { backgroundColor: colors.background }]}>
+      {/* Conteúdo Principal */}
+      <View style={[styles.content, { backgroundColor: "#000000" }]}>
         {children}
       </View>
 
-      {}
+      {/* Footer / Barra de Navegação Inferior (Cinza Escuro da Interface) */}
       <View
         style={[
-        styles.footerContainer,
-        {
-          backgroundColor: "#000000",
-          borderTopWidth: StyleSheet.hairlineWidth,
-          borderTopColor: "#27272a"
-        }]
-        }>
-        
+          styles.footerContainer,
+          {
+            backgroundColor: barBg,
+            borderTopWidth: 1,
+            borderTopColor: "rgba(255, 255, 255, 0.08)"
+          }
+        ]}
+      >
         <View
           style={[
-          styles.navBar,
-          {
-            backgroundColor: colors.card,
-            paddingBottom: Math.max(
-              insets.bottom,
-              Platform.OS === "android" ? 10 : 8
-            )
-          }]
-          }>
-          
+            styles.navBar,
+            {
+              backgroundColor: barBg,
+              paddingBottom: Math.max(
+                insets.bottom,
+                Platform.OS === "android" ? 12 : 8
+              )
+            }
+          ]}
+        >
           {tabs.map(([id, icon, label]) => {
             const isActive = active === id;
             const activeColor = "#FFFFFF";
-            const inactiveColor = "#A1A1AA";
+            const inactiveColor = "#71717A";
 
             return (
               <Pressable
                 key={id}
                 onPress={() => onNavigate(id)}
-                style={styles.tab}>
-                
-                {({ pressed }) =>
-                <View
-                  style={[styles.tabContent, { opacity: pressed ? 0.6 : 1 }]}>
-                  
+                style={styles.tab}
+              >
+                {({ pressed }) => (
+                  <View
+                    style={[styles.tabContent, { opacity: pressed ? 0.6 : 1 }]}
+                  >
                     <View style={styles.tabIcon}>
-                      {id === "trends" ?
-                    <Image
-                      source={{
-                        uri: "https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/jornal.png"
-                      }}
-                      style={{
-                        width: 22,
-                        height: 22,
-                        tintColor: isActive ? activeColor : inactiveColor
-                      }}
-                      resizeMode="contain" /> :
-
-                    id === "reels" ?
-                    <MaterialCommunityIcons
-                      name={isActive ? "movie-play" : "movie-play-outline"}
-                      size={24}
-                      color={isActive ? activeColor : inactiveColor} /> :
-
-
-                    <Feather
-                      name={icon}
-                      size={22}
-                      color={isActive ? activeColor : inactiveColor} />
-
-                    }
+                      {id === "trends" ? (
+                        <Image
+                          source={{
+                            uri: "https://pub-08d4ac7de5354fadbfe07fcbc70237ba.r2.dev/jornal.png"
+                          }}
+                          style={{
+                            width: 22,
+                            height: 22,
+                            tintColor: isActive ? activeColor : inactiveColor
+                          }}
+                          resizeMode="contain"
+                        />
+                      ) : id === "reels" ? (
+                        <MaterialCommunityIcons
+                          name={isActive ? "movie-play" : "movie-play-outline"}
+                          size={24}
+                          color={isActive ? activeColor : inactiveColor}
+                        />
+                      ) : (
+                        <Feather
+                          name={icon}
+                          size={22}
+                          color={isActive ? activeColor : inactiveColor}
+                        />
+                      )}
                     </View>
                     <Text
-                    style={[
-                    styles.tabText,
-                    {
-                      color: isActive ? activeColor : inactiveColor,
-                      fontFamily: isActive ?
-                      "Poppins_600SemiBold" :
-                      "Poppins_400Regular"
-                    }]
-                    }>
-                    
+                      style={[
+                        styles.tabText,
+                        {
+                          color: isActive ? activeColor : inactiveColor,
+                          fontFamily: isActive
+                            ? "Poppins_600SemiBold"
+                            : "Poppins_400Regular"
+                        }
+                      ]}
+                    >
                       {label}
                     </Text>
                   </View>
-                }
-              </Pressable>);
-
+                )}
+              </Pressable>
+            );
           })}
         </View>
       </View>
@@ -207,10 +198,10 @@ export function AppShell({
         onOpenProfile={onOpenProfile}
         onRequestHandled={() => {
           fetchRequests();
-        }} />
-      
-    </View>);
-
+        }}
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -272,38 +263,21 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: "#222222"
   },
-  createButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#222222",
-    borderWidth: 1,
-    borderColor: "#333333",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 24,
-    gap: 6
-  },
-  createButtonText: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
-    color: "#ffffff"
-  },
   content: {
     flex: 1,
-    zIndex: 5
+    zIndex: 5,
+    backgroundColor: "#000000"
   },
   footerContainer: {
     width: "100%",
-    zIndex: 100,
-    backgroundColor: "transparent"
+    zIndex: 100
   },
   navBar: {
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingTop: 8,
-    backgroundColor: "transparent"
+    paddingTop: 8
   },
   tab: {
     flex: 1,
