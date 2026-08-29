@@ -3,7 +3,9 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
+  LayoutAnimation,
   Modal,
   Platform,
   Pressable,
@@ -152,8 +154,34 @@ export function CommentsModal({
   const [audioUri, setAudioUri] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const recordingTimer = useRef(null);
   const recordingRef = useRef(null);
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      try {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      } catch (_) {}
+      setKeyboardHeight(e.endCoordinates?.height || 0);
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      try {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      } catch (_) {}
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const showAlert =
   showAlertProp || (
@@ -183,6 +211,7 @@ export function CommentsModal({
     setAudioUri(null);
     setOptionsComment(null);
     setDeleteConfirmComment(null);
+    setKeyboardHeight(0);
     if (post) {
       load();
     }
@@ -191,6 +220,14 @@ export function CommentsModal({
   useEffect(() => {
     recordingRef.current = recording;
   }, [recording]);
+
+  useEffect(() => {
+    if (keyboardHeight > 0 && items.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd?.({ animated: true });
+      }, 100);
+    }
+  }, [keyboardHeight, items.length]);
 
   useEffect(() => {
     return () => {
@@ -389,18 +426,20 @@ export function CommentsModal({
 
         {}
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
           style={styles.sheetWrapper}>
           
           <View
             style={[
-            styles.bottomSheet,
-            {
-              backgroundColor: colors.surface || "#121214",
-              borderColor: colors.border || "rgba(255, 255, 255, 0.08)"
-            }]
-            }>
+              styles.bottomSheet,
+              {
+                backgroundColor: colors.surface || "#0F1115",
+                borderColor: colors.border || "rgba(255, 255, 255, 0.08)",
+                marginBottom: keyboardHeight > 0 ? keyboardHeight : 0,
+                maxHeight: keyboardHeight > 0 ? "70%" : "85%"
+              }
+            ]}>
             
             {}
             <View style={styles.dragHandleContainer}>
@@ -428,9 +467,12 @@ export function CommentsModal({
             </View>
 
             {}
-            <FlatList
-              data={items}
-              keyExtractor={(item, index) => String(item.id || index)}
+            <View style={{ flex: 1 }}>
+              <FlatList
+                ref={flatListRef}
+                data={items}
+                keyExtractor={(item, index) => String(item.id || index)}
+                style={{ flex: 1 }}
               contentContainerStyle={[styles.commentsList, { paddingBottom: 16 }]}
               keyboardDismissMode="on-drag"
               keyboardShouldPersistTaps="handled"
@@ -563,14 +605,14 @@ export function CommentsModal({
                   </View>
 
               } />
-            
+            </View>
 
             {}
             <View
               style={[
               styles.footerInputBar,
               {
-                backgroundColor: colors.surface || "#121214",
+                backgroundColor: colors.surface || "#0F1115",
                 borderTopColor:
                 colors.border || "rgba(255, 255, 255, 0.08)",
                 paddingBottom: Math.max(insets.bottom, 12)
@@ -920,14 +962,16 @@ const styles = StyleSheet.create({
   },
   sheetWrapper: {
     width: "100%",
+    flex: 1,
     justifyContent: "flex-end"
   },
   bottomSheet: {
     width: "100%",
-    height: SCREEN_HEIGHT * 0.80,
+    height: SCREEN_HEIGHT * 0.78,
     maxHeight: SCREEN_HEIGHT * 0.85,
-    borderTopLeftRadius: 26,
-    borderTopRightRadius: 26,
+    backgroundColor: "#0F1115",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,

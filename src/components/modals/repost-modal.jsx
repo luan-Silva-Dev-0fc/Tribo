@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   Image,
   ScrollView,
   KeyboardAvoidingView,
+  Keyboard,
+  LayoutAnimation,
   Platform } from
 "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -38,6 +40,31 @@ export function RepostModal({ visible, post, currentUser, onClose, onRepost }) {
   const insets = useSafeAreaInsets();
   const [content, setContent] = useState("");
   const [sending, setSending] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      try {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      } catch (_) {}
+      setKeyboardHeight(e.endCoordinates?.height || 0);
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      try {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      } catch (_) {}
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   if (!post) return null;
 
@@ -85,20 +112,20 @@ export function RepostModal({ visible, post, currentUser, onClose, onRepost }) {
       visible={visible}
       transparent
       animationType="slide"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+      statusBarTranslucent>
       
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.overlay}>
-        
+      <View style={styles.overlay}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         
         <View
           style={[
           styles.container,
           {
-            backgroundColor: colors.card || colors.background,
-            borderColor: colors.border
+            backgroundColor: colors.surface || colors.card || "#0F1115",
+            borderColor: colors.border,
+            marginBottom: keyboardHeight > 0 ? keyboardHeight : 0,
+            maxHeight: keyboardHeight > 0 ? "75%" : "85%"
           }]
           }>
           
@@ -226,8 +253,8 @@ export function RepostModal({ visible, post, currentUser, onClose, onRepost }) {
             styles.footer,
             {
               borderTopColor: colors.border || "rgba(255,255,255,0.08)",
-              backgroundColor: colors.card || colors.background,
-              paddingBottom: Math.max(insets.bottom, 16) + 6
+              backgroundColor: colors.surface || colors.card || colors.background || "#0F1115",
+              paddingBottom: keyboardHeight > 0 ? 12 : Math.max(insets.bottom, 16) + 6
             }]
             }>
             
@@ -260,7 +287,7 @@ export function RepostModal({ visible, post, currentUser, onClose, onRepost }) {
             </Pressable>
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>);
 
 }

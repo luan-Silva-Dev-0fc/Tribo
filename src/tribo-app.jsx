@@ -124,10 +124,16 @@ function TriboRoot() {
 
     checkPlatformStatus();
 
-    // Re-check when app returns from background / becomes active
+    // Re-check and reconnect when app returns from background / becomes active
     const appStateSub = AppState.addEventListener("change", (nextState) => {
       if (nextState === "active") {
         checkPlatformStatus();
+        try {
+          const s = getChatSocket();
+          if (s && !s.connected) {
+            s.connect();
+          }
+        } catch (_) {}
       }
     });
 
@@ -227,6 +233,19 @@ function TriboRoot() {
         type === "comment")
         {
           setScreen("feed");
+        } else if (
+        type === "group" ||
+        type === "group_message" ||
+        type === "group_invite" ||
+        type === "tribe")
+        {
+          const groupId = data.groupId || data.group_id;
+          if (groupId) {
+            setActiveGroupId(groupId);
+            setScreen("tribe_details");
+          } else {
+            setScreen("tribes_list");
+          }
         } else if (
         type === "request" ||
         type === "follow" ||

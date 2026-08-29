@@ -64,7 +64,7 @@ export async function setOptimizedAudioMode(forRecording = false) {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: Boolean(forRecording),
       playsInSilentModeIOS: true,
-      staysActiveInBackground: false,
+      staysActiveInBackground: true,
       interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
       interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
       shouldDuckAndroid: true,
