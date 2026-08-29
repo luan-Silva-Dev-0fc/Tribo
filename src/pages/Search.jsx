@@ -523,21 +523,26 @@ export function EditProfile({ user, visible, onClose, onSaved, onUpdateUser }) {
       <View style={[styles.modalPage, { backgroundColor: colors.background }]}>
         <AppHeader title="Editar perfil" onBack={onClose} />
 
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={[
-          styles.editForm,
-          {
-            flexGrow: 1,
-            paddingBottom: Math.max((insets?.bottom || 0) + 40, 80)
-          }]
-          }
-          nestedScrollEnabled={true}
-          scrollEnabled={true}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          bounces={true}
-          overScrollMode="always">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
+          style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={[
+            styles.editForm,
+            {
+              flexGrow: 1,
+              paddingBottom: Math.max((insets?.bottom || 0) + 120, 180)
+            }]
+            }
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
+            bounces={true}
+            overScrollMode="always">
           
           {}
           <View style={styles.avatarEditContainer}>
@@ -706,6 +711,7 @@ export function EditProfile({ user, visible, onClose, onSaved, onUpdateUser }) {
             
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
       </View>
       <TriboAlertModal
         visible={alertConfig.visible}

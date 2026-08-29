@@ -7,6 +7,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Switch,
@@ -167,36 +168,49 @@ export function ProfileScreen({
   const [profileAlert, setProfileAlert] = useState({ visible: false });
   const [userPosts, setUserPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = useCallback(async (silent = false) => {
     if (!user?.id) return;
     try {
-      const res = await api.users.get(user.id);
-      if (res) {
-        setProfileData(res);
-        onUpdateUser?.(res);
+      if (!silent) setLoadingPosts(true);
+      const [res, meRes, postsRes] = await Promise.all([
+        api.users.get(user.id).catch(() => null),
+        api.me().catch(() => null),
+        api.users.posts(user.id).catch(() => null)
+      ]);
+      const resolved = res || unwrap(meRes, "user") || meRes;
+      if (resolved) {
+        const normalized = normalizeUser(resolved);
+        setProfileData(normalized);
       }
-    } catch (err) {
-
-    }
-
-
-    try {
-      setLoadingPosts(true);
-      const postsRes = await api.users.posts(user.id);
       const allPosts = postsRes?.posts || postsRes?.data || postsRes || [];
       setUserPosts(Array.isArray(allPosts) ? allPosts : []);
     } catch (err) {
-
+      console.warn("Erro ao carregar perfil:", err);
     } finally {
       setLoadingPosts(false);
     }
   }, [user?.id]);
 
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        fetchProfile(true),
+        fetchDeletionStatus(),
+        onRefresh ? Promise.resolve(onRefresh()) : Promise.resolve()
+      ]);
+    } catch (err) {
+      console.warn("Erro ao recarregar perfil:", err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchProfile, fetchDeletionStatus, onRefresh]);
+
   useEffect(() => {
     fetchProfile();
-
-  }, []);
+  }, [user?.id]);
 
   const fetchDeletionStatus = useCallback(async () => {
     try {
@@ -239,13 +253,14 @@ export function ProfileScreen({
     }
   };
 
-  const followersCount = profileData?.followers_count ?? profileData?.followersCount ?? 0;
-  const followingCount = profileData?.following_count ?? profileData?.followingCount ?? 0;
-  const postsCount = profileData?.posts_count ?? profileData?.postsCount ?? userPosts?.length ?? 0;
+  const currentProfile = profileData || user;
+  const followersCount = currentProfile?.followers_count ?? currentProfile?.followersCount ?? 0;
+  const followingCount = currentProfile?.following_count ?? currentProfile?.followingCount ?? 0;
+  const postsCount = currentProfile?.posts_count ?? currentProfile?.postsCount ?? userPosts?.length ?? 0;
   const isLoyal = Boolean(
-    profileData?.is_loyal_follower ||
-    profileData?.isLoyalFollower ||
-    profileData?.loyal
+    currentProfile?.is_loyal_follower ||
+    currentProfile?.isLoyalFollower ||
+    currentProfile?.loyal
   );
 
   return (
@@ -265,7 +280,15 @@ export function ProfileScreen({
         
         <ScrollView
           contentContainerStyle={styles.profileScroll}
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.primary || "#3b82f6"}
+              colors={[colors.primary || "#3b82f6"]}
+            />
+          }>
           
           {}
           {deletionInfo?.isPendingDeletion &&
@@ -316,7 +339,7 @@ export function ProfileScreen({
                 style={styles.profileAvatarContainer}
                 accessibilityLabel="Editar foto de perfil">
                 
-                <Avatar user={user} size={84} />
+                <Avatar user={currentProfile} size={84} />
                 <View
                   style={[
                   styles.profileAvatarEditBadge,
@@ -385,9 +408,9 @@ export function ProfileScreen({
             <View style={styles.nameBlock}>
               <View style={styles.nameRow}>
                 <Text selectable style={[styles.profileName, { color: colors.text }]}>
-                  {userName(user)}
+                  {userName(currentProfile)}
                 </Text>
-                <VerificationBadge user={user} size={18} />
+                <VerificationBadge user={currentProfile} size={18} />
                 {isLoyal &&
                 <View style={styles.loyalTag}>
                     <Feather name="star" size={12} color="#f59e0b" />
@@ -402,10 +425,10 @@ export function ProfileScreen({
                 { color: colors.subtext }]
                 }>
                 
-                @{user?.username || "tribo"}
+                @{currentProfile?.username || "tribo"}
               </Text>
 
-              {!!user?.bio &&
+              {!!currentProfile?.bio &&
               <Text
                 selectable
                 style={[
@@ -413,24 +436,30 @@ export function ProfileScreen({
                 { color: colors.text }]
                 }>
                 
-                  {user?.bio}
+                  {currentProfile?.bio}
                 </Text>
               }
 
-              {!!user?.website &&
+              {!!currentProfile?.website &&
               <Pressable
                 onPress={() =>
                 Linking.openURL(
-                  user?.website.startsWith("http") ?
-                  user?.website :
-                  `https://${user?.website}`
+                  currentProfile?.website.startsWith("http") ?
+                  currentProfile?.website :
+                  `https://${currentProfile?.website}`
                 )
                 }>
                 
-                  <Text style={[styles.profileWebsite, { color: colors.accent }]}>
-                    {user?.website}
+                  <Text style={[styles.profileWebsite, { color: colors.primary }]}>
+                    🔗 {currentProfile?.website}
                   </Text>
                 </Pressable>
+              }
+
+              {!!currentProfile?.location &&
+              <Text style={[styles.profileLocation, { color: colors.subtext }]}>
+                  📍 {currentProfile?.location}
+                </Text>
               }
             </View>
 
@@ -484,11 +513,14 @@ export function ProfileScreen({
         </ScrollView>
 
         <EditProfile
-          user={user}
+          user={profileData || user}
           visible={editing}
           onClose={() => setEditing(false)}
-          onUpdateUser={onUpdateUser}
-          onSaved={onRefresh} />
+          onUpdateUser={(updated) => {
+            setProfileData(updated);
+            onUpdateUser?.(updated);
+          }}
+          onSaved={handleRefresh} />
 
         <Settings
           user={user}
