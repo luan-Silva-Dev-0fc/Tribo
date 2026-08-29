@@ -101,8 +101,8 @@ export function GroupDetailsScreen({
   const isDark = Boolean(
     themeIsDark || mode === "dark" || mode === "oled" || colors.mode === "dark"
   );
-  const [group, setGroup] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [group, setGroup] = useState(() => ChatCache.getGroupSync?.(groupId) || null);
+  const [loading, setLoading] = useState(() => !ChatCache.getGroupSync?.(groupId));
   const [activeTab, setActiveTab] = useState("chat");
   const [enableTriboFeed, setEnableTriboFeed] = useState(false);
   const [enableTriboTrends, setEnableTriboTrends] = useState(false);
@@ -176,14 +176,18 @@ export function GroupDetailsScreen({
   const loadGroup = useCallback(async () => {
     try {
       const res = await api.groups.get(groupId);
-      setGroup(res.group || res);
+      const grp = res.group || res;
+      setGroup(grp);
+      ChatCache.setGroupSync?.(groupId, grp);
     } catch (error) {
-      showAlert({
-        title: "Erro ao Carregar",
-        message: errorMessage(error),
-        type: "error",
-        onPrimaryPress: onBack
-      });
+      if (!ChatCache.getGroupSync?.(groupId)) {
+        showAlert({
+          title: "Erro ao Carregar",
+          message: errorMessage(error),
+          type: "error",
+          onPrimaryPress: onBack
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -216,7 +220,7 @@ export function GroupDetailsScreen({
     loadAppSettings();
   }, [loadGroup, loadAppSettings]);
 
-  if (loading || !group) {
+  if (loading && !group) {
     return (
       <View
         style={[
@@ -2087,12 +2091,12 @@ ref)
     colors?.mode === "dark"
   );
 
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => ChatCache.getMessagesSync(groupId) || []);
   const [actionSheet, setActionSheet] = useState({
     visible: false,
     message: null
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !(ChatCache.getMessagesSync(groupId)?.length > 0));
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -2417,8 +2421,9 @@ ref)
       const cached = ChatCache.getMessagesSync(groupId);
       if (cached && cached.length > 0) {
         setMessages(cached);
+      } else {
+        setLoading(true);
       }
-      setLoading(true);
       const res = await api.groups.messages(groupId);
       let rawMsgs = listFrom(res, ["messages", "data"]) || res || [];
       const clearedTimestamp = await getClearedChatTimestamp(groupId);
@@ -2490,23 +2495,41 @@ ref)
     if (!socket) return;
 
     socket.emit("join_group", groupId);
+    socket.emit("join-room", groupId);
+    socket.emit("join-group", groupId);
+    socket.emit("join-room", `group_${groupId}`);
 
     const handleNewMessage = (msg) => {
-      if (String(msg.groupId || msg.group_id) === String(groupId)) {
+      if (!msg) return;
+      const msgGroupId = String(msg.groupId || msg.group_id || "");
+      if (msgGroupId === String(groupId) || !msgGroupId) {
+        const msgId = String(msg.id || msg._id || "");
+        const tempId = msg.tempId || msg.temp_id;
+
         setMessages((prev) => {
-          if (
-          prev.some(
-            (m) => String(m.id || m._id) === String(msg.id || msg._id)
-          ))
-          {
-            return prev;
+          const existingIdx = prev.findIndex(
+            (m) =>
+              (msgId && String(m.id || m._id) === msgId) ||
+              (tempId && (m.tempId === tempId || m.id === tempId))
+          );
+
+          let updated;
+          if (existingIdx >= 0) {
+            updated = [...prev];
+            updated[existingIdx] = { ...updated[existingIdx], ...msg, is_sending: false };
+          } else {
+            updated = [msg, ...prev];
           }
-          return [msg, ...prev];
+
+          ChatCache.setMessagesSync(groupId, updated);
+          return updated;
         });
       }
     };
 
     socket.on("group_message", handleNewMessage);
+    socket.on("group-message", handleNewMessage);
+    socket.on("receive-message", handleNewMessage);
     socket.on("new_message", handleNewMessage);
 
     const handleActiveSpeakersUpdated = (payload) => {
@@ -2653,20 +2676,55 @@ ref)
 
   const handleSendSticker = async (sticker) => {
     if (sending || isBanned) return;
-    try {
-      setSending(true);
-      const stickerUrl =
+    const stickerUrl =
       sticker?.video_url ||
       sticker?.videoUrl ||
       sticker?.media_url ||
       sticker?.mediaUrl ||
       sticker?.url;
-      const stickerId =
-      sticker?.id || sticker?.sticker_id || sticker?.stickerId;
-      const stickerName =
-      sticker?.sticker_name || sticker?.stickerName || "Figurinha";
-      const packName = sticker?.pack_name || sticker?.packName || "Gerais";
+    const stickerId = sticker?.id || sticker?.sticker_id || sticker?.stickerId;
+    const stickerName = sticker?.sticker_name || sticker?.stickerName || "Figurinha";
+    const packName = sticker?.pack_name || sticker?.packName || "Gerais";
 
+    if (!stickerUrl) return;
+
+    const replyIdToSend = replyingTo ? String(replyingTo.id || replyingTo._id) : null;
+    const viewOnceToSend = isViewOnce;
+
+    // Fechar seletores e limpar estado imediatamente
+    setIsViewOnce(false);
+    setReplyingTo(null);
+    setStickerPickerVisible(false);
+    setCreateStickerVisible(false);
+
+    const tempId = `temp_stk_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const optimisticMsg = {
+      id: tempId,
+      _id: tempId,
+      tempId,
+      userId: user?.id,
+      user: user,
+      sender: user,
+      author: user,
+      content: "",
+      media_url: stickerUrl,
+      media_type: "STICKER",
+      sticker_id: stickerId,
+      sticker_name: stickerName,
+      pack_name: packName,
+      is_view_once: viewOnceToSend,
+      reply_to_id: replyIdToSend,
+      createdAt: new Date().toISOString(),
+      is_sending: true
+    };
+
+    setMessages((prev) => {
+      const updated = [optimisticMsg, ...prev];
+      ChatCache.setMessagesSync(groupId, updated);
+      return updated;
+    });
+
+    try {
       const payload = {
         groupId,
         content: "",
@@ -2675,71 +2733,101 @@ ref)
         sticker_id: stickerId,
         sticker_name: stickerName,
         pack_name: packName,
-        is_view_once: isViewOnce,
-        reply_to_id: replyingTo ?
-        String(replyingTo.id || replyingTo._id) :
-        null
+        is_view_once: viewOnceToSend,
+        reply_to_id: replyIdToSend
       };
 
-      await api.groups.sendMessage(groupId, payload);
-      setIsViewOnce(false);
-      setReplyingTo(null);
-      setStickerPickerVisible(false);
-      setCreateStickerVisible(false);
-      loadMessages();
+      const sentRes = await api.groups.sendMessage(groupId, payload);
+      const realMsg = sentRes?.message || sentRes?.data || sentRes;
+      const realId = realMsg?.id || realMsg?._id;
+
+      if (realId) {
+        setMessages((prev) => {
+          const updated = prev.map((m) =>
+            m.id === tempId || m._id === tempId
+              ? { ...m, ...realMsg, id: realId, _id: realId, is_sending: false }
+              : m
+          );
+          ChatCache.setMessagesSync(groupId, updated);
+          return updated;
+        });
+      }
     } catch (err) {
+      setMessages((prev) => prev.filter((m) => m.id !== tempId && m._id !== tempId));
       showInternalAlert({
         title: "Erro ao enviar figurinha",
         message: errorMessage(err),
         type: "error"
       });
-    } finally {
-      setSending(false);
     }
   };
 
   const handleSend = async () => {
-    if (!text.trim() && !audioUri && !selectedMedia || sending || isBanned)
-    return;
+    if ((!text.trim() && !audioUri && !selectedMedia) || sending || isBanned) return;
+
+    const textToSend = text.trim();
+    const mediaToSend = selectedMedia;
+    const audioToSend = audioUri;
+    const viewOnceToSend = isViewOnce;
+    const replyIdToSend = replyingTo ? String(replyingTo.id || replyingTo._id) : null;
+
+    // Limpeza imediata da interface (0ms)
+    setText("");
+    setSelectedMedia(null);
+    setAudioUri(null);
+    setIsViewOnce(false);
+    setReplyingTo(null);
+
+    const tempId = `temp_group_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const optimisticMsg = {
+      id: tempId,
+      _id: tempId,
+      tempId,
+      userId: user?.id,
+      user: user,
+      sender: user,
+      author: user,
+      content: textToSend,
+      media_url: mediaToSend ? mediaToSend.uri || mediaToSend.url : null,
+      media_type: audioToSend ? "AUDIO" : mediaToSend ? (mediaToSend.type === "video" ? "VIDEO" : "IMAGE") : "TEXT",
+      audio_url: audioToSend || null,
+      is_view_once: viewOnceToSend,
+      reply_to_id: replyIdToSend,
+      createdAt: new Date().toISOString(),
+      is_sending: true
+    };
+
+    setMessages((prev) => {
+      const updated = [optimisticMsg, ...prev];
+      ChatCache.setMessagesSync(groupId, updated);
+      return updated;
+    });
+
     try {
-      setSending(true);
       let mediaUrl = null;
       let mediaType = "TEXT";
-      let uploadedAudioUrl = audioUri;
+      let uploadedAudioUrl = audioToSend;
 
-      if (audioUri) {
+      if (audioToSend) {
         try {
           const uploadFn = api.uploads?.audio || api.upload?.audio;
           if (uploadFn) {
-            const uploadRes = await uploadFn(
-              audioUri,
-              "audio.m4a",
-              "audio/m4a"
-            );
-            uploadedAudioUrl =
-            getUploadUrl(uploadRes) || uploadRes?.url || audioUri;
+            const uploadRes = await uploadFn(audioToSend, "audio.m4a", "audio/m4a");
+            uploadedAudioUrl = getUploadUrl(uploadRes) || uploadRes?.url || audioToSend;
           }
         } catch (e) {}
       }
 
-      if (selectedMedia) {
-        const rawUri = selectedMedia.url || selectedMedia.uri;
+      if (mediaToSend) {
+        const rawUri = mediaToSend.url || mediaToSend.uri;
         mediaUrl = rawUri;
-        mediaType = selectedMedia.type === "video" ? "VIDEO" : "IMAGE";
+        mediaType = mediaToSend.type === "video" ? "VIDEO" : "IMAGE";
         try {
           if (mediaType === "VIDEO" && api.uploads?.video) {
-            const uploadRes = await api.uploads.video(
-              rawUri,
-              "video.mp4",
-              "video/mp4"
-            );
+            const uploadRes = await api.uploads.video(rawUri, "video.mp4", "video/mp4");
             mediaUrl = getUploadUrl(uploadRes) || uploadRes?.url || rawUri;
           } else if (api.uploads?.photo) {
-            const uploadRes = await api.uploads.photo(
-              rawUri,
-              "photo.jpg",
-              "image/jpeg"
-            );
+            const uploadRes = await api.uploads.photo(rawUri, "photo.jpg", "image/jpeg");
             mediaUrl = getUploadUrl(uploadRes) || uploadRes?.url || rawUri;
           }
         } catch (e) {}
@@ -2747,31 +2835,36 @@ ref)
 
       const payload = {
         groupId,
-        content: text.trim(),
+        content: textToSend,
         media_url: mediaUrl,
-        media_type: audioUri ? "AUDIO" : mediaType,
+        media_type: audioToSend ? "AUDIO" : mediaType,
         audio_url: uploadedAudioUrl,
-        is_view_once: isViewOnce,
-        reply_to_id: replyingTo ?
-        String(replyingTo.id || replyingTo._id) :
-        null
+        is_view_once: viewOnceToSend,
+        reply_to_id: replyIdToSend
       };
 
-      await api.groups.sendMessage(groupId, payload);
-      setText("");
-      setSelectedMedia(null);
-      setAudioUri(null);
-      setIsViewOnce(false);
-      setReplyingTo(null);
-      loadMessages();
+      const sentRes = await api.groups.sendMessage(groupId, payload);
+      const realMsg = sentRes?.message || sentRes?.data || sentRes;
+      const realId = realMsg?.id || realMsg?._id;
+
+      if (realId) {
+        setMessages((prev) => {
+          const updated = prev.map((m) =>
+            m.id === tempId || m._id === tempId
+              ? { ...m, ...realMsg, id: realId, _id: realId, is_sending: false }
+              : m
+          );
+          ChatCache.setMessagesSync(groupId, updated);
+          return updated;
+        });
+      }
     } catch (err) {
+      setMessages((prev) => prev.filter((m) => m.id !== tempId && m._id !== tempId));
       showInternalAlert({
         title: "Erro ao enviar",
         message: errorMessage(err),
         type: "error"
       });
-    } finally {
-      setSending(false);
     }
   };
 

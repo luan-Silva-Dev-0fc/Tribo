@@ -51,6 +51,7 @@ import {
   registerForPushNotificationsAsync,
   unregisterPushNotificationsAsync } from
 "./services/notifications";
+import { ProfileCache } from "./services/profileCache";
 
 function TriboRoot() {
   useEffect(() => {
@@ -293,8 +294,14 @@ function TriboRoot() {
       const current = unwrap(res, "user");
       if (current?.id) {
         const normalized = normalizeUser(current);
-        setUser(normalized);
-        return normalized;
+        const cached = ProfileCache.getProfileSync(normalized.id);
+        const merged = {
+          ...(cached || {}),
+          ...normalized
+        };
+        setUser(merged);
+        ProfileCache.setProfileSync(normalized.id, merged);
+        return merged;
       }
       return current;
     } catch (error) {
@@ -329,25 +336,43 @@ function TriboRoot() {
   }, [refreshUser]);
 
   useEffect(() => {
-    if (user?.id) {
-      registerForPushNotificationsAsync(api).catch((err) => {
-        console.warn("[App] Falha ao registrar push notifications:", err);
-      });
+    if (user?.id && session?.token) {
+      registerForPushNotificationsAsync(api).catch(() => {});
     }
-  }, [user?.id]);
+  }, [user?.id, session?.token]);
 
   const authenticated = async (current) => {
     setShowIntro(true);
-    if (current?.id) setUser(normalizeUser(current));else
-    await refreshUser();
+    if (current?.id) {
+      const normalized = normalizeUser(current);
+      const cached = ProfileCache.getProfileSync(normalized.id);
+      const merged = { ...(cached || {}), ...normalized };
+      setUser(merged);
+      ProfileCache.setProfileSync(normalized.id, merged);
+    } else {
+      await refreshUser();
+    }
     setScreen("feed");
   };
 
   const logout = async () => {
-    await unregisterPushNotificationsAsync(api).catch(() => {});
-    await session.clear();
+    try {
+      await unregisterPushNotificationsAsync(api).catch(() => {});
+    } catch (_) {}
+    try {
+      await session.clear();
+    } catch (_) {}
+    try {
+      const socket = getChatSocket();
+      if (socket) {
+        socket.disconnect();
+      }
+    } catch (_) {}
     setUser(null);
     setScreen("feed");
+    setProfileToOpen(null);
+    setActiveGroupId(null);
+    setChatToOpen(null);
   };
 
   const isMasterAdmin = Boolean(

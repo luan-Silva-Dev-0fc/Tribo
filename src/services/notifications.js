@@ -91,22 +91,43 @@ export async function registerForPushNotificationsAsync(apiClient) {
 
     await AsyncStorage.setItem(PUSH_TOKEN_KEY, tokenStr);
 
+    // Só envia para o backend se houver sessão autenticada com token
+    try {
+      const { session } = require("../api");
+      if (!session?.token) {
+        return tokenStr;
+      }
 
-    if (apiClient?.users?.registerPushToken) {
-      await apiClient.users.registerPushToken({
-        token: tokenStr,
-        deviceType: Platform.OS
-      });
-    } else if (apiClient?.post) {
-      await apiClient.post("/api/users/push-token", {
-        token: tokenStr,
-        deviceType: Platform.OS
-      });
+      if (apiClient?.users?.registerPushToken) {
+        await apiClient.users.registerPushToken({
+          token: tokenStr,
+          deviceType: Platform.OS
+        });
+      } else if (apiClient?.post) {
+        await apiClient.post("/api/users/push-token", {
+          token: tokenStr,
+          deviceType: Platform.OS
+        });
+      }
+    } catch (apiErr) {
+      if (
+        apiErr?.message?.includes("Token de autenticação ausente") ||
+        apiErr?.status === 401
+      ) {
+        // Usuário ainda não logado; o token já está salvo localmente para sincronização futura
+        return tokenStr;
+      }
+      console.warn("[PushNotifications] Erro ao sincronizar token com o backend:", apiErr?.message);
     }
 
     return tokenStr;
   } catch (error) {
-    console.error("[PushNotifications] Erro ao registrar push notifications:", error);
+    if (
+      !error?.message?.includes("Token de autenticação ausente") &&
+      error?.status !== 401
+    ) {
+      console.warn("[PushNotifications] Erro ao configurar push notifications:", error?.message || error);
+    }
     return null;
   }
 }

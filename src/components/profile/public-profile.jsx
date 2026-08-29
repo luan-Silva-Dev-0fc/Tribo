@@ -26,6 +26,7 @@ import { FollowersModal } from "../modals/followers-modal";
 import { MediaViewerModal } from "../modals/media-viewer-modal";
 import { Comments } from "../feed/Composer";
 import { RepostModal } from "../modals/repost-modal";
+import { ProfileCache } from "../../services/profileCache";
 
 const ownerOf = (post = {}) => post.user || post.author || {};
 
@@ -296,9 +297,19 @@ function ProfilePostCard({ item, onOpenMedia }) {
 
 export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenProfile, onOpenChat }) {
   const { colors } = useTheme();
-  const [profile, setProfile] = useState(user);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const targetUserId =
+  (typeof user === "string" ? user : user?.id || user?.user_id || user?.userId || user?.author_id || user?.authorId) || null;
+
+  const [profile, setProfile] = useState(() => {
+    const cached = targetUserId ? ProfileCache.getProfileSync(targetUserId) : null;
+    return cached ? { ...(typeof user === "object" ? user : {}), ...cached } : (typeof user === "object" ? user : null);
+  });
+  const [posts, setPosts] = useState(() => {
+    return targetUserId ? ProfileCache.getPostsSync(targetUserId) : [];
+  });
+  const [loading, setLoading] = useState(() => {
+    return targetUserId ? !ProfileCache.getProfileSync(targetUserId) : false;
+  });
   const [working, setWorking] = useState(false);
   const [followWorking, setFollowWorking] = useState(false);
   const [fetchingProfile, setFetchingProfile] = useState(false);
@@ -309,9 +320,6 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
   const [followersModalVisible, setFollowersModalVisible] = useState(false);
   const [followersModalTab, setFollowersModalTab] = useState("followers");
   const [fullscreenMedia, setFullscreenMedia] = useState(null);
-
-  const targetUserId =
-  (typeof user === "string" ? user : user?.id || user?.user_id || user?.userId || user?.author_id || user?.authorId) || null;
 
   const visible = Boolean(targetUserId);
   const isOwnProfile = String(profile?.id || targetUserId) === String(currentUserId);
@@ -342,7 +350,6 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
 
   const isPrivate = Boolean(profile?.is_private ?? profile?.isPrivate ?? false);
 
-
   const canViewContent =
   isOwnProfile ||
   profile?.can_view_content === true ||
@@ -355,14 +362,14 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
     (typeof user === "string" ? user : user?.id || user?.user_id || user?.userId || user?.author_id || user?.authorId) || null;
 
     if (!uid) return;
-    setLoading(true);
+    const cached = ProfileCache.getProfileSync(uid);
+    if (!cached) {
+      setLoading(true);
+    }
     setFetchingProfile(true);
     try {
       const profileResponse = await api.users.getById(uid);
       const rawUser = unwrap(profileResponse, "user") || unwrap(profileResponse, "data") || profileResponse;
-      console.log("-> [DEBUG FINAL] Dados brutos do perfil recebidos:", rawUser);
-      console.log("-> [DEBUG FINAL] is_following:", rawUser?.is_following);
-      console.log("-> [DEBUG FINAL] isFollowing:", rawUser?.isFollowing);
 
       const normalized = normalizeUser(rawUser) || {};
 
@@ -403,6 +410,7 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
       };
 
       setProfile(nextProfile);
+      ProfileCache.setProfileSync(uid, nextProfile);
 
       const canView =
       String(nextProfile?.id || uid) === String(currentUserId) ||
@@ -415,13 +423,17 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
         const postsResponse = await api.users.posts(nextProfile.id || uid).catch(() => null);
         if (postsResponse) {
           const fetchedPosts = postsResponse.posts || postsResponse.data || postsResponse || [];
-          setPosts(Array.isArray(fetchedPosts) ? fetchedPosts : []);
+          const postArr = Array.isArray(fetchedPosts) ? fetchedPosts : [];
+          setPosts(postArr);
+          ProfileCache.setPostsSync(uid, postArr);
         }
       } else {
         setPosts([]);
       }
     } catch (error) {
-      Alert.alert("Perfil indisponível", errorMessage(error));
+      if (!cached) {
+        Alert.alert("Perfil indisponível", errorMessage(error));
+      }
     } finally {
       setLoading(false);
       setFetchingProfile(false);
@@ -429,9 +441,16 @@ export function PublicProfile({ user, currentUserId, onClose, onBlocked, onOpenP
   }, [user, currentUserId]);
 
   useEffect(() => {
-    setProfile(user);
-    setPosts([]);
-    if (targetUserId) load();
+    if (targetUserId) {
+      const cached = ProfileCache.getProfileSync(targetUserId);
+      if (cached) {
+        setProfile({ ...(typeof user === "object" ? user : {}), ...cached });
+        setPosts(ProfileCache.getPostsSync(targetUserId));
+      } else if (typeof user === "object") {
+        setProfile(user);
+      }
+      load();
+    }
   }, [user, targetUserId, load]);
 
   const handleFollowAction = async () => {

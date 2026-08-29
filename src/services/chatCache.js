@@ -118,5 +118,30 @@ export const ChatCache = {
   clearChat(chatId) {
     if (!chatId) return;
     removeStorage(`messages:${chatId}`);
+  },
+
+  getGroupSync(groupId) {
+    if (!groupId) return null;
+    return readStorage(`group:${groupId}`);
+  },
+
+  setGroupSync(groupId, groupData) {
+    if (!groupId || !groupData) return;
+    writeStorage(`group:${groupId}`, groupData);
+  },
+
+  getTribosSync() {
+    const data = readStorage("tribos_list");
+    return Array.isArray(data) ? data : [];
+  },
+
+  setTribosSync(tribos) {
+    if (!Array.isArray(tribos)) return;
+    writeStorage("tribos_list", tribos);
+    for (const t of tribos) {
+      if (t?.id) {
+        writeStorage(`group:${t.id}`, t);
+      }
+    }
   }
 };

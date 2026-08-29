@@ -17,7 +17,7 @@ import { errorMessage } from "../../lib/format";
 import { useTheme } from "../../theme";
 import { getChatSocket } from "../../services/chatSocket";
 import { NativeOptimization } from "../../services/nativeOptimization";
-
+import { ChatCache } from "../../services/chatCache";
 
 export { CreateTribeScreen } from "./CreateTribeScreen";
 export { GroupDetailsScreen } from "./GroupDetailsScreen";
@@ -26,8 +26,8 @@ export { InviteMembersScreen } from "./InviteMembersScreen";
 
 export function TribosListScreen({ onOpenTribe, onCreateTribe, onBack }) {
   const { colors } = useTheme();
-  const [tribos, setTribos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [tribos, setTribos] = useState(() => ChatCache.getTribosSync() || []);
+  const [loading, setLoading] = useState(() => !(ChatCache.getTribosSync()?.length > 0));
   const [searchQuery, setSearchQuery] = useState("");
   const [unreadMap, setUnreadMap] = useState({});
 
@@ -49,20 +49,31 @@ export function TribosListScreen({ onOpenTribe, onCreateTribe, onBack }) {
 
   const loadTribos = useCallback(async () => {
     try {
+      const cached = ChatCache.getTribosSync();
+      if (!cached || cached.length === 0) {
+        setLoading(true);
+      }
       const res = await api.groups.list();
       const list = res.groups || res.data || [];
       setTribos(list);
+      ChatCache.setTribosSync(list);
       loadUnreadCounts(list);
     } catch (error) {
-      Alert.alert("Erro", errorMessage(error));
+      if (!ChatCache.getTribosSync()?.length) {
+        Alert.alert("Erro", errorMessage(error));
+      }
     } finally {
       setLoading(false);
     }
   }, [loadUnreadCounts]);
 
   useEffect(() => {
+    const cached = ChatCache.getTribosSync();
+    if (cached?.length > 0) {
+      loadUnreadCounts(cached);
+    }
     loadTribos();
-  }, [loadTribos]);
+  }, [loadTribos, loadUnreadCounts]);
 
   useEffect(() => {
     const socket = getChatSocket();

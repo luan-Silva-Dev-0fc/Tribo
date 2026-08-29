@@ -1768,22 +1768,20 @@ export function Settings({
             variant="secondary"
             icon="log-out"
             onPress={() => {
-              onClose();
-              setTimeout(() => {
-                showAlert?.({
-                  visible: true,
-                  type: "warning",
-                  title: "Sair da Conta",
-                  message: "Você está prestes a desconectar da sua conta. Deseja continuar?",
-                  buttonText: "Sair",
-                  secondaryButtonText: "Cancelar",
-                  onSecondaryPress: () => showAlert?.({ visible: false }),
-                  onClose: () => {
-                    showAlert?.({ visible: false });
-                    onLogout();
-                  }
-                });
-              }, 100);
+              setAlertConfig({
+                visible: true,
+                type: "warning",
+                title: "Sair da Conta",
+                message: "Você está prestes a desconectar da sua conta. Deseja continuar?",
+                buttonText: "Sair",
+                secondaryButtonText: "Cancelar",
+                onSecondaryPress: () => setAlertConfig({ visible: false }),
+                onClose: () => {
+                  setAlertConfig({ visible: false });
+                  onClose?.();
+                  onLogout?.();
+                }
+              });
             }} />
           
           <Pressable
