@@ -7,3 +7,4 @@ const selected = Platform.OS === "web" ? WebAuth : NativeAuth;
 export const GOOGLE_WEB_CLIENT_ID = selected.GOOGLE_WEB_CLIENT_ID;
 export const configureGoogleSignIn = selected.configureGoogleSignIn;
 export const handleGoogleLogin = selected.handleGoogleLogin;
+export const signOutGoogle = selected.signOutGoogle;

@@ -28,6 +28,16 @@ export function configureGoogleSignIn() {
 
 
 
+export async function signOutGoogle() {
+  configureGoogleSignIn();
+  try {
+    await GoogleSignin.signOut();
+  } catch (error) {
+    // A conta pode nao ter usado Google; nao ha sessao de provedor para remover.
+    console.warn("[GoogleAuth] Nao foi possivel encerrar a sessao Google:", error?.message);
+  }
+}
+
 export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
   try {
     configureGoogleSignIn();

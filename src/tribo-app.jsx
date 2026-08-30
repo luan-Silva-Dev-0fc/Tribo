@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -52,6 +52,8 @@ import {
   unregisterPushNotificationsAsync } from
 "./services/notifications";
 import { ProfileCache } from "./services/profileCache";
+import { signOutGoogle } from "./services/google-auth";
+import { supabase } from "./lib/supabase";
 
 function TriboRoot() {
   useEffect(() => {
@@ -69,6 +71,8 @@ function TriboRoot() {
   const [bannedMessage, setBannedMessage] = useState(null);
   const [platformSuspended, setPlatformSuspended] = useState(null);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
+  // Invalida respostas de sessao iniciadas antes de um login/logout.
+  const authEpochRef = useRef(0);
 
   const checkPlatformStatus = useCallback(async () => {
     try {
@@ -289,8 +293,13 @@ function TriboRoot() {
   }, [handleNotificationResponse]);
 
   const refreshUser = useCallback(async () => {
+    const authEpoch = authEpochRef.current;
+    const tokenAtStart = session.token;
     try {
       const res = await api.me();
+      if (authEpoch !== authEpochRef.current || tokenAtStart !== session.token) {
+        return null;
+      }
       const current = unwrap(res, "user");
       if (current?.id) {
         const normalized = normalizeUser(current);
@@ -305,6 +314,9 @@ function TriboRoot() {
       }
       return current;
     } catch (error) {
+      if (authEpoch !== authEpochRef.current || tokenAtStart !== session.token) {
+        return null;
+      }
       if (error?.status === 401 || error?.status === 403) {
         await session.clear();
       } else {
@@ -322,8 +334,15 @@ function TriboRoot() {
 
   useEffect(() => {
     (async () => {
+      const authEpoch = authEpochRef.current;
       try {
         const hasToken = await session.restore();
+        // SecureStore e assincrono: se houve logout enquanto ele lia o token,
+        // nunca permita que o valor antigo restaure a conta novamente.
+        if (authEpoch !== authEpochRef.current) {
+          await session.clear();
+          return;
+        }
         if (hasToken) {
           await refreshUser();
         }
@@ -342,6 +361,7 @@ function TriboRoot() {
   }, [user?.id, session?.token]);
 
   const authenticated = async (current) => {
+    authEpochRef.current += 1;
     setShowIntro(true);
     if (current?.id) {
       const normalized = normalizeUser(current);
@@ -356,23 +376,29 @@ function TriboRoot() {
   };
 
   const logout = async () => {
+    // Atualiza a interface e invalida imediatamente requisicoes pendentes.
+    // Assim, uma resposta antiga de /me nao pode recolocar o usuario na conta.
+    authEpochRef.current += 1;
+    setUser(null);
+    setScreen("feed");
+    setProfileToOpen(null);
+    setActiveGroupId(null);
+    setChatToOpen(null);
+
     try {
       await unregisterPushNotificationsAsync(api).catch(() => {});
     } catch (_) {}
-    try {
-      await session.clear();
-    } catch (_) {}
+    await Promise.allSettled([
+      session.clear(),
+      signOutGoogle(),
+      supabase.auth.signOut({ scope: "local" })
+    ]);
     try {
       const socket = getChatSocket();
       if (socket) {
         socket.disconnect();
       }
     } catch (_) {}
-    setUser(null);
-    setScreen("feed");
-    setProfileToOpen(null);
-    setActiveGroupId(null);
-    setChatToOpen(null);
   };
 
   const isMasterAdmin = Boolean(
