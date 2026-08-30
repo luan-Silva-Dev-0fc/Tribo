@@ -18,38 +18,19 @@ import expo.modules.ReactNativeHostWrapper
 import com.microsoft.codepush.react.CodePush
 
 class MainApplication : Application(), ReactApplication {
-
-  private var codePushInstance: CodePush? = null
-
-  private fun getCodePush(): CodePush {
-    if (codePushInstance == null) {
-      val serverUrl = try {
-        resources.getString(R.string.CodePushServerUrl)
-      } catch (e: Exception) {
-        null
-      }
-      codePushInstance = if (serverUrl != null) {
-        CodePush(resources.getString(R.string.CodePushDeploymentKey), applicationContext, BuildConfig.DEBUG, serverUrl)
-      } else {
-        CodePush(resources.getString(R.string.CodePushDeploymentKey), applicationContext, BuildConfig.DEBUG)
-      }
-    }
-    return codePushInstance!!
-  }
-
   override val reactNativeHost: ReactNativeHost = ReactNativeHostWrapper(
       this,
       object : DefaultReactNativeHost(this) {
+        // CodePush is supplied by the generated package list. Initializing its
+        // bundle name after that list is created keeps its NativeModule aligned
+        // with the binary asset without registering it twice.
         override fun getPackages(): List<ReactPackage> =
-            PackageList(this).packages.apply {
-              add(getCodePush())
-            }
+            PackageList(this).packages.also { CodePush.getJSBundleFile() }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"
 
           override fun getJSBundleFile(): String? {
               return try {
-                  getCodePush()
                   CodePush.getJSBundleFile()
               } catch (e: Exception) {
                   null
@@ -62,17 +43,25 @@ class MainApplication : Application(), ReactApplication {
       }
   )
 
-  override val reactHost: ReactHost
-    get() = ReactNativeHostWrapper.createReactHost(applicationContext, reactNativeHost)
+  override val reactHost: ReactHost?
+    get() = if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      ReactNativeHostWrapper.createReactHost(applicationContext, reactNativeHost)
+    } else {
+      null
+    }
 
   override fun onCreate() {
     super.onCreate()
-    DefaultNewArchitectureEntryPoint.releaseLevel = try {
-      ReleaseLevel.valueOf(BuildConfig.REACT_NATIVE_RELEASE_LEVEL.uppercase())
-    } catch (e: IllegalArgumentException) {
-      ReleaseLevel.STABLE
-    }
+    // Required on every architecture: initializes SoLoader and React Native's
+    // native feature flags before the Activity delegate is created.
     loadReactNative(this)
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      DefaultNewArchitectureEntryPoint.releaseLevel = try {
+        ReleaseLevel.valueOf(BuildConfig.REACT_NATIVE_RELEASE_LEVEL.uppercase())
+      } catch (e: IllegalArgumentException) {
+        ReleaseLevel.STABLE
+      }
+    }
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
   }
 
