@@ -163,3 +163,23 @@ export async function getCurrentPushToken() {
     return null;
   }
 }
+
+export async function notifyUpdateApplied() {
+  if (Platform.OS === "web") return;
+  try {
+    await setupNotificationChannels();
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "★ Tribo Atualizada",
+        body: "Uma nova correção foi aplicada na Tribo.",
+        sound: "default",
+        channelId: "tribo_notifications",
+        data: { type: "system_update" }
+      },
+      trigger: null
+    });
+    console.log("[PushNotifications] Notificação de atualização local disparada.");
+  } catch (err) {
+    console.warn("[PushNotifications] Erro ao disparar notificação de atualização:", err?.message || err);
+  }
+}

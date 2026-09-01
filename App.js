@@ -1,6 +1,8 @@
 import React, { Component, useEffect } from 'react';
 import { LogBox, Platform, View, Text, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import TriboApp from './src/tribo-app';
+import { notifyUpdateApplied } from './src/services/notifications';
 
 LogBox.ignoreLogs([
   'Expo AV has been deprecated',
@@ -52,6 +54,20 @@ function App() {
         // Notifica que o bundle atual inicializou com sucesso (evita rollback acidental)
         codePush.notifyAppReady();
 
+        // Se o app acabou de inicializar com um novo bundle CodePush aplicado, dispara a notificação
+        codePush.getUpdateMetadata(codePush.UpdateState?.RUNNING ?? 0)
+          .then(async (metadata) => {
+            if (metadata?.isFirstRun) {
+              const key = `@tribo_update_notified_${metadata.label || metadata.appVersion || 'applied'}`;
+              const alreadyNotified = await AsyncStorage.getItem(key).catch(() => null);
+              if (!alreadyNotified) {
+                await AsyncStorage.setItem(key, "true").catch(() => {});
+                await notifyUpdateApplied();
+              }
+            }
+          })
+          .catch(() => {});
+
         // Faz a verificação e download em segundo plano sem travar a interface
         // Aplica a atualização de forma silenciosa na próxima vez que o app for reiniciado/resumido
         codePush.sync(
@@ -74,7 +90,8 @@ function App() {
                 console.log('[CodePush] Aplicativo já está na versão mais recente.');
                 break;
               case codePush.SyncStatus?.UPDATE_INSTALLED:
-                console.log('[CodePush]  Atualização instalada com sucesso! Será aplicada no próximo reinício.');
+                console.log('[CodePush]  Atualização instalada com sucesso! Disparando notificação...');
+                notifyUpdateApplied();
                 break;
               case codePush.SyncStatus?.UNKNOWN_ERROR:
                 console.log('[CodePush] Erro desconhecido durante o sync.');
