@@ -1,60 +1,60 @@
 {
-    "expo":  {
-                 "name":  "Tribo",
-                 "slug":  "tribo",
-                 "version":  "1.0.0",
-                 "orientation":  "portrait",
-                 "icon":  "./assets/icon.png",
-                 "userInterfaceStyle":  "automatic",
-                 "ios":  {
-                             "supportsTablet":  true
-                         },
-                 "android":  {
-                                 "package":  "tribo.network.com.br",
-                                 "googleServicesFile":  "./google-services.json",
-                                 "adaptiveIcon":  {
-                                                      "foregroundImage":  "./assets/adaptive-icon.png",
-                                                      "backgroundColor":  "#ffffff"
-                                                  },
-                                 "permissions":  [
-                                                     "android.permission.RECORD_AUDIO",
-                                                     "android.permission.MODIFY_AUDIO_SETTINGS",
-                                                     "android.permission.POST_NOTIFICATIONS",
-                                                     "android.permission.WAKE_LOCK",
-                                                     "android.permission.RECEIVE_BOOT_COMPLETED",
-                                                     "android.permission.FOREGROUND_SERVICE",
-                                                     "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
-                                                 ],
-                                 "softwareKeyboardLayoutMode":  "resize"
-                             },
-                 "androidNavigationBar":  {
-                                              "barStyle":  "light-content",
-                                              "backgroundColor":  "#121214"
-                                          },
-                 "notification":  {
-                                      "icon":  "./assets/notification-icon.png",
-                                      "color":  "#F59E0B"
-                                  },
-                 "web":  {
-                             "favicon":  "./assets/favicon.png"
-                         },
-                 "plugins":  [
-                                 "expo-secure-store",
-                                 "expo-font",
-                                 "expo-web-browser",
-                                 "expo-video",
-                                 [
-                                     "expo-av",
-                                     {
-                                         "microphonePermission":  "Allow Tribo to access your microphone."
-                                     }
-                                 ]
-                             ],
-                 "extra":  {
-                               "eas":  {
-                                           "projectId":  "4806cd3f-51e8-4893-b4b1-d938a3d6852e"
-                                       }
-                           },
-                 "owner":  "luanzinbr"
-             }
+  "expo": {
+    "name": "Tribo",
+    "slug": "tribo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "tribo.network.com.br",
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.WAKE_LOCK",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
+      "softwareKeyboardLayoutMode": "resize"
+    },
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#121214"
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#F59E0B"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-font",
+      "expo-web-browser",
+      "expo-video",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Tribo to access your microphone."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6def7cf9-9fc1-485b-bcdc-b3ea964e0d08"
+      }
+    },
+    "owner": "luanzimbr"
+  }
 }

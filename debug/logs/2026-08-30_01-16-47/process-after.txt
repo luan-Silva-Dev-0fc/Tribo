@@ -1,0 +1,57 @@
+ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)
+  OOM levels:
+    -900: SYSTEM_ADJ (   84,224K)
+    -800: PERSISTENT_PROC_ADJ (   84,224K)
+    -700: PERSISTENT_SERVICE_ADJ (   84,224K)
+      0: FOREGROUND_APP_ADJ (   84,224K)
+     100: VISIBLE_APP_ADJ (   96,512K)
+     200: PERCEPTIBLE_APP_ADJ (  108,800K)
+     225: PERCEPTIBLE_MEDIUM_APP_ADJ (  121,088K)
+     250: PERCEPTIBLE_LOW_APP_ADJ (  121,088K)
+     300: BACKUP_APP_ADJ (  298,183K)
+     400: HEAVY_WEIGHT_APP_ADJ (  298,183K)
+     500: SERVICE_ADJ (  298,183K)
+     600: HOME_APP_ADJ (  298,183K)
+     700: PREVIOUS_APP_ADJ (  298,183K)
+     800: SERVICE_B_ADJ (  298,183K)
+     900: CACHED_APP_MIN_ADJ (  298,183K)
+     999: CACHED_APP_MAX_ADJ (  406,309K)
+
+  Process OOM control (67 total, non-act at 3, non-svc at 3):
+
+  mHomeProcess: ProcessRecord{7baf15f 3097:com.motorola.launcher3/u0a228}
+  mPreviousProcess: null
+
+
+  Process LRU list (sorted by oom_adj, 67 total, non-act at 3, non-svc at 3):
+  mPreviousProcessVisibleTime: +1h40m8s257ms
+
+  mUidChangeDispatchCount=8681
+  Slow UID dispatches:
+    com.android.server.PinnerService$3: 0 / Max 4ms
+    com.android.server.job.controllers.QuotaController$QcUidObserver: 0 / Max 1ms
+    com.android.server.job.JobSchedulerService$4: 1 / Max 37ms
+    android.app.ActivityManager$UidObserver: 0 / Max 13ms
+    android.app.IUidObserver$Stub$Proxy: 0 / Max 12ms
+    android.app.ActivityManager$UidObserver: 0 / Max 17ms
+    android.app.ActivityManager$UidObserver: 0 / Max 7ms
+    com.android.server.pm.ShortcutService$4: 0 / Max 11ms
+    android.app.ActivityManager$UidObserver: 1 / Max 106ms
+    android.app.IUidObserver$Stub$Proxy: 3 / Max 72ms
+    com.android.server.usage.UsageStatsService$3: 0 / Max 8ms
+    com.android.server.job.controllers.QuotaController$QcUidObserver: 0 / Max 15ms
+    android.app.IUidObserver$Stub$Proxy: 1 / Max 22ms
+    com.android.server.power.hint.HintManagerService$UidObserver: 0 / Max 8ms
+    com.android.server.vibrator.VibrationSettings$UidObserver: 0 / Max 3ms
+    android.app.ActivityManager$UidObserver: 0 / Max 6ms
+    com.android.server.AppStateTrackerImpl$UidObserver: 0 / Max 5ms
+    android.app.IUidObserver$Stub$Proxy: 0 / Max 14ms
+    com.android.server.net.NetworkPolicyManagerService$4: 0 / Max 7ms
+    android.app.IUidObserver$Stub$Proxy: 0 / Max 10ms
+    com.android.server.statusbar.StatusBarManagerService$UidObserver: 0 / Max 4ms
+  mDeviceIdleAllowlist=[1007, 2000, 10084, 10088, 10090, 10097, 10123, 10124, 10131, 10133, 10137, 10139, 10154, 10159, 10161, 10169, 10170, 10171, 10177, 10186, 10196, 10219, 10221, 10222, 10225, 10226, 10229, 10236, 10237, 10243, 10245, 10255, 10262, 10265, 10266, 10272, 10301, 10314, 10317, 10320, 10357]
+  mDeviceIdleExceptIdleAllowlist=[1007, 2000, 10084, 10087, 10088, 10090, 10097, 10100, 10123, 10124, 10126, 10129, 10131, 10133, 10134, 10137, 10139, 10145, 10146, 10154, 10159, 10161, 10166, 10168, 10169, 10170, 10171, 10177, 10179, 10186, 10188, 10196, 10219, 10221, 10222, 10223, 10225, 10226, 10229, 10236, 10237, 10243, 10245, 10255, 10262, 10265, 10266, 10272, 10301, 10314, 10317, 10320, 10357]
+  mDeviceIdleTempAllowlist=[1000, 10397]
+  mFgsStartTempAllowList:
+    1000:  duration=30000 callingUid=1000 reasonCode=KEY_CHAIN reason=keychain expiration=2026-08-30 04:17:09.475 (+11s979ms)
+  mForceBackgroundCheck=false

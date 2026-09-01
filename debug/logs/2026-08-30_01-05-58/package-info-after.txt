@@ -1,0 +1,475 @@
+Activity Resolver Table:
+  Schemes:
+      exp+tribo:
+        9cf21af tribo.network.com.br/.MainActivity filter 2d22d45
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "exp+tribo"
+      expo-dev-launcher:
+        5a67c9a tribo.network.com.br/expo.modules.devlauncher.compose.AuthActivity filter af629cb
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "expo-dev-launcher"
+
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        9cf21af tribo.network.com.br/.MainActivity filter 5ced9bc
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Receiver Resolver Table:
+  Non-Data Actions:
+      android.intent.action.QUICKBOOT_POWERON:
+        98dd5a8 tribo.network.com.br/expo.modules.notifications.service.NotificationsService filter 6d58c1
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.REBOOT"
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      com.htc.intent.action.QUICKBOOT_POWERON:
+        98dd5a8 tribo.network.com.br/expo.modules.notifications.service.NotificationsService filter 6d58c1
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.REBOOT"
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      androidx.profileinstaller.action.SAVE_PROFILE:
+        7bea454 tribo.network.com.br/androidx.profileinstaller.ProfileInstallReceiver filter e800743
+          Action: "androidx.profileinstaller.action.SAVE_PROFILE"
+      expo.modules.notifications.NOTIFICATION_EVENT:
+        98dd5a8 tribo.network.com.br/expo.modules.notifications.service.NotificationsService filter 6d58c1
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.REBOOT"
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      androidx.profileinstaller.action.INSTALL_PROFILE:
+        7bea454 tribo.network.com.br/androidx.profileinstaller.ProfileInstallReceiver filter f35bffd
+          Action: "androidx.profileinstaller.action.INSTALL_PROFILE"
+      com.google.android.c2dm.intent.RECEIVE:
+        5dfc866 tribo.network.com.br/com.google.firebase.iid.FirebaseInstanceIdReceiver filter 43b97a7
+          Action: "com.google.android.c2dm.intent.RECEIVE"
+      androidx.profileinstaller.action.SKIP_FILE:
+        7bea454 tribo.network.com.br/androidx.profileinstaller.ProfileInstallReceiver filter 51004f2
+          Action: "androidx.profileinstaller.action.SKIP_FILE"
+      androidx.profileinstaller.action.BENCHMARK_OPERATION:
+        7bea454 tribo.network.com.br/androidx.profileinstaller.ProfileInstallReceiver filter f8bb1c0
+          Action: "androidx.profileinstaller.action.BENCHMARK_OPERATION"
+      android.intent.action.BOOT_COMPLETED:
+        98dd5a8 tribo.network.com.br/expo.modules.notifications.service.NotificationsService filter 6d58c1
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.REBOOT"
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      android.intent.action.MY_PACKAGE_REPLACED:
+        98dd5a8 tribo.network.com.br/expo.modules.notifications.service.NotificationsService filter 6d58c1
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.REBOOT"
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      android.intent.action.REBOOT:
+        98dd5a8 tribo.network.com.br/expo.modules.notifications.service.NotificationsService filter 6d58c1
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.REBOOT"
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+
+Service Resolver Table:
+  Non-Data Actions:
+      com.google.firebase.MESSAGING_EVENT:
+        611d49f tribo.network.com.br/expo.modules.notifications.service.ExpoFirebaseMessagingService filter 65a29ec
+          Action: "com.google.firebase.MESSAGING_EVENT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+        5b1f1b5 tribo.network.com.br/com.google.firebase.messaging.FirebaseMessagingService filter b67404a
+          Action: "com.google.firebase.MESSAGING_EVENT"
+          mPriority=-500, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      com.google.android.gms.metadata.MODULE_DEPENDENCIES:
+        9235ef9 tribo.network.com.br/com.google.android.gms.metadata.ModuleDependencies filter 8957e3e
+          Action: "com.google.android.gms.metadata.MODULE_DEPENDENCIES"
+
+Domain verification status:
+
+Permissions:
+  Permission [tribo.network.com.br.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION] (be5280c):
+    sourcePackage=tribo.network.com.br
+    uid=10397 gids=[] type=0 prot=signature
+    perm=PermissionInfo{f1f77ab tribo.network.com.br.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION}
+
+Registered ContentProviders:
+  tribo.network.com.br/com.google.mlkit.common.internal.MlKitInitProvider:
+    Provider{1e3e08 tribo.network.com.br/com.google.mlkit.common.internal.MlKitInitProvider}
+  tribo.network.com.br/expo.modules.filesystem.FileSystemFileProvider:
+    Provider{5f709a1 tribo.network.com.br/expo.modules.filesystem.FileSystemFileProvider}
+  tribo.network.com.br/com.google.firebase.provider.FirebaseInitProvider:
+    Provider{2a457c6 tribo.network.com.br/com.google.firebase.provider.FirebaseInitProvider}
+  tribo.network.com.br/expo.modules.imagepicker.fileprovider.ImagePickerFileProvider:
+    Provider{bdbe387 tribo.network.com.br/expo.modules.imagepicker.fileprovider.ImagePickerFileProvider}
+  tribo.network.com.br/com.canhub.cropper.CropFileProvider:
+    Provider{d5d32b4 tribo.network.com.br/com.canhub.cropper.CropFileProvider}
+  tribo.network.com.br/androidx.startup.InitializationProvider:
+    Provider{1599edd tribo.network.com.br/androidx.startup.InitializationProvider}
+  tribo.network.com.br/com.reactnativecommunity.webview.RNCWebViewFileProvider:
+    Provider{d7e2a52 tribo.network.com.br/com.reactnativecommunity.webview.RNCWebViewFileProvider}
+  tribo.network.com.br/expo.modules.sharing.SharingFileProvider:
+    Provider{d093123 tribo.network.com.br/expo.modules.sharing.SharingFileProvider}
+
+ContentProvider Authorities:
+  [tribo.network.com.br.firebaseinitprovider]:
+    Provider{2a457c6 tribo.network.com.br/com.google.firebase.provider.FirebaseInitProvider}
+      applicationInfo=ApplicationInfo{80de555 tribo.network.com.br}
+  [tribo.network.com.br.mlkitinitprovider]:
+    Provider{1e3e08 tribo.network.com.br/com.google.mlkit.common.internal.MlKitInitProvider}
+      applicationInfo=ApplicationInfo{e88bb6a tribo.network.com.br}
+  [tribo.network.com.br.SharingFileProvider]:
+    Provider{d093123 tribo.network.com.br/expo.modules.sharing.SharingFileProvider}
+      applicationInfo=ApplicationInfo{74e485b tribo.network.com.br}
+  [tribo.network.com.br.androidx-startup]:
+    Provider{1599edd tribo.network.com.br/androidx.startup.InitializationProvider}
+      applicationInfo=ApplicationInfo{7c2b8f8 tribo.network.com.br}
+  [tribo.network.com.br.fileprovider]:
+    Provider{d7e2a52 tribo.network.com.br/com.reactnativecommunity.webview.RNCWebViewFileProvider}
+      applicationInfo=ApplicationInfo{a1481d1 tribo.network.com.br}
+  [tribo.network.com.br.cropper.fileprovider]:
+    Provider{d5d32b4 tribo.network.com.br/com.canhub.cropper.CropFileProvider}
+      applicationInfo=ApplicationInfo{2ef2436 tribo.network.com.br}
+  [tribo.network.com.br.ImagePickerFileProvider]:
+    Provider{bdbe387 tribo.network.com.br/expo.modules.imagepicker.fileprovider.ImagePickerFileProvider}
+      applicationInfo=ApplicationInfo{49f0f37 tribo.network.com.br}
+  [tribo.network.com.br.FileSystemFileProvider]:
+    Provider{5f709a1 tribo.network.com.br/expo.modules.filesystem.FileSystemFileProvider}
+      applicationInfo=ApplicationInfo{9e66ca4 tribo.network.com.br}
+
+Key Set Manager:
+  [tribo.network.com.br]
+      Signing KeySets: 223
+
+Packages:
+  Package [tribo.network.com.br] (be13938):
+    userId=10397
+    pkg=Package{7a49d11 tribo.network.com.br}
+    codePath=/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==
+    resourcePath=/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==
+    legacyNativeLibraryDir=/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/lib
+    extractNativeLibs=false
+    primaryCpuAbi=arm64-v8a
+    secondaryCpuAbi=null
+    cpuAbiOverride=null
+    versionCode=1 minSdk=24 targetSdk=36
+    minExtensionVersions=[]
+    versionName=1.0.0
+    usesNonSdkApi=false
+    splits=[base]
+    apkSigningVersion=2
+    applicationInfo=PackageImpl{7a49d11 tribo.network.com.br}
+    flags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_REQUEST_LEGACY_EXTERNAL_STORAGE PARTIALLY_DIRECT_BOOT_AWARE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    queriesIntents=[Intent { act=android.intent.action.VIEW cat=[android.intent.category.BROWSABLE] dat=https:///... }, Intent { act=org.chromium.intent.action.PAY }, Intent { act=org.chromium.intent.action.IS_READY_TO_PAY }, Intent { act=org.chromium.intent.action.UPDATE_PAYMENT_DETAILS }, Intent { act=android.media.action.IMAGE_CAPTURE }, Intent { act=android.media.action.ACTION_VIDEO_CAPTURE }, Intent { act=android.intent.action.GET_CONTENT cat=[android.intent.category.OPENABLE] dat=content://*/* typ=*/* }, Intent { act=android.intent.action.OPEN_DOCUMENT cat=[android.intent.category.DEFAULT,android.intent.category.OPENABLE] dat=content://*/* typ=*/* }, Intent { act=android.intent.action.OPEN_DOCUMENT_TREE }, Intent { act=android.intent.action.SEND dat=content://*/* typ=*/* }, Intent { act=android.support.customtabs.action.CustomTabsService }]
+    dataDir=/data/user/0/tribo.network.com.br
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2026-08-30 01:00:59
+    firstInstallTime=2026-08-30 01:01:01
+    lastUpdateTime=2026-08-30 01:01:01
+    signatures=PackageSignatures{5183e76 version:2, signatures:[51ed3f60], past signatures:[]}
+    installPermissionsFixed=true
+    pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    declared permissions:
+      tribo.network.com.br.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: prot=signature, INSTALLED
+    requested permissions:
+      android.permission.SYSTEM_ALERT_WINDOW
+      android.permission.FOREGROUND_SERVICE
+      android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
+      android.permission.INTERNET
+      android.permission.MODIFY_AUDIO_SETTINGS
+      android.permission.POST_NOTIFICATIONS
+      android.permission.READ_EXTERNAL_STORAGE
+      android.permission.READ_MEDIA_AUDIO
+      android.permission.READ_MEDIA_IMAGES
+      android.permission.READ_MEDIA_VIDEO
+      android.permission.READ_MEDIA_VISUAL_USER_SELECTED
+      android.permission.RECEIVE_BOOT_COMPLETED
+      android.permission.RECORD_AUDIO
+      android.permission.VIBRATE
+      android.permission.WAKE_LOCK
+      android.permission.WRITE_EXTERNAL_STORAGE
+      android.permission.CAMERA
+      android.permission.DETECT_SCREEN_CAPTURE
+      android.permission.USE_BIOMETRIC
+      android.permission.USE_FINGERPRINT
+      android.permission.ACCESS_NETWORK_STATE
+      com.google.android.c2dm.permission.RECEIVE
+      tribo.network.com.br.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+      com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE
+      com.sec.android.provider.badge.permission.READ
+      com.sec.android.provider.badge.permission.WRITE
+      com.htc.launcher.permission.READ_SETTINGS
+      com.htc.launcher.permission.UPDATE_SHORTCUT
+      com.sonyericsson.home.permission.BROADCAST_BADGE
+      com.sonymobile.home.permission.PROVIDER_INSERT_BADGE
+      com.anddoes.launcher.permission.UPDATE_COUNT
+      com.majeur.launcher.permission.UPDATE_BADGE
+      com.huawei.android.launcher.permission.CHANGE_BADGE
+      com.huawei.android.launcher.permission.READ_SETTINGS
+      com.huawei.android.launcher.permission.WRITE_SETTINGS
+      android.permission.READ_APP_BADGE
+      com.oppo.launcher.permission.READ_SETTINGS
+      com.oppo.launcher.permission.WRITE_SETTINGS
+      me.everything.badger.permission.BADGE_COUNT_READ
+      me.everything.badger.permission.BADGE_COUNT_WRITE
+    install permissions:
+      com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE: granted=true
+      com.google.android.c2dm.permission.RECEIVE: granted=true
+      android.permission.MODIFY_AUDIO_SETTINGS: granted=true
+      android.permission.FOREGROUND_SERVICE: granted=true
+      android.permission.RECEIVE_BOOT_COMPLETED: granted=true
+      android.permission.INTERNET: granted=true
+      tribo.network.com.br.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true
+      android.permission.ACCESS_NETWORK_STATE: granted=true
+      android.permission.USE_FINGERPRINT: granted=true
+      android.permission.VIBRATE: granted=true
+      android.permission.USE_BIOMETRIC: granted=true
+      android.permission.WAKE_LOCK: granted=true
+    User 0: ceDataInode=743263 installed=true hidden=false suspended=false distractionFlags=0 stopped=false notLaunched=false enabled=0 instant=false virtual=false
+      overlay paths:
+        /product/overlay/NavigationBarMode3Button/NavigationBarMode3ButtonOverlay.apk
+        /data/resource-cache/com.android.systemui-neutral-QJs1.frro
+        /product/overlay/IconShapeRoundedRect/IconShapeRoundedRectOverlay.apk
+        /product/overlay/FontRobotoSlabRegular/FontRobotoSlabRegularOverlay.apk
+        /data/resource-cache/com.android.systemui-accent-EBGW.frro
+      legacy overlay paths:
+        /product/overlay/NavigationBarMode3Button/NavigationBarMode3ButtonOverlay.apk
+        /product/overlay/IconShapeRoundedRect/IconShapeRoundedRectOverlay.apk
+        /product/overlay/FontRobotoSlabRegular/FontRobotoSlabRegularOverlay.apk
+      gids=[3003]
+      runtime permissions:
+        android.permission.READ_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+        android.permission.CAMERA: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.WRITE_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+        android.permission.RECORD_AUDIO: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+
+Queries:
+  system apps queryable: false
+  queries via package name:
+    tribo.network.com.br:
+      host.exp.exponent
+  queries via intent:
+    com.motorola.actions:
+      tribo.network.com.br
+    com.motorola.gamemode:
+      tribo.network.com.br
+    com.google.android.apps.messaging:
+      tribo.network.com.br
+    com.motorola.appforecast:
+      tribo.network.com.br
+    [com.motorola.android.fota,com.motorola.ccc.notification,com.motorola.ccc.ota,com.motorola.ccc.devicemanagement]:
+      tribo.network.com.br
+    com.facebook.katana:
+      tribo.network.com.br
+    com.whatsapp:
+      tribo.network.com.br
+    br.com.agipag.app:
+      tribo.network.com.br
+    br.com.intermedium:
+      tribo.network.com.br
+    com.taxis99:
+      tribo.network.com.br
+    com.mercadolibre:
+      tribo.network.com.br
+    com.instapro.android:
+      tribo.network.com.br
+    com.nvt.cs:
+      tribo.network.com.br
+    idm.internet.download.manager:
+      tribo.network.com.br
+    com.snaptube.premium:
+      tribo.network.com.br
+    br.com.serasaexperian.consumidor:
+      tribo.network.com.br
+    com.vector123.roundphotomaker:
+      tribo.network.com.br
+    videoeditor.videomaker.videoeditorforyoutube:
+      tribo.network.com.br
+    com.microsoft.office.outlook:
+      tribo.network.com.br
+    com.elegant.nuvix:
+      tribo.network.com.br
+    com.mercadopago.wallet:
+      tribo.network.com.br
+    easynotes.notes.notepad.notebook.privatenotes.note:
+      tribo.network.com.br
+    com.instagram.android:
+      tribo.network.com.br
+    com.a0soft.gphone.acc.free:
+      tribo.network.com.br
+    com.facebook.stella:
+      tribo.network.com.br
+    com.babydola.launcherios:
+      tribo.network.com.br
+    com.zhiliaoapp.musically:
+      tribo.network.com.br
+    ch.protonvpn.android:
+      tribo.network.com.br
+    tribo.network.com.br:
+      com.android.bips
+      com.google.android.documentsui
+      com.motorola.camera3
+      com.google.android.googlequicksearchbox
+      com.motorola.help
+      com.google.android.apps.nbu.files
+      com.google.android.apps.messaging
+      com.google.android.youtube
+      com.google.android.apps.photos
+      com.google.android.gm
+      com.android.chrome
+      com.google.android.apps.maps
+      com.google.android.setupwizard
+      com.facebook.katana
+      com.whatsapp
+      com.opera.browser
+      br.com.intermedium
+      com.openai.chatgpt
+      com.google.android.apps.bard
+      com.ubercab
+      ai.x.grok
+      com.anthropic.claude
+      com.mercadolibre
+      com.cxinventor.file.explorer
+      com.canva.editor
+      app.revanced.android.gms
+      mp3videoconverter.videotomp3.videotomp3converter
+      com.reddit.frontpage
+      com.twitter.android
+      com.google.android.photopicker
+      com.microsoft.appmanager
+      com.instapro.android
+      idm.internet.download.manager
+      com.snaptube.premium
+      host.exp.exponent
+      com.google.android.apps.docs
+      com.smp.musicspeed
+      tv.twitch.android.app
+      com.google.android.apps.tasks
+      audioeditor.musiceditor.soundeditor.songeditor
+      com.vector123.roundphotomaker
+      videoeditor.videomaker.videoeditorforyoutube
+      com.termux
+      com.microsoft.office.outlook
+      com.niksoftware.snapseed
+      com.mercadopago.wallet
+      easynotes.notes.notepad.notebook.privatenotes.note
+      com.instagram.android
+      com.facebook.stella
+      com.strava
+      com.gold.android.youtube
+      com.babydola.launcherios
+      com.zhiliaoapp.musically
+  queryable via interaction:
+    User 0:
+      [com.android.keychain,android,com.android.dynsystem,com.android.location.fused,com.motorola.android.providers.settings,com.android.inputdevices,com.android.server.telecom,com.android.providers.settings,com.qualcomm.qti.xrvd.service,com.android.settings,com.android.localtransport,com.android.wallpaperbackup,com.motorola.android.jvtcmd]:
+        tribo.network.com.br
+      [com.google.android.gms,com.google.android.gsf]:
+        tribo.network.com.br
+      com.google.android.inputmethod.latin:
+        tribo.network.com.br
+  queryable via uses-library:
+
+Package Changes:
+  Sequence number=834
+  User 0:
+    seq=2, package=com.motorola.audiofx
+    seq=3, package=com.android.traceur
+    seq=18, package=com.motorola.brapps
+    seq=20, package=com.motorola.carriersettingsext
+    seq=43, package=com.google.android.gms
+    seq=45, package=com.microsoft.appmanager
+    seq=242, package=com.motorola.msimsettings
+    seq=365, package=ch.protonvpn.android
+    seq=367, package=com.google.android.ext.services
+    seq=513, package=com.excelliance.multiaccount
+    seq=574, package=app.revanced.android.gms
+    seq=599, package=com.motorola.moto
+    seq=659, package=com.android.shell
+    seq=660, package=com.android.settings
+    seq=704, package=tribo.network.com.br
+    seq=794, package=com.google.android.apps.docs
+    seq=833, package=com.facebook.appmanager
+
+
+Dexopt state:
+  [tribo.network.com.br]
+    path: /data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk
+      arm64: [status=run-from-apk] [reason=unknown]
+
+
+Compiler stats:
+  [tribo.network.com.br]
+     base.apk - 2936
+
+APEX session state:
+
+Active APEX packages:
+
+
+Inactive APEX packages:
+
+
+Factory APEX packages:
+
+
+Snapshot statistics
+   Unrecorded-hits: 21574  Cork-level: 0
+   Summary stats               TotBlds     TotUsed     TotCork     BigBlds    ShortLvd     TotTime     MaxTime
+          0:00         now           0           0           0           0           0           0           0
+          1:00        0:00           0           0           0           0           0           0           0
+          2:00        1:00           0           0           0           0           0           0           0
+          3:00        2:00          23       29049           0           0           9          30           3
+          4:00        3:00          66      390509           0           0          26          78           3
+          5:00        4:00          69      702481           0           1          27          98          14
+          6:00        5:00          27      877444           0           1          19          57          15
+          7:00        6:00          35       99389           0           0           7          55           8
+          8:00        7:00          16      272982           0           0           0          59           7
+          9:00        8:00           0           0           0           0           0           0           0
+      01:40:01         now        1635     9003005           0          35         369        3141          33
+
+   Build times                  <= 1ms      <= 2ms      <= 5ms     <= 10ms     <= 20ms     <= 50ms    <= 100ms     > 100ms
+          0:00         now           0           0           0           0           0           0           0           0
+          1:00        0:00           0           0           0           0           0           0           0           0
+          2:00        1:00           0           0           0           0           0           0           0           0
+          3:00        2:00          22           0           1           0           0           0           0           0
+          4:00        3:00          59           6           1           0           0           0           0           0
+          5:00        4:00          55           8           4           1           1           0           0           0
+          6:00        5:00          19           4           3           0           1           0           0           0
+          7:00        6:00          28           4           2           1           0           0           0           0
+          8:00        7:00           3           4           6           3           0           0           0           0
+          9:00        8:00           0           0           0           0           0           0           0           0
+      01:40:01         now        1164         221         154          67          23           6           0           0
+
+   Use counters                   <= 1        <= 2        <= 5       <= 10       <= 20       <= 50      <= 100       > 100
+          0:00         now           0           0           0           0           0           0           0           0
+          1:00        0:00           0           0           0           0           0           0           0           0
+          2:00        1:00           0           0           0           0           0           0           0           0
+          3:00        2:00           0           4           5           2           5           2           0           5
+          4:00        3:00           7           3          16           3           7           6           5          19
+          5:00        4:00           9           2          16           4           4           5           9          20
+          6:00        5:00           3          10           6           0           0           0           1           7
+          7:00        6:00           4           2           1           1           0           2           2          23
+          8:00        7:00           0           0           0           0           0           2           1          13
+          9:00        8:00           0           0           0           0           0           0           0           0
+      01:40:01         now         133          84         151          83         103         142         156         782

@@ -1,0 +1,61 @@
+========================================
+     RELATORIO DE DEPURACAO ANDROID
+========================================
+Sessao: 2026-08-30_01-31-40
+Dispositivo: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Modelo: moto g(60)
+Android: 12 (SDK 31)
+ABI: arm64-v8a
+Package: tribo.network.com.br
+Classificacao baseada em evidencias: [JS]
+Possivel crash durante a captura: NAO DETECTADO
+
+Arquivos de evidencia:
+- raw.log: logcat integral, fonte principal
+- errors.log: ocorrencias relevantes com numero de linha
+- stack-context.log: trechos com contexto de stack trace
+- crash.log, react-native.log, java-kotlin.log, native.log, anr.log
+
+=== Principais ocorrencias ===
+PID no inicio:
+8015
+PID no encerramento:
+8015
+40:08-30 01:31:44.595  8015  8015 D nativeloader: Load /data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!/lib/arm64-v8a/libc++_shared.so using class loader ns clns-4 (caller=/data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!classes3.dex): ok
+42:08-30 01:31:44.600  8015  8015 D nativeloader: Load /data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!/lib/arm64-v8a/libjsi.so using class loader ns clns-4 (caller=/data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!classes3.dex): ok
+44:08-30 01:31:44.608  8015  8015 D nativeloader: Load /data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!/lib/arm64-v8a/libreactnative.so using class loader ns clns-4 (caller=/data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!classes3.dex): ok
+51:08-30 01:31:44.608  8015  8015 D jni_lib_merge: Preparing to register libreactnativeblob_so.  onload_func: 0x6d3006c5b0
+52:08-30 01:31:44.608  8015  8015 D jni_lib_merge: Preparing to register libreactnativejni_so.  onload_func: 0x6d30086b24
+53:08-30 01:31:44.608  8015  8015 D jni_lib_merge: Preparing to register libreactnativejni_common_so.  onload_func: 0x6d3008d458
+55:08-30 01:31:44.608  8015  8015 D jni_lib_merge: Preparing to register libturbomodulejsijni_so.  onload_func: 0x6d301411a4
+64:08-30 01:31:44.638  8015  8015 D ReactNative: [CodePush] Loading JS bundle from "assets://index.android.bundle"
+66:08-30 01:31:44.642  8015  8015 D nativeloader: Load /data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!/lib/arm64-v8a/libhermes.so using class loader ns clns-4 (caller=/data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!classes3.dex): ok
+67:08-30 01:31:44.646  8015  8015 D nativeloader: Load /data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!/lib/arm64-v8a/libhermestooling.so using class loader ns clns-4 (caller=/data/app/~~QOMKfQxNXs8jZIzqOvUMUQ==/tribo.network.com.br-m5JFlB3Wj1yJnyYNeztu3w==/base.apk!classes3.dex): ok
+70:08-30 01:31:44.646  8015  8015 D jni_lib_merge: Preparing to register libhermes_executor_so.  onload_func: 0x6db2bdd4b0
+71:08-30 01:31:44.646  8015  8015 D jni_lib_merge: Preparing to register libhermesinstancejni_so.  onload_func: 0x6db2be4900
+72:08-30 01:31:44.646  8015  8015 D jni_lib_merge: Preparing to register libjsijniprofiler_so.  onload_func: 0x6db2be50ec
+162:08-30 01:31:44.786  8015  8120 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.reactnativegooglesignin.RNGoogleSigninButtonViewManager
+200:08-30 01:31:44.805  8015  8120 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.reactnativecommunity.webview.RNCWebViewManager
+212:08-30 01:31:44.874  8015  8119 I ExpoModulesCore: ✅ JSI interop was installed
+214:08-30 01:31:44.913  8015  8119 I ReactNativeJS: '[API CONFIG] Conectado na Base URL:', 'https://tribo-api-production-2f6f.up.railway.app/api'
+247:08-30 01:31:45.086  8015  8119 W ReactNativeJS: [expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality.
+254:08-30 01:31:45.117  8015  8119 I ReactNativeJS: Running "main"
+256:08-30 01:31:45.128  8015  8119 W ReactNativeJS: The app is running using the Legacy Architecture. The Legacy Architecture is deprecated and will be removed in a future version of React Native. Please consider migrating to the New Architecture. For more information, please see https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here
+257:08-30 01:31:45.128  8015  8119 E AVManager: Cannot install JSI bindings for AV module because JS context is not available
+259:08-30 01:31:45.132  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+260:08-30 01:31:45.133  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+261:08-30 01:31:45.136  8015  8119 I ReactNativeJS: [CodePush] Verificando atualizações no Revopush...
+264:08-30 01:31:45.177  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+265:08-30 01:31:45.177  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+273:08-30 01:31:45.196  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+275:08-30 01:31:45.197  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+300:08-30 01:31:45.233  8015  8139 D nativeloader:   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libcrypto_httpengine.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libhttpengine.so:libservice-connectivity.so:libservice-thread-jni.so
+360:08-30 01:31:46.425  8015  8119 I ReactNativeJS: [CodePush] An update is available, but it is being ignored due to having been previously rolled back.
+361:08-30 01:31:46.427  8015  8119 I ReactNativeJS: [CodePush] Aplicativo já está na versão mais recente.
+386:08-30 01:31:49.580  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+387:08-30 01:31:49.580  8015  8120 W unknown:ReactNative: StatusBarModule: Ignored status bar change, current activity is edge-to-edge.
+388:08-30 01:31:49.618  8015  8120 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+389:08-30 01:31:49.618  8015  8120 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+390:08-30 01:31:49.618  8015  8120 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+
+=== Contexto de crash/stack trace ===

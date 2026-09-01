@@ -1,0 +1,4 @@
+Session started: 30/08/2026  0:54:08,01
+Serial: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Package: 
+Project root: C:\Users\LUAN-DEV\Documents\depuracao

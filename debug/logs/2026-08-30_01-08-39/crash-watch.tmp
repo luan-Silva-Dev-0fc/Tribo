@@ -1,0 +1,19 @@
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: FATAL EXCEPTION: create_react_context
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: Process: tribo.network.com.br, PID: 18715
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: java.lang.IllegalStateException: 
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: Native module CodePush tried to override CodePushNativeModule.
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: Check the getPackages() method in MainApplication.java, it might be that module is being created twice.
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: If this was your intention, set canOverrideExistingModule=true. This error may also be present if the
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: package is present only once in getPackages() but is also automatically added later during build time
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: by autolinking. Try removing the existing entry and rebuild.
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.NativeModuleRegistryBuilder.processPackage(NativeModuleRegistryBuilder.kt:49)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.processPackage(ReactInstanceManager.java:1571)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.processPackages(ReactInstanceManager.java:1542)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.createReactContext(ReactInstanceManager.java:1453)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.lambda$runCreateReactContextOnNewThread$2(ReactInstanceManager.java:1222)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.$r8$lambda$PrBhihCbbAFk4ZReAALGanVLCyc(ReactInstanceManager.java:0)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:1572)
+08-30 01:08:44.046  1834  3112 I ActivityManager: Process tribo.network.com.br (pid 18715) has died: fg  TOP 

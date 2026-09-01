@@ -1,0 +1,106 @@
+========================================
+     RELATORIO DE DEPURACAO ANDROID
+========================================
+Sessao: 2026-08-30_01-08-39
+Dispositivo: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Modelo: moto g(60)
+Android: 12 (SDK 31)
+ABI: arm64-v8a
+Package: tribo.network.com.br
+Classificacao baseada em evidencias: [NATIVE JAVA/KOTLIN]
+Possivel crash durante a captura: SIM
+
+Arquivos de evidencia:
+- raw.log: logcat integral, fonte principal
+- errors.log: ocorrencias relevantes com numero de linha
+- stack-context.log: trechos com contexto de stack trace
+- crash.log, react-native.log, java-kotlin.log, native.log, anr.log
+
+=== Principais ocorrencias ===
+PID no inicio:
+PID no encerramento:
+77:08-30 01:08:43.800 18715 18715 D nativeloader: Load /data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!/lib/arm64-v8a/libc++_shared.so using class loader ns clns-4 (caller=/data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!classes3.dex): ok
+78:08-30 01:08:43.806 18715 18715 D nativeloader: Load /data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!/lib/arm64-v8a/libjsi.so using class loader ns clns-4 (caller=/data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!classes3.dex): ok
+81:08-30 01:08:43.815 18715 18715 D nativeloader: Load /data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!/lib/arm64-v8a/libreactnative.so using class loader ns clns-4 (caller=/data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!classes3.dex): ok
+88:08-30 01:08:43.816 18715 18715 D jni_lib_merge: Preparing to register libreactnativeblob_so.  onload_func: 0x6d302635b0
+89:08-30 01:08:43.816 18715 18715 D jni_lib_merge: Preparing to register libreactnativejni_so.  onload_func: 0x6d3027db24
+90:08-30 01:08:43.816 18715 18715 D jni_lib_merge: Preparing to register libreactnativejni_common_so.  onload_func: 0x6d30284458
+92:08-30 01:08:43.816 18715 18715 D jni_lib_merge: Preparing to register libturbomodulejsijni_so.  onload_func: 0x6d303381a4
+100:08-30 01:08:43.841 18715 18715 D ReactNative: [CodePush] Loading JS bundle from "assets://index.android.bundle"
+104:08-30 01:08:43.845 18715 18715 D nativeloader: Load /data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!/lib/arm64-v8a/libhermes.so using class loader ns clns-4 (caller=/data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!classes3.dex): ok
+105:08-30 01:08:43.849 18715 18715 D nativeloader: Load /data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!/lib/arm64-v8a/libhermestooling.so using class loader ns clns-4 (caller=/data/app/~~DMKM48R3xw0gRICfZKbVTg==/tribo.network.com.br-iq1fHXfW1sRhi4M2O1AtOw==/base.apk!classes3.dex): ok
+108:08-30 01:08:43.849 18715 18715 D jni_lib_merge: Preparing to register libhermes_executor_so.  onload_func: 0x6db32e14b0
+109:08-30 01:08:43.849 18715 18715 D jni_lib_merge: Preparing to register libhermesinstancejni_so.  onload_func: 0x6db32e8900
+110:08-30 01:08:43.849 18715 18715 D jni_lib_merge: Preparing to register libjsijniprofiler_so.  onload_func: 0x6db32e90ec
+136:08-30 01:08:43.945 18715 18764 E AndroidRuntime: FATAL EXCEPTION: create_react_context
+137:08-30 01:08:43.945 18715 18764 E AndroidRuntime: Process: tribo.network.com.br, PID: 18715
+138:08-30 01:08:43.945 18715 18764 E AndroidRuntime: java.lang.IllegalStateException: 
+139:08-30 01:08:43.945 18715 18764 E AndroidRuntime: Native module CodePush tried to override CodePushNativeModule.
+140:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 
+141:08-30 01:08:43.945 18715 18764 E AndroidRuntime: Check the getPackages() method in MainApplication.java, it might be that module is being created twice.
+142:08-30 01:08:43.945 18715 18764 E AndroidRuntime: If this was your intention, set canOverrideExistingModule=true. This error may also be present if the
+143:08-30 01:08:43.945 18715 18764 E AndroidRuntime: package is present only once in getPackages() but is also automatically added later during build time
+144:08-30 01:08:43.945 18715 18764 E AndroidRuntime: by autolinking. Try removing the existing entry and rebuild.
+145:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 
+146:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.NativeModuleRegistryBuilder.processPackage(NativeModuleRegistryBuilder.kt:49)
+147:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.processPackage(ReactInstanceManager.java:1571)
+148:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.processPackages(ReactInstanceManager.java:1542)
+149:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.createReactContext(ReactInstanceManager.java:1453)
+150:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.lambda$runCreateReactContextOnNewThread$2(ReactInstanceManager.java:1222)
+151:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.$r8$lambda$PrBhihCbbAFk4ZReAALGanVLCyc(ReactInstanceManager.java:0)
+152:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+153:08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:1572)
+227:08-30 01:08:44.046  1834  3112 I ActivityManager: appDiedLocked: app=ProcessRecord{780f53b 18715:tribo.network.com.br/u0a397} thread=android.os.BinderProxy@74bd4fb fromBinderDied=true isKilledByAm=false reason=null
+228:08-30 01:08:44.046  1834  3112 I ActivityManager: Process tribo.network.com.br (pid 18715) has died: fg  TOP 
+240:08-30 01:08:44.084  1834  1965 W ActivityManager: setHasOverlayUi called on unknown pid: 18715
+380:08-30 01:08:44.665  1834  2040 I ActivityManager: Start proc 18786:com.google.android.cellbroadcastreceiver/u0a272 for broadcast {com.google.android.cellbroadcastreceiver/com.android.cellbroadcastreceiver.CellBroadcastReceiver}
+395:08-30 01:08:44.870 18786 18786 D nativeloader:   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libcrypto_httpengine.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libhttpengine.so:libservice-connectivity.so:libservice-thread-jni.so
+417:08-30 01:08:45.994  1834  3112 I ActivityManager: Killing 16824:com.motorola.mototour/u0a160 (adj 965, setSvc -10000): empty #17
+418:08-30 01:08:45.997  1834  3112 I ActivityManager: Killing 16801:com.motorola.motodisplay/u0a153 (adj 975, setSvc -10000): empty #18
+420:08-30 01:08:46.032  1834  3102 I ActivityManager: appDiedLocked: app=ProcessRecord{8af3dd4 16824:com.motorola.mototour/u0a160} thread=android.os.BinderProxy@1a1ff84 fromBinderDied=true isKilledByAm=true reason=null
+423:08-30 01:08:46.045  1834  3112 I ActivityManager: appDiedLocked: app=ProcessRecord{f8ed50d 16801:com.motorola.motodisplay/u0a153} thread=android.os.BinderProxy@1ec336d fromBinderDied=true isKilledByAm=true reason=null
+
+=== Contexto de crash/stack trace ===
+08-30 01:08:43.920 18715 18756 I AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+08-30 01:08:43.926  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:43.941  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:43.941 18715 18764 I ExpoModulesCore: âœ… AppContext was initialized
+--------- beginning of crash
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: FATAL EXCEPTION: create_react_context
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: Process: tribo.network.com.br, PID: 18715
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: java.lang.IllegalStateException: 
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: Native module CodePush tried to override CodePushNativeModule.
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: Check the getPackages() method in MainApplication.java, it might be that module is being created twice.
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: If this was your intention, set canOverrideExistingModule=true. This error may also be present if the
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: package is present only once in getPackages() but is also automatically added later during build time
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: by autolinking. Try removing the existing entry and rebuild.
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.NativeModuleRegistryBuilder.processPackage(NativeModuleRegistryBuilder.kt:49)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.processPackage(ReactInstanceManager.java:1571)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.processPackages(ReactInstanceManager.java:1542)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.createReactContext(ReactInstanceManager.java:1453)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.lambda$runCreateReactContextOnNewThread$2(ReactInstanceManager.java:1222)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager.$r8$lambda$PrBhihCbbAFk4ZReAALGanVLCyc(ReactInstanceManager.java:0)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at com.facebook.react.ReactInstanceManager$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+08-30 01:08:43.945 18715 18764 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:1572)
+08-30 01:08:43.949  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:43.951  1834 18771 I DropBoxManagerService: add tag=data_app_crash isTagEnabled=true flags=0x2
+08-30 01:08:43.952  1834  4309 W ActivityTaskManager:   Force finishing activity tribo.network.com.br/.MainActivity
+08-30 01:08:43.954  1834  4309 V WindowManager: Changing focus of displayId=0 to null from Window{5a72485 u0 tribo.network.com.br/tribo.network.com.br.MainActivity}
+08-30 01:08:43.958  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:43.965 18715 18756 I AdrenoGLES-0: PFP: 0x016ee190, ME: 0x00000000
+08-30 01:08:43.982  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:43.984 18715 18764 I Process : Sending signal. PID: 18715 SIG: 9
+08-30 01:08:43.991  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:43.998  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:43.999  1834  1966 I WindowManager: SURFACE hide Surface(name=com.motorola.livewallpaper3.wallpapers.CustomizationWallpaperService)/@0x595ecd5 on display:0
+08-30 01:08:43.999  1834  1966 I WindowManager: SURFACE hide Surface(name=com.motorola.launcher3/com.android.launcher3.CustomizationPanelLauncher)/@0xf4d80c6 on display:0
+08-30 01:08:43.999  1834  1966 I WindowManager: SURFACE hide Surface(name=GoogleDiscoverWindow)/@0x605887 on display:0
+08-30 01:08:44.005  2886  2886 I WallpaperService: engine paused
+08-30 01:08:44.009  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:44.023  1262  1262 I sensors-hal: batch:242, android.sensor.accelerometer/11, period=10000000, max_latency=200000000
+08-30 01:08:44.024  1262  1262 I sensors-hal: set_config:63, sample_period_ns is adjusted to 10000000 based on min/max delay_ns
+08-30 01:08:44.025  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:08:44.034  1262  1262 E QMI_FW  : qmi_cci_put_ref: ref count decreased 1
+

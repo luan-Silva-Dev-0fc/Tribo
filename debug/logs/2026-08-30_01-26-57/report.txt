@@ -1,0 +1,148 @@
+========================================
+     RELATORIO DE DEPURACAO ANDROID
+========================================
+Sessao: 2026-08-30_01-26-57
+Dispositivo: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Modelo: moto g(60)
+Android: 12 (SDK 31)
+ABI: arm64-v8a
+Package: tribo.network.com.br
+Classificacao baseada em evidencias: [NATIVE JAVA/KOTLIN]
+Possivel crash durante a captura: NAO DETECTADO
+
+Arquivos de evidencia:
+- raw.log: logcat integral, fonte principal
+- errors.log: ocorrencias relevantes com numero de linha
+- stack-context.log: trechos com contexto de stack trace
+- crash.log, react-native.log, java-kotlin.log, native.log, anr.log
+
+=== Principais ocorrencias ===
+PID no inicio:
+31271
+PID no encerramento:
+31271
+49:08-30 01:27:01.158 31271 31271 D nativeloader: Load /data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!/lib/arm64-v8a/libc++_shared.so using class loader ns clns-4 (caller=/data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!classes3.dex): ok
+50:08-30 01:27:01.164 31271 31271 D nativeloader: Load /data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!/lib/arm64-v8a/libjsi.so using class loader ns clns-4 (caller=/data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!classes3.dex): ok
+53:08-30 01:27:01.177 31271 31271 D nativeloader: Load /data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!/lib/arm64-v8a/libreactnative.so using class loader ns clns-4 (caller=/data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!classes3.dex): ok
+60:08-30 01:27:01.177 31271 31271 D jni_lib_merge: Preparing to register libreactnativeblob_so.  onload_func: 0x6d2e26f5b0
+61:08-30 01:27:01.177 31271 31271 D jni_lib_merge: Preparing to register libreactnativejni_so.  onload_func: 0x6d2e289b24
+62:08-30 01:27:01.177 31271 31271 D jni_lib_merge: Preparing to register libreactnativejni_common_so.  onload_func: 0x6d2e290458
+64:08-30 01:27:01.177 31271 31271 D jni_lib_merge: Preparing to register libturbomodulejsijni_so.  onload_func: 0x6d2e3441a4
+80:08-30 01:27:01.275 31271 31271 D ReactNative: [CodePush] Loading JS bundle from "assets://index.android.bundle"
+82:08-30 01:27:01.278 31271 31271 D nativeloader: Load /data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!/lib/arm64-v8a/libhermes.so using class loader ns clns-4 (caller=/data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!classes3.dex): ok
+84:08-30 01:27:01.282 31271 31271 D nativeloader: Load /data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!/lib/arm64-v8a/libhermestooling.so using class loader ns clns-4 (caller=/data/app/~~agIEdJtWimw-CT__ixURnQ==/tribo.network.com.br-4v03GW9cfBGGUSrSAp3Qfw==/base.apk!classes3.dex): ok
+87:08-30 01:27:01.282 31271 31271 D jni_lib_merge: Preparing to register libhermes_executor_so.  onload_func: 0x6db2bd74b0
+88:08-30 01:27:01.282 31271 31271 D jni_lib_merge: Preparing to register libhermesinstancejni_so.  onload_func: 0x6db2bde900
+89:08-30 01:27:01.282 31271 31271 D jni_lib_merge: Preparing to register libjsijniprofiler_so.  onload_func: 0x6db2bdf0ec
+206:08-30 01:27:01.457 31271 31386 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.reactnativegooglesignin.RNGoogleSigninButtonViewManager
+223:08-30 01:27:01.473 31271 31386 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.reactnativecommunity.webview.RNCWebViewManager
+225:08-30 01:27:01.521 31271 31385 I ExpoModulesCore: ✅ JSI interop was installed
+233:08-30 01:27:01.557 31271 31385 I ReactNativeJS: '[API CONFIG] Conectado na Base URL:', 'https://tribo-api-production-2f6f.up.railway.app/api'
+268:08-30 01:27:01.765 31271 31385 W ReactNativeJS: [expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality.
+273:08-30 01:27:01.800 31271 31385 I ReactNativeJS: Running "main"
+275:08-30 01:27:01.815 31271 31385 W ReactNativeJS: The app is running using the Legacy Architecture. The Legacy Architecture is deprecated and will be removed in a future version of React Native. Please consider migrating to the New Architecture. For more information, please see https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here
+276:08-30 01:27:01.815 31271 31385 E AVManager: Cannot install JSI bindings for AV module because JS context is not available
+277:08-30 01:27:01.836 31271 31385 I ReactNativeJS: [CodePush] Verificando atualizações no Revopush...
+279:08-30 01:27:01.840 31271 31385 I ReactNativeJS: [CodePush] Reporting binary update (1.0.0)
+315:08-30 01:27:01.911 31271 31413 D nativeloader:   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libcrypto_httpengine.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libhttpengine.so:libservice-connectivity.so:libservice-thread-jni.so
+359:08-30 01:27:02.256 31271 31386 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+360:08-30 01:27:02.256 31271 31386 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+361:08-30 01:27:02.256 31271 31386 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+362:08-30 01:27:02.256 31271 31386 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+363:08-30 01:27:02.256 31271 31386 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+364:08-30 01:27:02.256 31271 31386 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+379:08-30 01:27:02.979 31271 31385 I ReactNativeJS: [CodePush] ⬇ Baixando pacote de atualização em segundo plano...
+383:08-30 01:27:03.564  1834  3101 W ActivityManager: Unable to start service Intent { act=app.revanced.android.gms.clearcut.service.START pkg=app.revanced.android.gms } U=0: not found
+384:08-30 01:27:03.564  1834  3101 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@822ee88
+386:08-30 01:27:03.667 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 1%
+387:08-30 01:27:03.674 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 1%
+388:08-30 01:27:03.716 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 2%
+389:08-30 01:27:03.724 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 3%
+390:08-30 01:27:03.733 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 4%
+391:08-30 01:27:03.741 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 4%
+394:08-30 01:27:03.766 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 5%
+395:08-30 01:27:03.774 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 6%
+396:08-30 01:27:03.782 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 6%
+398:08-30 01:27:03.791 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 8%
+399:08-30 01:27:03.798 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 8%
+400:08-30 01:27:03.807 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 9%
+401:08-30 01:27:03.816 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 10%
+402:08-30 01:27:03.824 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 11%
+403:08-30 01:27:03.832 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 13%
+404:08-30 01:27:03.849 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 13%
+405:08-30 01:27:03.857 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 15%
+406:08-30 01:27:03.865 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 16%
+407:08-30 01:27:03.874 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 17%
+408:08-30 01:27:03.882 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 21%
+409:08-30 01:27:03.890 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 23%
+410:08-30 01:27:03.899 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 25%
+411:08-30 01:27:03.907 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 29%
+412:08-30 01:27:03.915 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 31%
+413:08-30 01:27:03.923 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 33%
+415:08-30 01:27:03.981 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 36%
+416:08-30 01:27:03.990 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 37%
+419:08-30 01:27:03.999 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 40%
+420:08-30 01:27:04.007 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 42%
+421:08-30 01:27:04.015 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 44%
+422:08-30 01:27:04.023 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 48%
+423:08-30 01:27:04.033 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 49%
+424:08-30 01:27:04.040 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 54%
+425:08-30 01:27:04.049 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 55%
+426:08-30 01:27:04.057 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 58%
+429:08-30 01:27:04.067 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 60%
+432:08-30 01:27:04.123 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 64%
+433:08-30 01:27:04.132 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 67%
+434:08-30 01:27:04.140 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 70%
+437:08-30 01:27:04.148 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 72%
+440:08-30 01:27:04.157 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 75%
+442:08-30 01:27:04.165 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 78%
+443:08-30 01:27:04.174 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 82%
+444:08-30 01:27:04.182 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 84%
+445:08-30 01:27:04.190 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 86%
+448:08-30 01:27:04.215 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 87%
+449:08-30 01:27:04.223 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 89%
+450:08-30 01:27:04.231 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 90%
+454:08-30 01:27:04.240 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 92%
+455:08-30 01:27:04.249 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 94%
+456:08-30 01:27:04.257 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 96%
+457:08-30 01:27:04.266 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 97%
+458:08-30 01:27:04.274 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 99%
+459:08-30 01:27:04.280 31271 31385 I ReactNativeJS: [CodePush]  Progresso do download: 100%
+460:08-30 01:27:04.570 31271 31411 E ReactNative: [CodePush] Exception
+461:08-30 01:27:04.570 31271 31411 E ReactNative: com.microsoft.codepush.react.CodePushInvalidUpdateException: Update is invalid - A JS bundle file named "null" could not be found within the downloaded contents. Please check that you are releasing your CodePush updates using the exact same JS bundle file name that was shipped with your app's binary.
+462:08-30 01:27:04.570 31271 31411 E ReactNative: 	at com.microsoft.codepush.react.CodePushUpdateManager.downloadPackage(CodePushUpdateManager.java:255)
+463:08-30 01:27:04.570 31271 31411 E ReactNative: 	at com.microsoft.codepush.react.CodePushNativeModule$3.doInBackground(CodePushNativeModule.java:298)
+464:08-30 01:27:04.570 31271 31411 E ReactNative: 	at com.microsoft.codepush.react.CodePushNativeModule$3.doInBackground(CodePushNativeModule.java:292)
+465:08-30 01:27:04.570 31271 31411 E ReactNative: 	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+466:08-30 01:27:04.570 31271 31411 E ReactNative: 	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+467:08-30 01:27:04.570 31271 31411 E ReactNative: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1100)
+468:08-30 01:27:04.570 31271 31411 E ReactNative: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+469:08-30 01:27:04.570 31271 31411 E ReactNative: 	at java.lang.Thread.run(Thread.java:1572)
+470:08-30 01:27:04.578 31271 31385 I ReactNativeJS: [CodePush] Erro desconhecido durante o sync.
+471:08-30 01:27:04.578 31271 31385 I ReactNativeJS: [CodePush] Update is invalid - A JS bundle file named "null" could not be found within the downloaded contents. Please check that you are releasing your CodePush updates using the exact same JS bundle file name that was shipped with your app's binary.
+472:08-30 01:27:04.579 31271 31385 W ReactNativeJS: '[CodePush] Falha ao verificar atualizações (seguro ignorar):', 'Update is invalid - A JS bundle file named "null" could not be found within the downloaded contents. Please check that you are releasing your CodePush updates using the exact same JS bundle file name that was shipped with your app\'s binary.'
+504:08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: Caused by: tji: Unable to bind to service
+512:08-30 01:27:06.429  1834  7047 W ActivityManager: Unable to start service Intent { act=app.revanced.android.c2dm.intent.REGISTER pkg=app.revanced.android.gms } U=0: not found
+513:08-30 01:27:06.430  1834  7047 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@95d9994
+
+=== Contexto de crash/stack trace ===
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at vmp.run(PG:7)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1100)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at tvd.run(PG:7)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at java.lang.Thread.run(Thread.java:1572)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: Caused by: tji: Unable to bind to service
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at tje.f(PG:37)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at tje.g(PG:3)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at tje.e(PG:75)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at tjk.e(PG:17)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at tjk.c(PG:10)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	at tju.b(PG:53)
+08-30 01:27:06.419 30106 30251 W HttpPingECatcherLogImpl: 	... 8 more
+08-30 01:27:06.429  1834  7047 W ActivityManager: Unable to start service Intent { act=app.revanced.android.c2dm.intent.REGISTER pkg=app.revanced.android.gms } U=0: not found
+08-30 01:27:06.430  1834  7047 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@95d9994
+08-30 01:27:06.849 23768 31478 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+08-30 01:27:06.849 23768 31478 I adbd    : UsbFfs: connection terminated: monitor thread finished
+08-30 01:27:06.866 31271 31275 I .network.com.b: Background concurrent copying GC freed 18MB AllocSpace bytes, 93(4564KB) LOS objects, 49% free, 9229KB/18MB, paused 90us,56us total 108.815ms
+08-30 01:27:06.876 23768 23772 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+

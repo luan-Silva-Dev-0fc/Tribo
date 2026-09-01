@@ -1,0 +1,156 @@
+========================================
+     RELATORIO DE DEPURACAO ANDROID
+========================================
+Sessao: 2026-08-30_01-24-13
+Dispositivo: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Modelo: moto g(60)
+Android: 12 (SDK 31)
+ABI: arm64-v8a
+Package: 'tribo.network.com.br'
+Classificacao baseada em evidencias: [NATIVE JAVA/KOTLIN]
+Possivel crash durante a captura: NAO DETECTADO
+
+Arquivos de evidencia:
+- raw.log: logcat integral, fonte principal
+- errors.log: ocorrencias relevantes com numero de linha
+- stack-context.log: trechos com contexto de stack trace
+- crash.log, react-native.log, java-kotlin.log, native.log, anr.log
+
+=== Principais ocorrencias ===
+PID no inicio:
+PID no encerramento:
+29777
+25:08-30 01:24:16.796  1834  2040 I ActivityManager: Start proc 29777:tribo.network.com.br/u0a397 for pre-top-activity {tribo.network.com.br/tribo.network.com.br.MainActivity}
+53:08-30 01:24:16.927 29777 29777 E AndroidRuntime: FATAL EXCEPTION: main
+54:08-30 01:24:16.927 29777 29777 E AndroidRuntime: Process: tribo.network.com.br, PID: 29777
+55:08-30 01:24:16.927 29777 29777 E AndroidRuntime: java.lang.ExceptionInInitializerError
+56:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxAccessor.enableBridgelessArchitecture(ReactNativeFeatureFlagsCxxAccessor.kt:178)
+57:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlags.enableBridgelessArchitecture(ReactNativeFeatureFlags.kt:97)
+58:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.rncompatibility.ReactNativeFeatureFlags.<clinit>(ReactNativeFeatureFlags.kt:11)
+59:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invokeSuspend(ReactActivityDelegateWrapper.kt:160)
+60:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:8)
+61:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:4)
+62:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invokeSuspend(ReactActivityDelegateWrapper.kt:485)
+63:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:8)
+64:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:4)
+65:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.intrinsics.UndispatchedKt.startCoroutineUndispatched(Undispatched.kt:20)
+66:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.CoroutineStart.invoke(CoroutineStart.kt:360)
+67:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.AbstractCoroutine.start(AbstractCoroutine.kt:124)
+68:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch(Builders.common.kt:52)
+69:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch(dex-id-956cd5e6587cab5d543c3dd34a23d3c6b058dfb6:1)
+70:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch$default(Builders.common.kt:43)
+71:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch$default(dex-id-956cd5e6587cab5d543c3dd34a23d3c6b058dfb6:1)
+72:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.launchLifecycleScopeWithLock(ReactActivityDelegateWrapper.kt:483)
+73:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.onCreate(ReactActivityDelegateWrapper.kt:150)
+74:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.ReactActivity.onCreate(ReactActivity.java:61)
+75:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at tribo.network.com.br.MainActivity.onCreate(MainActivity.kt:19)
+76:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8232)
+77:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8212)
+78:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1331)
+79:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3724)
+80:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3919)
+81:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
+82:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:135)
+83:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:95)
+84:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2311)
+85:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:111)
+86:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:238)
+87:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:357)
+88:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:8090)
+89:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+90:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
+91:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+92:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	Suppressed: kotlinx.coroutines.internal.DiagnosticCoroutineContextException: [StandaloneCoroutine{Cancelling}@1fbce6e, Dispatchers.Main.immediate]
+93:08-30 01:24:16.927 29777 29777 E AndroidRuntime: Caused by: java.lang.IllegalStateException: SoLoader.init() not yet called
+94:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.assertInitialized(SoLoader.java:1273)
+95:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibraryOnNonAndroid(SoLoader.java:880)
+96:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:825)
+97:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:812)
+98:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxInterop.<clinit>(ReactNativeFeatureFlagsCxxInterop.kt:28)
+99:08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	... 36 more
+
+=== Contexto de crash/stack trace ===
+08-30 01:24:16.888 29777 29777 I Typeface: updateThemeFont new=RobotoSlab-Regular;old=sans-serif
+08-30 01:24:16.900  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:16.901 29777 29777 D AppCompatDelegate: Checking for metadata for AppLocalesMetadataHolderService : Service not found
+08-30 01:24:16.916  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+--------- beginning of crash
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: FATAL EXCEPTION: main
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: Process: tribo.network.com.br, PID: 29777
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: java.lang.ExceptionInInitializerError
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxAccessor.enableBridgelessArchitecture(ReactNativeFeatureFlagsCxxAccessor.kt:178)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlags.enableBridgelessArchitecture(ReactNativeFeatureFlags.kt:97)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.rncompatibility.ReactNativeFeatureFlags.<clinit>(ReactNativeFeatureFlags.kt:11)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invokeSuspend(ReactActivityDelegateWrapper.kt:160)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:8)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:4)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invokeSuspend(ReactActivityDelegateWrapper.kt:485)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:8)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:4)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.intrinsics.UndispatchedKt.startCoroutineUndispatched(Undispatched.kt:20)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.CoroutineStart.invoke(CoroutineStart.kt:360)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.AbstractCoroutine.start(AbstractCoroutine.kt:124)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch(Builders.common.kt:52)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch(dex-id-956cd5e6587cab5d543c3dd34a23d3c6b058dfb6:1)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch$default(Builders.common.kt:43)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch$default(dex-id-956cd5e6587cab5d543c3dd34a23d3c6b058dfb6:1)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.launchLifecycleScopeWithLock(ReactActivityDelegateWrapper.kt:483)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.onCreate(ReactActivityDelegateWrapper.kt:150)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.ReactActivity.onCreate(ReactActivity.java:61)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at tribo.network.com.br.MainActivity.onCreate(MainActivity.kt:19)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8232)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8212)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1331)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3724)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3919)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:135)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:95)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2311)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:111)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:238)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:357)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:8090)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	Suppressed: kotlinx.coroutines.internal.DiagnosticCoroutineContextException: [StandaloneCoroutine{Cancelling}@1fbce6e, Dispatchers.Main.immediate]
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: Caused by: java.lang.IllegalStateException: SoLoader.init() not yet called
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.assertInitialized(SoLoader.java:1273)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibraryOnNonAndroid(SoLoader.java:880)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:825)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:812)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxInterop.<clinit>(ReactNativeFeatureFlagsCxxInterop.kt:28)
+08-30 01:24:16.927 29777 29777 E AndroidRuntime: 	... 36 more
+08-30 01:24:16.930  1834 29811 I DropBoxManagerService: add tag=data_app_crash isTagEnabled=true flags=0x2
+08-30 01:24:16.930  1834  4251 W ActivityTaskManager:   Force finishing activity tribo.network.com.br/.MainActivity
+08-30 01:24:16.933  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:16.950  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:16.967  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:16.983  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:16.986  3483 29814 I DropBoxUtil: (REDACTED) Reading dropbox entry with tag %s and timestamp %d
+08-30 01:24:16.992  3097  3123 W System  : A resource failed to call release. 
+08-30 01:24:16.992  3097  3123 W System  : A resource failed to call release. 
+08-30 01:24:16.991  3483 29814 I DropBoxUtil: (REDACTED) Reading dropbox entry with tag %s and timestamp %d
+08-30 01:24:16.996  1834  1963 V WindowManager: Changing focus of displayId=0 to Window{ce27afc u0 Application Error: tribo.network.com.br} from null
+08-30 01:24:17.000  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:17.009  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:17.012  1834  1963 I WindowManager: SURFACE create Surface(name=Application Error: tribo.network.com.br)/@0xefd2d94 on display:0
+08-30 01:24:17.019  1834  2683 D WifiStaIfaceHidlImpl: getCachedScanData is not implemented by HIDL
+08-30 01:24:17.025  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:17.033  4318  5207 I ModemStats: [DataStallDetectService] onCapabilitiesChanged networkCapabilities=[ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED LinkUpBandwidth>=15184Kbps LinkDnBandwidth>=51374Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /192.168.18.52, Security type: 2, Supplicant state: COMPLETED, Wi-Fi standard: 11ac, RSSI: -75, Link speed: 58Mbps, Tx Link speed: 58Mbps, Max Supported Tx Link speed: 433Mbps, Calculated Tx : 20Mbps, Rx Link speed: 130Mbps, Max Supported Rx Link speed: 433Mbps, Calculated Rx : 164Mbps, Frequency: 5180MHz, Net ID: -1, Metered hint: false, score: 100, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -75 UnderlyingNetworks: Null]
+08-30 01:24:17.033  4318  5207 I ModemStats: [DataStallDetectService] onCapabilitiesChanged NET_CAPABILITY_VALIDATED=true
+08-30 01:24:17.033  4318  5207 I ModemStats: [DataStallDetectService] onCapabilitiesChanged mDataStallManager.mDataStallInstance=null
+08-30 01:24:17.034  1834  2683 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+08-30 01:24:17.035  3483  4239 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+08-30 01:24:17.035  3483  4239 W Binder  : reply too large data on java level: InterfaceDescriptor = null, code = 1
+08-30 01:24:17.036  4342 10837 D OtaApp  : PollingManagerService:NetworkCallback:networkCapabilities=[ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED LinkUpBandwidth>=15184Kbps LinkDnBandwidth>=51374Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /192.168.18.52, Security type: 2, Supplicant state: COMPLETED, Wi-Fi standard: 11ac, RSSI: -75, Link speed: 58Mbps, Tx Link speed: 58Mbps, Max Supported Tx Link speed: 433Mbps, Calculated Tx : 20Mbps, Rx Link speed: 130Mbps, Max Supported Rx Link speed: 433Mbps, Calculated Rx : 164Mbps, Frequency: 5180MHz, Net ID: -1, Metered hint: false, score: 100, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -75 UnderlyingNetworks: Null]
+08-30 01:24:17.037  4342 10837 D Fota    : ConnectivityActionReceiver:NetworkCallback:networkCapabilities=[ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED LinkUpBandwidth>=15184Kbps LinkDnBandwidth>=51374Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /192.168.18.52, Security type: 2, Supplicant state: COMPLETED, Wi-Fi standard: 11ac, RSSI: -75, Link speed: 58Mbps, Tx Link speed: 58Mbps, Max Supported Tx Link speed: 433Mbps, Calculated Tx : 20Mbps, Rx Link speed: 130Mbps, Max Supported Rx Link speed: 433Mbps, Calculated Rx : 164Mbps, Frequency: 5180MHz, Net ID: -1, Metered hint: false, score: 100, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -75 UnderlyingNetworks: Null]
+08-30 01:24:17.041  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:17.043 28757 28795 I BugleRcsEngine: handleMessage processing message:[NOTIFY_UPTIME_IGNORE_STATE_CHANGED] with [non-null]:RcsEngineImpl reference [CONTEXT log_prefix="RcsEngineImpl[DUAL_REG]:[08a0aa52-ecda]>Handler" thread_id=130 ]
+08-30 01:24:17.044 28757 28791 I BugleRcsEngine: Connected state: [1], networkType: [WIFI] [CONTEXT thread_id=126 ]
+08-30 01:24:17.046  3483  3483 D BoundBrokerSvc: onRebind: Intent { act=com.google.android.gms.common.telemetry.service.START dat=chimera-action: cmp=com.google.android.gms/.chimera.PersistentApiService }
+08-30 01:24:17.049  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:24:17.053  1834  2691 D ConnectivityService: NetReassign [no changes] [c 0] [a 2] [i 2]
+

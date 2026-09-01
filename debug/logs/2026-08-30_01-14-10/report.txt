@@ -1,0 +1,181 @@
+========================================
+     RELATORIO DE DEPURACAO ANDROID
+========================================
+Sessao: 2026-08-30_01-14-10
+Dispositivo: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Modelo: moto g(60)
+Android: 12 (SDK 31)
+ABI: arm64-v8a
+Package: tribo.network.com.br
+Classificacao baseada em evidencias: [NATIVE JAVA/KOTLIN]
+Possivel crash durante a captura: NAO DETECTADO
+
+Arquivos de evidencia:
+- raw.log: logcat integral, fonte principal
+- errors.log: ocorrencias relevantes com numero de linha
+- stack-context.log: trechos com contexto de stack trace
+- crash.log, react-native.log, java-kotlin.log, native.log, anr.log
+
+=== Principais ocorrencias ===
+PID no inicio:
+20963
+PID no encerramento:
+20963
+40:08-30 01:14:20.203 20963 20963 E AndroidRuntime: FATAL EXCEPTION: main
+41:08-30 01:14:20.203 20963 20963 E AndroidRuntime: Process: tribo.network.com.br, PID: 20963
+42:08-30 01:14:20.203 20963 20963 E AndroidRuntime: java.lang.ExceptionInInitializerError
+43:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxAccessor.enableBridgelessArchitecture(ReactNativeFeatureFlagsCxxAccessor.kt:178)
+44:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlags.enableBridgelessArchitecture(ReactNativeFeatureFlags.kt:97)
+45:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.rncompatibility.ReactNativeFeatureFlags.<clinit>(ReactNativeFeatureFlags.kt:11)
+46:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invokeSuspend(ReactActivityDelegateWrapper.kt:160)
+47:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:8)
+48:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:4)
+49:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invokeSuspend(ReactActivityDelegateWrapper.kt:485)
+50:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:8)
+51:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:4)
+52:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.intrinsics.UndispatchedKt.startCoroutineUndispatched(Undispatched.kt:20)
+53:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.CoroutineStart.invoke(CoroutineStart.kt:360)
+54:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.AbstractCoroutine.start(AbstractCoroutine.kt:124)
+55:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch(Builders.common.kt:52)
+56:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch(dex-id-17d22245ff246ff45608005dbd0c9ecdab55bc86:1)
+57:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch$default(Builders.common.kt:43)
+58:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch$default(dex-id-17d22245ff246ff45608005dbd0c9ecdab55bc86:1)
+59:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.launchLifecycleScopeWithLock(ReactActivityDelegateWrapper.kt:483)
+60:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.onCreate(ReactActivityDelegateWrapper.kt:150)
+61:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.ReactActivity.onCreate(ReactActivity.java:61)
+62:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at tribo.network.com.br.MainActivity.onCreate(MainActivity.kt:19)
+63:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8232)
+64:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8212)
+65:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1331)
+66:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3724)
+67:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3919)
+68:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
+69:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:135)
+70:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:95)
+71:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2311)
+72:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:111)
+73:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:238)
+74:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:357)
+75:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:8090)
+76:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+77:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
+78:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+79:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	Suppressed: kotlinx.coroutines.internal.DiagnosticCoroutineContextException: [StandaloneCoroutine{Cancelling}@da9e0a3, Dispatchers.Main.immediate]
+80:08-30 01:14:20.203 20963 20963 E AndroidRuntime: Caused by: java.lang.IllegalStateException: SoLoader.init() not yet called
+81:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.assertInitialized(SoLoader.java:1273)
+82:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibraryOnNonAndroid(SoLoader.java:880)
+83:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:825)
+84:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:812)
+85:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxInterop.<clinit>(ReactNativeFeatureFlagsCxxInterop.kt:28)
+86:08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	... 36 more
+129:08-30 01:14:20.296  1834  2040 I ActivityManager: Start proc 21171:br.com.intermedium/u0a282 for service {br.com.intermedium/androidx.work.impl.background.systemjob.SystemJobService}
+239:08-30 01:14:20.432 21171 21171 D nativeloader:   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libcrypto_httpengine.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libhttpengine.so:libservice-connectivity.so:libservice-thread-jni.so
+432:08-30 01:14:21.820 21171 21171 W System.err: java.lang.IllegalStateException: WorkManager is already initialized.  Did you try to initialize it manually without disabling WorkManagerInitializer? See WorkManager#initialize(Context, Configuration) or the class level Javadoc for more information.
+433:08-30 01:14:21.823 21171 21171 W System.err: 	at androidx.work.impl.WorkManagerImpl.initialize(:204)
+434:08-30 01:14:21.823 21171 21171 W System.err: 	at androidx.work.WorkManager$Companion.initialize(:201)
+435:08-30 01:14:21.823 21171 21171 W System.err: 	at br.com.intermedium.Application.onCreate(:10118)
+436:08-30 01:14:21.823 21171 21171 W System.err: 	at android.app.Instrumentation.callApplicationOnCreate(Instrumentation.java:1213)
+437:08-30 01:14:21.823 21171 21171 W System.err: 	at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6907)
+438:08-30 01:14:21.823 21171 21171 W System.err: 	at android.app.ActivityThread.access$1600(ActivityThread.java:261)
+439:08-30 01:14:21.823 21171 21171 W System.err: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2154)
+440:08-30 01:14:21.823 21171 21171 W System.err: 	at android.os.Handler.dispatchMessage(Handler.java:111)
+441:08-30 01:14:21.823 21171 21171 W System.err: 	at android.os.Looper.loopOnce(Looper.java:238)
+442:08-30 01:14:21.823 21171 21171 W System.err: 	at android.os.Looper.loop(Looper.java:357)
+443:08-30 01:14:21.823 21171 21171 W System.err: 	at android.app.ActivityThread.main(ActivityThread.java:8090)
+444:08-30 01:14:21.823 21171 21171 W System.err: 	at java.lang.reflect.Method.invoke(Native Method)
+445:08-30 01:14:21.823 21171 21171 W System.err: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
+446:08-30 01:14:21.823 21171 21171 W System.err: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+447:08-30 01:14:21.860 21171 21271 W System.err: OFDHB:109
+450:08-30 01:14:21.909 21171 21271 W System.err: OFDHB:109
+453:08-30 01:14:21.933 21171 21281 W System.err: OFDHB:181
+456:08-30 01:14:22.012 21171 21171 W System.err: SLF4J(W): No SLF4J providers were found.
+457:08-30 01:14:22.012 21171 21171 W System.err: SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+458:08-30 01:14:22.012 21171 21171 W System.err: SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+466:08-30 01:14:22.102 21171 21281 W System.err: OFDHB:189
+469:08-30 01:14:22.142 21171 21286 W System.err: OFDHB:100
+
+=== Contexto de crash/stack trace ===
+08-30 01:14:20.163 30283 30283 W dxpw    : measuring already stopped.
+08-30 01:14:20.165  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.181  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.198  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+--------- beginning of crash
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: FATAL EXCEPTION: main
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: Process: tribo.network.com.br, PID: 20963
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: java.lang.ExceptionInInitializerError
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxAccessor.enableBridgelessArchitecture(ReactNativeFeatureFlagsCxxAccessor.kt:178)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlags.enableBridgelessArchitecture(ReactNativeFeatureFlags.kt:97)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.rncompatibility.ReactNativeFeatureFlags.<clinit>(ReactNativeFeatureFlags.kt:11)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invokeSuspend(ReactActivityDelegateWrapper.kt:160)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:8)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$onCreate$1.invoke(ReactActivityDelegateWrapper.kt:4)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invokeSuspend(ReactActivityDelegateWrapper.kt:485)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:8)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper$launchLifecycleScopeWithLock$1.invoke(ReactActivityDelegateWrapper.kt:4)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.intrinsics.UndispatchedKt.startCoroutineUndispatched(Undispatched.kt:20)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.CoroutineStart.invoke(CoroutineStart.kt:360)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.AbstractCoroutine.start(AbstractCoroutine.kt:124)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch(Builders.common.kt:52)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch(dex-id-17d22245ff246ff45608005dbd0c9ecdab55bc86:1)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt__Builders_commonKt.launch$default(Builders.common.kt:43)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at kotlinx.coroutines.BuildersKt.launch$default(dex-id-17d22245ff246ff45608005dbd0c9ecdab55bc86:1)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.launchLifecycleScopeWithLock(ReactActivityDelegateWrapper.kt:483)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at expo.modules.ReactActivityDelegateWrapper.onCreate(ReactActivityDelegateWrapper.kt:150)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.ReactActivity.onCreate(ReactActivity.java:61)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at tribo.network.com.br.MainActivity.onCreate(MainActivity.kt:19)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8232)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.Activity.performCreate(Activity.java:8212)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1331)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3724)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3919)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:135)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:95)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2311)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:111)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:238)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:357)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:8090)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	Suppressed: kotlinx.coroutines.internal.DiagnosticCoroutineContextException: [StandaloneCoroutine{Cancelling}@da9e0a3, Dispatchers.Main.immediate]
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: Caused by: java.lang.IllegalStateException: SoLoader.init() not yet called
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.assertInitialized(SoLoader.java:1273)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibraryOnNonAndroid(SoLoader.java:880)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:825)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:812)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	at com.facebook.react.internal.featureflags.ReactNativeFeatureFlagsCxxInterop.<clinit>(ReactNativeFeatureFlagsCxxInterop.kt:28)
+08-30 01:14:20.203 20963 20963 E AndroidRuntime: 	... 36 more
+08-30 01:14:20.206  1834 21167 I DropBoxManagerService: add tag=data_app_crash isTagEnabled=true flags=0x2
+08-30 01:14:20.207  1834  4251 W ActivityTaskManager:   Force finishing activity tribo.network.com.br/.MainActivity
+08-30 01:14:20.215  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.217 20763 20796 I Finsky  : [141] Initializing the instant apps module.
+08-30 01:14:20.233  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.240  1834  2037 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.DROPBOX_ENTRY_ADDED flg=0x10 (has extras) } to com.google.android.gms/.stats.service.DropBoxEntryAddedReceiver
+08-30 01:14:20.248  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.248 23768 21155 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+08-30 01:14:20.248 23768 21155 I adbd    : UsbFfs: connection terminated: monitor thread finished
+08-30 01:14:20.265  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.268  1834  1834 D CompatibilityChangeReporter: Compat change id reported: 168419799; UID 10154; state: DISABLED
+08-30 01:14:20.272  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.273 23768 23772 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+08-30 01:14:20.275  1834  1834 D CompatibilityChangeReporter: Compat change id reported: 135634846; UID 10282; state: DISABLED
+08-30 01:14:20.276  1834  1834 D CompatibilityChangeReporter: Compat change id reported: 177438394; UID 10282; state: DISABLED
+08-30 01:14:20.276  1834  1834 D CompatibilityChangeReporter: Compat change id reported: 135772972; UID 10282; state: DISABLED
+08-30 01:14:20.277  1834  1834 D CompatibilityChangeReporter: Compat change id reported: 135754954; UID 10282; state: ENABLED
+08-30 01:14:20.278  1834  2040 D CompatibilityChangeReporter: Compat change id reported: 143937733; UID 10282; state: ENABLED
+08-30 01:14:20.285  1262  1262 I sensors-hal: batch:242, android.sensor.motion_detect/302, period=1000000, max_latency=0
+08-30 01:14:20.285 20763 20797 W Finsky  : [142] PreloadClasses: Unable to load [androidx.compose.ui.platform.ViewCompositionStrategy$DisposeOnViewTreeLifecycleDestroyed$installFor$1, androidx.compose.ui.platform.AndroidUiDispatcher$Companion$Main$2, androidx.compose.ui.platform.AndroidCompositionLocals_androidKt$LocalConfiguration$1, androidx.compose.ui.platform.AndroidCompositionLocals_androidKt$LocalContext$1, androidx.compose.ui.platform.AndroidCompositionLocals_androidKt$LocalView$1, androidx.compose.ui.platform.DisposableSaveableStateRegistry_androidKt$DisposableSaveableStateRegistry$saveableStateRegistry$1, androidx.compose.ui.platform.DisposableSaveableStateRegistry_androidKt$DisposableSaveableStateRegistry$1, androidx.compose.ui.platform.InspectableValueKt$NoInspectorInfo$1, androidx.compose.ui.node.ComposeUiNode$Companion$SetModifier$1, androidx.compose.ui.node.ComposeUiNode$Companion$SetLayoutDirection$1, androidx.compose.ui.semantics.SemanticsProperties$ContentDescription$1, androidx.compose.ui.semantics.SemanticsPropertyKey$1, androidx.compose.ui.semantics.SemanticsProperties$PaneTitle$1, androidx.compose.ui.semantics.SemanticsProperties$InvisibleToUser$1, androidx.compose.ui.semantics.SemanticsProperties$IsPopup$1, androidx.compose.ui.semantics.SemanticsProperties$IsDialog$1, androidx.compose.ui.semantics.SemanticsProperties$Role$1, androidx.compose.ui.semantics.SemanticsProperties$TestTag$1, androidx.compose.ui.semantics.SemanticsProperties$Text$1, androidx.compose.ui.platform.ComposeView$Content$1, androidx.compose.ui.platform.CompositionLocalsKt$ProvideCommonCompositionLocals$1, androidx.compose.ui.layout.RootMeasurePolicy$measure$2, androidx.compose.ui.input.pointer.PointerInteropFilter_androidKt$pointerInteropFilter$2, androidx.compose.ui.graphics.painter.Painter$drawLambda$1, androidx.compose.ui.graphics.SimpleGraphicsLayerModifier$layerBlock$1, androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher$calculateNestedScrollScope$1, androidx.compose.animation.TransitionData, androidx.compose.animation.Fade, androidx.compose.ui.layout.SubcomposeLayoutState$setRoot$1, androidx.compose.ui.layout.SubcomposeLayoutState$setMeasurePolicy$1, androidx.compose.ui.graphics.BlockGraphicsLayerModifier$measure$1, androidx.compose.ui.text.platform.AndroidParagraphIntrinsics, androidx.compose.ui.graphics.SimpleGraphicsLayerModifier$measure$1, androidx.compose.ui.layout.SubcomposeLayoutKt$SubcomposeLayout$2, androidx.compose.ui.platform.ViewCompositionStrategy$DisposeOnDetachedFromWindowOrReleasedFromPool$installFor$1, androidx.navigation.NavControllerViewModel, androidx.navigation.NavControllerViewModel$Companion]
+08-30 01:14:20.285  1262  1262 I sensors-hal: set_config:63, sample_period_ns is adjusted to 0 based on min/max delay_ns
+08-30 01:14:20.285  1262  1262 I sensors-hal: batch:251, android.sensor.motion_detect/302, period=1000000, max_latency=0 request completed
+08-30 01:14:20.286  1262  1262 I sensors-hal: activate:209, android.sensor.motion_detect/302 en=1
+08-30 01:14:20.288  1262  1262 I sensors-hal: get_qmi_debug_flag:241, support_qmi_debug : false
+08-30 01:14:20.290  1271  1899 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:14:20.291  1262  1262 E QMI_FW  : qmi_cci_put_ref: ref count decreased 1
+08-30 01:14:20.291  1262  1262 E QMI_FW  : qmi_cci_put_ref: ref count decreased 1
+08-30 01:14:20.291  1262  1262 E QMI_FW  : qmi_cci_put_ref: ref count decreased 1
+08-30 01:14:20.291  1262  1262 E QMI_FW  : qmi clnt rel: Stopped accepting txns
+08-30 01:14:20.291  1262  1262 E QMI_FW  : qmi clnt rel: Completed cleanup_client_lists
+

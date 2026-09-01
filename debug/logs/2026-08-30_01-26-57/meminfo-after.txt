@@ -1,0 +1,58 @@
+Applications Memory Usage (in Kilobytes):
+Uptime: 7251950 Realtime: 7252053
+
+** MEMINFO in pid 31271 [tribo.network.com.br] **
+                   Pss  Private  Private  SwapPss      Rss     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty    Total     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------   ------
+  Native Heap    19677    19552        0        0    23144    30368    19670     5672
+  Dalvik Heap     7608     7272        0        0    14948    17852     8926     8926
+ Dalvik Other     3924     3800        0        1     4532                           
+        Stack     1956     1956        0        0     1968                           
+       Ashmem       10        0        0        0      496                           
+      Gfx dev     3392     3392        0        0     3392                           
+    Other dev        9        4        4        0      252                           
+     .so mmap    16717      208    13200        3    38820                           
+    .jar mmap     2912        0     1584        0    27952                           
+    .apk mmap    20741     1096    14320        0    30740                           
+    .ttf mmap      922      560      240        0     1044                           
+    .dex mmap    27876       16    27040        0    29348                           
+    .oat mmap      435        0        0        0    15456                           
+    .art mmap     1318      548        0        0    22412                           
+   Other mmap      597        8      368        0     1440                           
+   EGL mtrack    42208    42208        0        0    42208                           
+    GL mtrack      384      384        0        0      384                           
+      Unknown     9282     9200       64        0    10124                           
+        TOTAL   159972    90204    56820        4   268660    48220    28596    14598
+ 
+ App Summary
+                       Pss(KB)                        Rss(KB)
+                        ------                         ------
+           Java Heap:     7820                          37360
+         Native Heap:    19552                          23144
+                Code:    58264                         143596
+               Stack:     1956                           1968
+            Graphics:    45984                          45984
+       Private Other:    13448
+              System:    12948
+             Unknown:                                   16608
+ 
+           TOTAL PSS:   159972            TOTAL RSS:   268660       TOTAL SWAP PSS:        4
+ 
+ Objects
+               Views:       48         ViewRootImpl:        1
+         AppContexts:        8           Activities:        1
+              Assets:       47        AssetManagers:        0
+       Local Binders:       26        Proxy Binders:       34
+       Parcel memory:       10         Parcel count:       42
+    Death Recipients:        0      OpenSSL Sockets:        5
+            WebViews:        0
+ 
+ SQL
+         MEMORY_USED:      192
+  PAGECACHE_OVERFLOW:       71          MALLOC_SIZE:       46
+ 
+ DATABASES
+      pgsz     dbsz   Lookaside(b)          cache  Dbname
+         4       20             34         7/31/4  /data/user/0/tribo.network.com.br/databases/RKStorage
+         4       32             69        11/47/8  /data/user/0/tribo.network.com.br/databases/exoplayer_internal.db

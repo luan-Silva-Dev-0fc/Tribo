@@ -1,0 +1,97 @@
+========================================
+     RELATORIO DE DEPURACAO ANDROID
+========================================
+Sessao: 2026-08-30_01-05-58
+Dispositivo: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Modelo: moto g(60)
+Android: 12 (SDK 31)
+ABI: arm64-v8a
+Package: tribo.network.com.br
+Classificacao baseada em evidencias: [NATIVE JAVA/KOTLIN]
+Possivel crash durante a captura: NAO DETECTADO
+
+Arquivos de evidencia:
+- raw.log: logcat integral, fonte principal
+- errors.log: ocorrencias relevantes com numero de linha
+- stack-context.log: trechos com contexto de stack trace
+- crash.log, react-native.log, java-kotlin.log, native.log, anr.log
+
+=== Principais ocorrencias ===
+PID no inicio:
+PID no encerramento:
+17233
+20:08-30 01:06:14.347  1834  2040 I ActivityManager: Start proc 17143:com.google.android.apps.subscriptions.red/u0a204 for service {com.google.android.apps.subscriptions.red/androidx.work.impl.background.systemjob.SystemJobService}
+23:08-30 01:06:14.369  1834  2040 W ActivityManager: Slow operation: 53ms so far, now at startProcess: returned from zygote!
+24:08-30 01:06:14.369  1834  2040 W ActivityManager: Slow operation: 53ms so far, now at startProcess: done updating battery stats
+25:08-30 01:06:14.369  1834  2040 W ActivityManager: Slow operation: 53ms so far, now at startProcess: building log message
+26:08-30 01:06:14.369  1834  2040 I ActivityManager: Start proc 17144:com.google.android.googlequicksearchbox:search/u0a156 for service {com.google.android.googlequicksearchbox/androidx.work.impl.background.systemjob.SystemJobService}
+27:08-30 01:06:14.369  1834  2040 W ActivityManager: Slow operation: 53ms so far, now at startProcess: starting to update pids map
+28:08-30 01:06:14.369  1834  2040 W ActivityManager: Slow operation: 53ms so far, now at startProcess: done updating pids map
+46:08-30 01:06:14.428 17143 17143 D nativeloader:   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libcrypto_httpengine.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libhttpengine.so:libservice-connectivity.so:libservice-thread-jni.so
+61:08-30 01:06:14.449 17144 17144 D nativeloader:   com_android_tethering: libandroid_net_connectivity_com_android_net_module_util_jni.so:libandroid_net_connectivity_com_android_net_module_util_jni_CommonConnectivityJni.so:libcrypto_httpengine.so:libframework-connectivity-jni.so:libframework-connectivity-tiramisu-jni.so:libhttpengine.so:libservice-connectivity.so:libservice-thread-jni.so
+167:08-30 01:06:15.373  1834  4504 I ActivityManager: Killing 16227:com.facebook.system/u0a148 (adj 975, setSvc -10000): empty #17
+172:08-30 01:06:15.418  1834  4504 I ActivityManager: appDiedLocked: app=ProcessRecord{916bf64 16227:com.facebook.system/u0a148} thread=android.os.BinderProxy@710112 fromBinderDied=true isKilledByAm=true reason=null
+178:08-30 01:06:15.645  1834  3111 I ActivityManager: Killing 16090:com.facebook.appmanager/u0a188 (adj 975, setSvc -10000): empty #17
+180:08-30 01:06:15.701  1834  3111 I ActivityManager: appDiedLocked: app=ProcessRecord{6bb64c0 16090:com.facebook.appmanager/u0a188} thread=android.os.BinderProxy@2f53e55 fromBinderDied=true isKilledByAm=true reason=null
+269:08-30 01:06:21.624  1834  2040 I ActivityManager: Start proc 17233:tribo.network.com.br/u0a397 for pre-top-activity {tribo.network.com.br/tribo.network.com.br.MainActivity}
+404:08-30 01:06:22.945 17233 17233 D nativeloader: Load /data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!/lib/arm64-v8a/libc++_shared.so using class loader ns clns-4 (caller=/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!classes7.dex): ok
+416:08-30 01:06:22.966 17233 17233 D nativeloader: Load /data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!/lib/arm64-v8a/libjsi.so using class loader ns clns-4 (caller=/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!classes7.dex): ok
+418:08-30 01:06:23.057 17233 17233 D nativeloader: Load /data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!/lib/arm64-v8a/libreactnative.so using class loader ns clns-4 (caller=/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!classes7.dex): ok
+425:08-30 01:06:23.059 17233 17233 D jni_lib_merge: Preparing to register libreactnativeblob_so.  onload_func: 0x6d2ed05cb4
+426:08-30 01:06:23.059 17233 17233 D jni_lib_merge: Preparing to register libreactnativejni_so.  onload_func: 0x6d2ed536bc
+427:08-30 01:06:23.059 17233 17233 D jni_lib_merge: Preparing to register libreactnativejni_common_so.  onload_func: 0x6d2ed64044
+429:08-30 01:06:23.059 17233 17233 D jni_lib_merge: Preparing to register libturbomodulejsijni_so.  onload_func: 0x6d2eec3f68
+440:08-30 01:06:23.088 17233 17233 D jni_lib_merge: Preparing to register libreactnativeblob_so.  onload_func: 0x6d2ed05cb4
+441:08-30 01:06:23.088 17233 17233 D jni_lib_merge: Preparing to register libreactnativejni_so.  onload_func: 0x6d2ed536bc
+442:08-30 01:06:23.088 17233 17233 D jni_lib_merge: Preparing to register libreactnativejni_common_so.  onload_func: 0x6d2ed64044
+444:08-30 01:06:23.088 17233 17233 D jni_lib_merge: Preparing to register libturbomodulejsijni_so.  onload_func: 0x6d2eec3f68
+463:08-30 01:06:23.213 17233 17233 E DevLauncherController: java.lang.ClassNotFoundException: expo.modules.splashscreen.SplashScreenManager
+484:08-30 01:06:23.213 17233 17233 E DevLauncherController: Caused by: java.lang.ClassNotFoundException: Didn't find class "expo.modules.splashscreen.SplashScreenManager" on path: DexPathList[[zip file "/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk"],nativeLibraryDirectories=[/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/lib/arm64, /data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+579:08-30 01:06:24.588  1834  1965 I ActivityManager: PendingStartActivityUids startActivity to updateOomAdj delay:1094ms, uid:10397
+610:08-30 01:06:24.846  1834  3111 I ActivityManager: Killing 13964:com.android.vending/u0a179 (adj 975, setSvc -10000): empty #17
+616:08-30 01:06:24.892  1834  4778 I ActivityManager: appDiedLocked: app=ProcessRecord{75740f0 13964:com.android.vending/u0a179} thread=android.os.BinderProxy@3942f78 fromBinderDied=true isKilledByAm=true reason=null
+
+=== Contexto de crash/stack trace ===
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at android.os.Looper.loop(Looper.java:357)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at android.app.ActivityThread.main(ActivityThread.java:8090)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at java.lang.reflect.Method.invoke(Native Method)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: Caused by: java.lang.ClassNotFoundException: Didn't find class "expo.modules.splashscreen.SplashScreenManager" on path: DexPathList[[zip file "/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk"],nativeLibraryDirectories=[/data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/lib/arm64, /data/app/~~wR4q0-_zjihwztSDO5QjfQ==/tribo.network.com.br-SLivZwC1Kqlssbwx0np-4w==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:644)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:580)
+08-30 01:06:23.213 17233 17233 E DevLauncherController: 	... 20 more
+08-30 01:06:23.227 17233 17233 I Typeface: updateThemeFont new=RobotoSlab-Regular;old=sans-serif
+08-30 01:06:23.268 17233 17233 D AppCompatDelegate: Checking for metadata for AppLocalesMetadataHolderService : Service not found
+08-30 01:06:23.294 17233 17233 I .network.com.b: hiddenapi: Accessing hidden field Ljava/lang/reflect/Field;->accessFlags:I (runtime_flags=0, domain=core-platform, api=unsupported) from Lexpo/modules/ReactActivityDelegateWrapper; (domain=app, TargetSdkVersion=36) using reflection: allowed
+08-30 01:06:23.300 17233 17280 W unknown:ReconnectingWebSocket: Couldn't connect to "ws://localhost:8081/message?device=moto%20g(60)%20-%2012%20-%20API%2031&app=tribo.network.com.br&clientid=BridgelessDevSupportManager", will silently retry
+08-30 01:06:23.325 17233 17233 I .network.com.b: hiddenapi: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app, TargetSdkVersion=36) using reflection: allowed
+08-30 01:06:23.328  1834  4778 I ActivityTaskManager: START u0 {flg=0x10018000 cmp=tribo.network.com.br/expo.modules.devlauncher.launcher.DevLauncherActivity} from uid 10397
+08-30 01:06:23.328  1834  4778 D ActivityTaskManager: getPreferredLaunchDisplay userset_displayid false current displayId -1
+08-30 01:06:23.328  1834  4778 D ActivityTaskManager: getPreferredLaunchDisplay userset_displayid false current displayId -1
+08-30 01:06:23.346  1279  1279 I QTI PowerHAL: Power setMode: 5 to: 1
+08-30 01:06:23.351 17233 17233 I ExpoDevMenu: Set new dev-menu delegate: class expo.modules.devmenu.DevMenuDefaultDelegate
+08-30 01:06:23.362  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:06:23.370  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:06:23.405 17233 17233 I Choreographer: Skipped 73 frames!  The application may be doing too much work on its main thread.
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: QUALCOMM build                   : 223000e821, I12e4aa4c5c
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: Build Date                       : 01/22/22
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: OpenGL ES Shader Compiler Version: EV031.32.02.17
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: Local Branch                     : 
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: Remote Branch                    : 
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: Remote Branch                    : 
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: Reconstruct Branch               : 
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: Build Config                     : S P 10.0.7 AArch64
+08-30 01:06:23.423 17233 17277 I AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+08-30 01:06:23.433 17233 17277 I AdrenoGLES-0: PFP: 0x016ee190, ME: 0x00000000
+08-30 01:06:23.452  1271  1375 I SDM     : HWCDisplay::GetColorModeCount: Supported color mode count = 3
+08-30 01:06:23.453  1271  1375 I SDM     : HWCDisplay::GetColorModes: Color mode = 0 is supported
+08-30 01:06:23.453  1271  1375 I SDM     : HWCDisplay::GetColorModes: Color mode = 7 is supported
+08-30 01:06:23.453  1271  1375 I SDM     : HWCDisplay::GetColorModes: Color mode = 9 is supported
+08-30 01:06:23.456 17233 17277 D hw-ProcessState: Binder ioctl to enable oneway spam detection failed: Invalid argument
+08-30 01:06:23.458  3483 17093 I NearbySharing: Network state changed: NetworkState(isRestricted=false, isOnline=true, isCongested=false, isMetered=false, isWifiConnected=true)
+08-30 01:06:23.487  1271  1375 I SDM     : HWCDisplayBuiltIn::GetOptimalRefreshRate: active_refresh_rate_: 60
+08-30 01:06:23.491  1834  1855 W ActivityTaskManager: Tried to set launchTime (0) < mLastActivityLaunchTime (6005255)
+08-30 01:06:23.498  1834  1855 I LaunchCheckinHandler: MotoDisplayed tribo.network.com.br/.MainActivity,cp,ca,1907
+

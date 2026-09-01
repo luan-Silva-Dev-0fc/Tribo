@@ -1,0 +1,4 @@
+Session started: 30/08/2026  1:14:10,94
+Serial: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Package: tribo.network.com.br
+Project root: C:\Users\LUAN-DEV\Documents\tribo

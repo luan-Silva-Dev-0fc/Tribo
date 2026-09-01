@@ -1,0 +1,23 @@
+========================================
+     RELATORIO DE DEPURACAO ANDROID
+========================================
+Sessao: 2026-08-30_00-54-07
+Dispositivo: adb-ZF523QF87P-pshaoe._adb-tls-connect._tcp
+Modelo: moto g(60)
+Android: 12 (SDK 31)
+ABI: arm64-v8a
+Package: 
+Classificacao baseada em evidencias: [ANDROID]
+Possivel crash durante a captura: NAO DETECTADO
+
+Arquivos de evidencia:
+- raw.log: logcat integral, fonte principal
+- errors.log: ocorrencias relevantes com numero de linha
+- stack-context.log: trechos com contexto de stack trace
+- crash.log, react-native.log, java-kotlin.log, native.log, anr.log
+
+=== Principais ocorrencias ===
+89:08-30 00:54:11.423  1834  2476 I ActivityManager: Killing 22387:com.android.providers.calendar/u0a84 (adj 995, setSvc -10000): empty #17
+93:08-30 00:54:11.458  1834  4505 I ActivityManager: appDiedLocked: app=ProcessRecord{2efa040 22387:com.android.providers.calendar/u0a84} thread=android.os.BinderProxy@c4dbe7a fromBinderDied=true isKilledByAm=true reason=null
+
+=== Contexto de crash/stack trace ===
