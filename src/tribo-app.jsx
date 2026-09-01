@@ -7,6 +7,7 @@ import {
   Text,
   BackHandler,
   AppState,
+  ToastAndroid,
   Platform } from
 "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -44,7 +45,7 @@ import { PublicProfile } from "./components/profile/public-profile";
 import { ThemeProvider, useTheme } from "./theme";
 import { UserProvider } from "./context/user-context";
 
-export const APP_OTA_VERSION = "1.0.3";
+export const APP_OTA_VERSION = "1.0.4";
 import { normalizeUser, unwrap } from "./lib/format";
 import { initGlobalAudioMode } from "./services/audioRecordingDucking";
 import { getChatSocket } from "./services/chatSocket";
@@ -64,7 +65,8 @@ function TriboRoot() {
   const { colors, mode } = useTheme();
   const [booting, setBooting] = useState(true);
   const [user, setUser] = useState(null);
-  const [screen, setScreen] = useState("feed");
+  const [screenStack, setScreenStack] = useState(["feed"]);
+  const screen = screenStack[screenStack.length - 1] || "feed";
   const [profileToOpen, setProfileToOpen] = useState(null);
   const [chatToOpen, setChatToOpen] = useState(null);
   const [activeGroupId, setActiveGroupId] = useState(null);
@@ -75,6 +77,38 @@ function TriboRoot() {
   const [showAdminAuth, setShowAdminAuth] = useState(false);
   // Invalida respostas de sessao iniciadas antes de um login/logout.
   const authEpochRef = useRef(0);
+  const lastBackPressRef = useRef(0);
+
+  const navigate = useCallback((targetScreen) => {
+    if (!targetScreen) return;
+    setScreenStack((prev) => {
+      if (prev[prev.length - 1] === targetScreen) {
+        return prev;
+      }
+      if (targetScreen === "feed") {
+        return ["feed"];
+      }
+      const mainTabs = ["search", "reels", "trends", "profile"];
+      if (mainTabs.includes(targetScreen)) {
+        return ["feed", targetScreen];
+      }
+      return [...prev, targetScreen];
+    });
+  }, []);
+
+  const goBack = useCallback(() => {
+    if (profileToOpen !== null) {
+      setProfileToOpen(null);
+      return true;
+    }
+
+    if (screenStack.length > 1) {
+      setScreenStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
+      return true;
+    }
+
+    return false;
+  }, [profileToOpen, screenStack.length]);
 
   const checkPlatformStatus = useCallback(async () => {
     try {
@@ -94,7 +128,7 @@ function TriboRoot() {
   useEffect(() => {
     const unsubBan = api.onBan((message) => {
       setUser(null);
-      setScreen("feed");
+      setScreenStack(["feed"]);
       setBannedMessage(
         message ||
         "Sua conta foi banida por violação das diretrizes da comunidade."
@@ -170,30 +204,25 @@ function TriboRoot() {
         return true;
       }
 
-      const backMap = {
-        tribe_invite: "tribe_settings",
-        tribe_settings: "tribe_details",
-        tribe_details: "tribes_list",
-        tribe_create: "tribes_list",
-        tribes_list: "feed",
-        appearance: "profile",
-        saved_posts: "profile",
-        archived_posts: "profile",
-        chat: "conversations",
-        conversations: "feed",
-        reels: "feed",
-        search: "feed",
-        trends: "feed",
-        profile: "feed"
-      };
-
-      if (screen !== "feed" && backMap[screen]) {
-        setScreen(backMap[screen]);
+      if (screenStack.length > 1) {
+        setScreenStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
         return true;
       }
 
-      if (screen === "feed") {
-        return false;
+      if (screen !== "feed") {
+        setScreenStack(["feed"]);
+        return true;
+      }
+
+      if (Platform.OS === "android") {
+        const now = Date.now();
+        if (now - lastBackPressRef.current < 2000) {
+          BackHandler.exitApp();
+          return true;
+        }
+        lastBackPressRef.current = now;
+        ToastAndroid.show("Pressione voltar novamente para sair", ToastAndroid.SHORT);
+        return true;
       }
 
       return false;
@@ -205,12 +234,12 @@ function TriboRoot() {
     );
 
     return () => backHandler.remove();
-  }, [profileToOpen, screen, showIntro]);
+  }, [profileToOpen, screenStack.length, screen, showIntro]);
 
   const handleOpenChat = useCallback((targetUser) => {
     setChatToOpen(targetUser);
-    setScreen("chat");
-  }, []);
+    navigate("chat");
+  }, [navigate]);
 
   const handleNotificationResponse = useCallback(
     (response) => {
@@ -231,7 +260,7 @@ function TriboRoot() {
           if (senderId) {
             handleOpenChat({ id: senderId, username: senderUsername });
           } else {
-            setScreen("conversations");
+            navigate("conversations");
           }
         } else if (
         type === "post_like" ||
@@ -239,7 +268,7 @@ function TriboRoot() {
         type === "post_comment" ||
         type === "comment")
         {
-          setScreen("feed");
+          navigate("feed");
         } else if (
         type === "group" ||
         type === "group_message" ||
@@ -249,9 +278,9 @@ function TriboRoot() {
           const groupId = data.groupId || data.group_id;
           if (groupId) {
             setActiveGroupId(groupId);
-            setScreen("tribe_details");
+            navigate("tribe_details");
           } else {
-            setScreen("tribes_list");
+            navigate("tribes_list");
           }
         } else if (
         type === "request" ||
@@ -266,14 +295,14 @@ function TriboRoot() {
           if (targetId) {
             setProfileToOpen({ id: targetId });
           } else {
-            setScreen("profile");
+            navigate("profile");
           }
         }
       } catch (err) {
         console.warn("[App] Erro ao tratar clique de notificação:", err);
       }
     },
-    [handleOpenChat]
+    [handleOpenChat, navigate]
   );
 
   useEffect(() => {
@@ -374,7 +403,7 @@ function TriboRoot() {
     } else {
       await refreshUser();
     }
-    setScreen("feed");
+    setScreenStack(["feed"]);
   };
 
   const logout = async () => {
@@ -382,7 +411,7 @@ function TriboRoot() {
     // Assim, uma resposta antiga de /me nao pode recolocar o usuario na conta.
     authEpochRef.current += 1;
     setUser(null);
-    setScreen("feed");
+    setScreenStack(["feed"]);
     setProfileToOpen(null);
     setActiveGroupId(null);
     setChatToOpen(null);
@@ -454,10 +483,10 @@ function TriboRoot() {
       onRefresh={refreshUser}
       onLogout={logout}
       onOpenProfile={setProfileToOpen}
-      onOpenSettings={() => setScreen("settings")}
-      onOpenAppearance={() => setScreen("appearance")}
-      onOpenSavedPosts={() => setScreen("saved_posts")}
-      onOpenArchivedPosts={() => setScreen("archived_posts")}
+      onOpenSettings={() => navigate("settings")}
+      onOpenAppearance={() => navigate("appearance")}
+      onOpenSavedPosts={() => navigate("saved_posts")}
+      onOpenArchivedPosts={() => navigate("archived_posts")}
       onUpdateUser={(next) =>
       setUser(typeof next === "function" ? next : normalizeUser(next))
       } />,
@@ -465,47 +494,47 @@ function TriboRoot() {
     settings:
     <Settings
       user={user}
-      onClose={() => setScreen("profile")}
+      onClose={goBack}
       onLogout={logout}
-      onOpenAppearance={() => setScreen("appearance")}
-      onOpenSavedPosts={() => setScreen("saved_posts")}
-      onOpenArchivedPosts={() => setScreen("archived_posts")}
+      onOpenAppearance={() => navigate("appearance")}
+      onOpenSavedPosts={() => navigate("saved_posts")}
+      onOpenArchivedPosts={() => navigate("archived_posts")}
       onUpdateUser={(next) =>
       setUser(typeof next === "function" ? next : normalizeUser(next))
       } />,
 
-    appearance: <AppearanceScreen onBack={() => setScreen("profile")} />,
+    appearance: <AppearanceScreen onBack={goBack} />,
     saved_posts:
     <SavedPostsScreen
       user={user}
-      onBack={() => setScreen("profile")}
+      onBack={goBack}
       onOpenProfile={setProfileToOpen} />,
 
 
     archived_posts:
     <ArchivedPostsScreen
       user={user}
-      onBack={() => setScreen("profile")}
+      onBack={goBack}
       onOpenProfile={setProfileToOpen} />,
 
 
     tribes_list:
     <TribosListScreen
-      onBack={() => setScreen("feed")}
-      onCreateTribe={() => setScreen("tribe_create")}
+      onBack={goBack}
+      onCreateTribe={() => navigate("tribe_create")}
       onOpenTribe={(id) => {
         setActiveGroupId(id);
-        setScreen("tribe_details");
+        navigate("tribe_details");
       }} />,
 
 
     tribe_create:
     <CreateTribeScreen
       user={user}
-      onBack={() => setScreen("tribes_list")}
+      onBack={goBack}
       onCreated={(id) => {
         setActiveGroupId(id);
-        setScreen("tribe_details");
+        navigate("tribe_details");
       }} />,
 
 
@@ -513,12 +542,12 @@ function TriboRoot() {
     <GroupDetailsScreen
       groupId={activeGroupId}
       user={user}
-      onBack={() => setScreen("tribes_list")}
+      onBack={goBack}
       onSettings={(grp) => {
         setActiveGroupObject(grp);
-        setScreen("tribe_settings");
+        navigate("tribe_settings");
       }}
-      onInvite={() => setScreen("tribe_invite")}
+      onInvite={() => navigate("tribe_invite")}
       onOpenProfile={setProfileToOpen} />,
 
 
@@ -526,23 +555,23 @@ function TriboRoot() {
     <GroupSettingsScreen
       group={activeGroupObject}
       user={user}
-      onBack={() => setScreen("tribe_details")}
-      onInvite={() => setScreen("tribe_invite")}
-      onGroupDeleted={() => setScreen("tribes_list")}
-      onLeft={() => setScreen("tribes_list")} />,
+      onBack={goBack}
+      onInvite={() => navigate("tribe_invite")}
+      onGroupDeleted={() => navigate("tribes_list")}
+      onLeft={() => navigate("tribes_list")} />,
 
 
     tribe_invite:
     <InviteMembersScreen
       groupId={activeGroupId}
       user={user}
-      onBack={() => setScreen("tribe_settings")} />,
+      onBack={goBack} />,
 
 
     conversations:
     <ConversationsListScreen
       user={user}
-      onBack={() => setScreen("feed")}
+      onBack={goBack}
       onOpenChat={handleOpenChat}
       onOpenProfile={setProfileToOpen} />,
 
@@ -551,7 +580,7 @@ function TriboRoot() {
     <DirectChatScreen
       targetUser={chatToOpen}
       currentUser={user}
-      onBack={() => setScreen("conversations")}
+      onBack={goBack}
       onOpenProfile={setProfileToOpen} />
 
 
@@ -568,6 +597,8 @@ function TriboRoot() {
   "conversations",
   "chat",
   "appearance",
+  "saved_posts",
+  "archived_posts",
   "settings"].
   includes(screen))
   {
@@ -661,9 +692,9 @@ function TriboRoot() {
           <AppShell
             user={user}
             active={screen}
-            onNavigate={setScreen}
-            onCreateTribo={() => setScreen("tribes_list")}
-            onOpenMessages={() => setScreen("conversations")}
+            onNavigate={navigate}
+            onCreateTribo={() => navigate("tribes_list")}
+            onOpenMessages={() => navigate("conversations")}
             onOpenProfile={setProfileToOpen}>
             
             {pages[screen]}
