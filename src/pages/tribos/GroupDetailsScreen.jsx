@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -146,6 +146,9 @@ export function GroupDetailsScreen({
     try {
       const res = await api.groups.get(groupId);
       const grp = res.group || res;
+      if (res?.role) {
+        grp.role = res.role;
+      }
       setGroup(grp);
       ChatCache.setGroupSync?.(groupId, grp);
     } catch (error) {
@@ -248,7 +251,18 @@ export function GroupDetailsScreen({
     );
   }
 
-  const isAdmin = String(group?.admin_id || group?.adminId) === String(user?.id);
+  const isAdmin = Boolean(
+    (group?.created_by && String(group.created_by) === String(user?.id)) ||
+    (group?.createdBy && String(group.createdBy) === String(user?.id)) ||
+    (group?.creator_id && String(group.creator_id) === String(user?.id)) ||
+    (group?.creatorId && String(group.creatorId) === String(user?.id)) ||
+    (group?.owner_id && String(group.owner_id) === String(user?.id)) ||
+    (group?.ownerId && String(group.ownerId) === String(user?.id)) ||
+    (group?.admin_id && String(group.admin_id) === String(user?.id)) ||
+    (group?.adminId && String(group.adminId) === String(user?.id)) ||
+    (group?.role && (String(group.role).toUpperCase() === "ADMIN" || String(group.role).toUpperCase() === "OWNER" || String(group.role).toUpperCase() === "CRIADOR")) ||
+    (group?.user_role && (String(group.user_role).toUpperCase() === "ADMIN" || String(group.user_role).toUpperCase() === "OWNER" || String(group.user_role).toUpperCase() === "CRIADOR"))
+  );
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -352,7 +366,7 @@ export function GroupDetailsScreen({
           >
             <Ionicons name="musical-notes" size={19} color={isGold ? "#FFB800" : colors.text} />
           </Pressable>
-          {onInvite && (
+          {isAdmin && onInvite && (
             <Pressable
               onPress={onInvite}
               style={{
@@ -363,6 +377,7 @@ export function GroupDetailsScreen({
                 alignItems: "center",
                 justifyContent: "center"
               }}
+              accessibilityLabel="Adicionar membro"
             >
               <Feather name="user-plus" size={18} color={colors.text} />
             </Pressable>

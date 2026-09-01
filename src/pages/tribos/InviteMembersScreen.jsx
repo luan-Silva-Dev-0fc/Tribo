@@ -151,10 +151,36 @@ export function InviteMembersScreen({ groupId, user, onBack }) {
 
   const loadMutuals = async () => {
     try {
+      const groupRes = await api.groups.get(groupId).catch(() => null);
+      const grp = groupRes?.group || groupRes;
+      const role = (groupRes?.role || grp?.role || grp?.user_role || "").toUpperCase();
+      const isAdm = Boolean(
+        (grp?.created_by && String(grp.created_by) === String(user?.id)) ||
+        (grp?.createdBy && String(grp.createdBy) === String(user?.id)) ||
+        (grp?.creator_id && String(grp.creator_id) === String(user?.id)) ||
+        (grp?.creatorId && String(grp.creatorId) === String(user?.id)) ||
+        (grp?.owner_id && String(grp.owner_id) === String(user?.id)) ||
+        (grp?.ownerId && String(grp.ownerId) === String(user?.id)) ||
+        (grp?.admin_id && String(grp.admin_id) === String(user?.id)) ||
+        (grp?.adminId && String(grp.adminId) === String(user?.id)) ||
+        role === "ADMIN" || role === "OWNER" || role === "CRIADOR"
+      );
+
+      if (grp && !isAdm) {
+        setCustomAlert({
+          visible: true,
+          type: "warning",
+          title: "Acesso Restrito",
+          message: "Apenas administradores podem adicionar membros a esta tribo.",
+          primaryText: "Voltar",
+          onPrimaryPress: onBack
+        });
+        setLoading(false);
+        return;
+      }
 
       const followersRes = await api.users.followers(user.id);
       const followers = listFrom(followersRes, ["followers", "users", "data"]);
-
 
       const followingRes = await api.users.following(user.id);
       const following = listFrom(followingRes, ["following", "users", "data"]);
