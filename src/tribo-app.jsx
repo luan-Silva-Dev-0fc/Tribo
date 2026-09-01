@@ -44,7 +44,7 @@ import { PublicProfile } from "./components/profile/public-profile";
 import { ThemeProvider, useTheme } from "./theme";
 import { UserProvider } from "./context/user-context";
 
-export const APP_OTA_VERSION = "1.0.2";
+export const APP_OTA_VERSION = "1.0.3";
 import { normalizeUser, unwrap } from "./lib/format";
 import { initGlobalAudioMode } from "./services/audioRecordingDucking";
 import { getChatSocket } from "./services/chatSocket";
