@@ -1,0 +1,62 @@
+diff --git a/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePush.java b/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePush.java
+index 2718204..442369b 100644
+--- a/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePush.java
++++ b/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePush.java
+@@ -31,7 +31,7 @@ public class CodePush implements ReactPackage {
+ 
+     private boolean mDidUpdate = false;
+ 
+-    private String mAssetsBundleFileName;
++    private String mAssetsBundleFileName = CodePushConstants.DEFAULT_JS_BUNDLE_NAME;
+ 
+     // Helper classes.
+     private CodePushUpdateManager mUpdateManager;
+@@ -188,7 +188,7 @@ public class CodePush implements ReactPackage {
+     }
+ 
+     public String getAssetsBundleFileName() {
+-        return mAssetsBundleFileName;
++        return mAssetsBundleFileName != null ? mAssetsBundleFileName : CodePushConstants.DEFAULT_JS_BUNDLE_NAME;
+     }
+ 
+     public String getPublicKey() {
+diff --git a/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushNativeModule.java b/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushNativeModule.java
+index e996486..cc67641 100644
+--- a/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushNativeModule.java
++++ b/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushNativeModule.java
+@@ -20,7 +20,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
+ import com.facebook.react.bridge.ReactMethod;
+ import com.facebook.react.bridge.ReadableMap;
+ import com.facebook.react.bridge.WritableMap;
+-import com.facebook.react.modules.core.ChoreographerCompat;
++import android.view.Choreographer;
+ import com.facebook.react.modules.core.DeviceEventManagerModule;
+ import com.facebook.react.modules.core.ReactChoreographer;
+ 
+@@ -320,7 +320,7 @@ public class CodePushNativeModule extends ReactContextBaseJavaModule {
+                             getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+                                 @Override
+                                 public void run() {
+-                                    ReactChoreographer.getInstance().postFrameCallback(ReactChoreographer.CallbackType.TIMERS_EVENTS, new ChoreographerCompat.FrameCallback() {
++                                    ReactChoreographer.getInstance().postFrameCallback(ReactChoreographer.CallbackType.TIMERS_EVENTS, new Choreographer.FrameCallback() {
+                                         @Override
+                                         public void doFrame(long frameTimeNanos) {
+                                             if (!latestDownloadProgress.isCompleted()) {
+diff --git a/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushUpdateManager.java b/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushUpdateManager.java
+index 0bbe38c..62c8f61 100644
+--- a/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushUpdateManager.java
++++ b/node_modules/react-native-code-push/android/app/src/main/java/com/microsoft/codepush/react/CodePushUpdateManager.java
+@@ -249,10 +249,11 @@ public class CodePushUpdateManager {
+ 
+             // For zip updates, we need to find the relative path to the jsBundle and save it in the
+             // metadata so that we can find and run it easily the next time.
+-            String relativeBundlePath = CodePushUpdateUtils.findJSBundleInUpdateContents(newUpdateFolderPath, expectedBundleFileName);
++            String resolvedBundleName = expectedBundleFileName != null ? expectedBundleFileName : CodePushConstants.DEFAULT_JS_BUNDLE_NAME;
++            String relativeBundlePath = CodePushUpdateUtils.findJSBundleInUpdateContents(newUpdateFolderPath, resolvedBundleName);
+ 
+             if (relativeBundlePath == null) {
+-                throw new CodePushInvalidUpdateException("Update is invalid - A JS bundle file named \"" + expectedBundleFileName + "\" could not be found within the downloaded contents. Please check that you are releasing your CodePush updates using the exact same JS bundle file name that was shipped with your app's binary.");
++                throw new CodePushInvalidUpdateException("Update is invalid - A JS bundle file named \"" + resolvedBundleName + "\" could not be found within the downloaded contents. Please check that you are releasing your CodePush updates using the exact same JS bundle file name that was shipped with your app's binary.");
+             } else {
+                 if (FileUtils.fileAtPathExists(newUpdateMetadataPath)) {
+                     File metadataFileFromOldUpdate = new File(newUpdateMetadataPath);
