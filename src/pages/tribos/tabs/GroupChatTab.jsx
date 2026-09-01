@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useState,
   useEffect,
   useCallback,
@@ -671,6 +671,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
         setActiveSpeakers([]);
         setIsMeSpeaking(false);
         liveVoiceStreamer.stopStreaming();
+        liveVoiceStreamer.stopPlayback();
       }
     };
 
@@ -727,6 +728,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
 
     return () => {
       liveVoiceStreamer.stopStreaming();
+      liveVoiceStreamer.stopPlayback();
       socket.off("group_message", handleNewMessage);
       socket.off("group-message", handleNewMessage);
       socket.off("receive-message", handleNewMessage);
