@@ -25,13 +25,16 @@ class MainApplication : Application(), ReactApplication {
         // bundle name after that list is created keeps its NativeModule aligned
         // with the binary asset without registering it twice.
         override fun getPackages(): List<ReactPackage> =
-            PackageList(this).packages.also { CodePush.getJSBundleFile() }
+            PackageList(this).packages.also {
+              if (BuildConfig.CODE_PUSH_ENABLED) CodePush.getJSBundleFile("index.android.bundle")
+            }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"
 
           override fun getJSBundleFile(): String? {
+              if (!BuildConfig.CODE_PUSH_ENABLED) return null
               return try {
-                  CodePush.getJSBundleFile()
+                  CodePush.getJSBundleFile("index.android.bundle")
               } catch (e: Exception) {
                   null
               }
