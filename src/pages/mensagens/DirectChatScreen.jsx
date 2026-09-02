@@ -226,16 +226,20 @@ export function DirectChatScreen({
         </View>
       )}
 
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        inverted
-        keyExtractor={(item, index) => String(item.id || index)}
-        contentContainerStyle={[
-          styles.chatListContent,
-          messages.length === 0 && { flexGrow: 1, justifyContent: "center" }
-        ]}
-        onScroll={notifyChatScroll}
+      {messages.length === 0 && !loading ? (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 20 }}>
+          <EmptyState icon="message-circle">
+            Sem mensagens ainda. Envie uma figurinha ou diga olá!
+          </EmptyState>
+        </View>
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          inverted
+          keyExtractor={(item, index) => String(item.id || index)}
+          contentContainerStyle={styles.chatListContent}
+          onScroll={notifyChatScroll}
         scrollEventThrottle={16}
         renderItem={({ item }) => {
           const isMe =
@@ -604,16 +608,8 @@ export function DirectChatScreen({
         }}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
-        ListEmptyComponent={
-          !loading && (
-            <View style={{ transform: [{ scaleY: -1 }], alignItems: "center", justifyContent: "center" }}>
-              <EmptyState icon="message-circle">
-                Sem mensagens ainda. Envie uma figurinha ou diga olá!
-              </EmptyState>
-            </View>
-          )
-        }
       />
+    )}
 
       <View
         style={[

@@ -1636,6 +1636,12 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
 
       {loading && messages.length === 0 ? (
         <ActivityIndicator style={{ marginTop: 40 }} color="#0284c7" />
+      ) : messages.length === 0 ? (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 20 }}>
+          <Text style={{ color: "#71717a", textAlign: "center", fontFamily: "Poppins_400Regular" }}>
+            Nenhuma mensagem nesta conversa ainda.
+          </Text>
+        </View>
       ) : (
         <FlatList
           ref={flatListRef}
@@ -1644,10 +1650,7 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
           keyExtractor={(i) => String(i.id || i._id)}
-          contentContainerStyle={[
-            { paddingBottom: 8, paddingTop: 8 },
-            messages.length === 0 && { flexGrow: 1, justifyContent: "center" }
-          ]}
+          contentContainerStyle={{ paddingBottom: 8, paddingTop: 8 }}
           onScroll={notifyChatScroll}
           scrollEventThrottle={16}
           renderItem={({ item, index }) => {
@@ -2025,13 +2028,6 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
               </View>
             );
           }}
-          ListEmptyComponent={
-            <View style={{ transform: [{ scaleY: -1 }], alignItems: "center", justifyContent: "center" }}>
-              <Text style={{ color: "#71717a", textAlign: "center", fontFamily: "Poppins_400Regular" }}>
-                Nenhuma mensagem nesta conversa ainda.
-              </Text>
-            </View>
-          }
         />
       )}
 
