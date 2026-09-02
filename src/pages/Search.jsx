@@ -52,6 +52,7 @@ import {
   downloadApkInternally,
   installApk,
   openUnknownSourcesSettings,
+  canRequestPackageInstalls,
   checkCodePushUpdate
 } from "../services/appUpdater";
 
@@ -864,13 +865,22 @@ export function UpdateModal({ visible, updateInfo, onClose }) {
   const [totalMB, setTotalMB] = useState("0.0");
   const [downloadedFilePath, setDownloadedFilePath] = useState(null);
   const [installing, setInstalling] = useState(false);
+  const [hasUnknownPermission, setHasUnknownPermission] = useState(true);
   const [alertConfig, setAlertConfig] = useState({ visible: false });
+
+  useEffect(() => {
+    if (visible && Platform.OS === "android") {
+      canRequestPackageInstalls()
+        .then((allowed) => setHasUnknownPermission(Boolean(allowed)))
+        .catch(() => {});
+    }
+  }, [visible]);
 
   if (!visible || !updateInfo) return null;
 
   const handleStartDownloadAndInstall = async () => {
     if (downloadedFilePath) {
-      handleInstall(downloadedFilePath);
+      await handleInstall(downloadedFilePath);
       return;
     }
 
@@ -888,7 +898,7 @@ export function UpdateModal({ visible, updateInfo, onClose }) {
 
       setDownloadedFilePath(localUri);
       setDownloading(false);
-      handleInstall(localUri);
+      await handleInstall(localUri);
     } catch (err) {
       console.warn("[UpdateModal] Erro ao baixar APK:", err);
       setDownloading(false);
@@ -896,7 +906,7 @@ export function UpdateModal({ visible, updateInfo, onClose }) {
         visible: true,
         type: "error",
         title: "Erro no Download",
-        message: "Não foi possível concluir o download interno. Deseja baixar pelo navegador?",
+        message: `Não foi possível concluir o download interno (${err?.message || "falha de rede"}). Deseja baixar pelo navegador?`,
         buttonText: "Abrir no Navegador",
         onClose: () => {
           setAlertConfig({ visible: false });
@@ -932,6 +942,13 @@ export function UpdateModal({ visible, updateInfo, onClose }) {
 
   const handleOpenSettings = async () => {
     await openUnknownSourcesSettings();
+    setTimeout(() => {
+      if (Platform.OS === "android") {
+        canRequestPackageInstalls()
+          .then((allowed) => setHasUnknownPermission(Boolean(allowed)))
+          .catch(() => {});
+      }
+    }, 1500);
   };
 
   return (
@@ -954,12 +971,82 @@ export function UpdateModal({ visible, updateInfo, onClose }) {
         </Text>
 
         <Text style={{ fontFamily: "Poppins_600SemiBold", fontSize: 13, color: colors.accent, textAlign: "center", marginBottom: 8 }}>
-          Versão {updateInfo.version || "1.1.0"}
+          Versão {updateInfo.version || "1.0.1"}
         </Text>
 
         <Text style={{ fontFamily: "Poppins_400Regular", fontSize: 13, color: colors.muted, textAlign: "center", marginBottom: 16, lineHeight: 19 }}>
           {updateInfo.notes || "Uma nova atualização com melhorias de segurança e performance está disponível para o aplicativo Tribo."}
         </Text>
+
+        {/* Card Informativo sobre Permissão de Fontes Desconhecidas */}
+        {Platform.OS === "android" && (
+          <View
+            style={{
+              backgroundColor: hasUnknownPermission ? "rgba(16, 185, 129, 0.08)" : "rgba(245, 158, 11, 0.12)",
+              borderColor: hasUnknownPermission ? "rgba(16, 185, 129, 0.25)" : "rgba(245, 158, 11, 0.35)",
+              borderWidth: 1,
+              borderRadius: 14,
+              padding: 14,
+              marginBottom: 16,
+              width: "100%"
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 6 }}>
+              <Feather
+                name={hasUnknownPermission ? "check-circle" : "shield"}
+                size={17}
+                color={hasUnknownPermission ? "#10b981" : "#f59e0b"}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  fontFamily: "Poppins_600SemiBold",
+                  fontSize: 13,
+                  color: hasUnknownPermission ? "#10b981" : "#f59e0b",
+                  flex: 1
+                }}
+              >
+                {hasUnknownPermission
+                  ? "Instalação Interna Liberada"
+                  : "Aviso: Permitir Fontes Desconhecidas"}
+              </Text>
+            </View>
+
+            <Text
+              style={{
+                fontFamily: "Poppins_400Regular",
+                fontSize: 12,
+                color: colors.muted,
+                lineHeight: 18,
+                marginBottom: hasUnknownPermission ? 0 : 10
+              }}
+            >
+              {hasUnknownPermission
+                ? "Seu dispositivo já está autorizado a instalar atualizações internamente pelo aplicativo."
+                : "O Android exige permissão para instalar arquivos APK atualizados diretamente. Ative 'Instalar apps desconhecidos' para a Tribo."}
+            </Text>
+
+            {!hasUnknownPermission && (
+              <Pressable
+                onPress={handleOpenSettings}
+                style={{
+                  alignSelf: "flex-start",
+                  backgroundColor: "rgba(245, 158, 11, 0.2)",
+                  paddingVertical: 7,
+                  paddingHorizontal: 14,
+                  borderRadius: 8,
+                  flexDirection: "row",
+                  alignItems: "center"
+                }}
+              >
+                <Feather name="settings" size={13} color="#f59e0b" style={{ marginRight: 6 }} />
+                <Text style={{ fontFamily: "Poppins_600SemiBold", fontSize: 12, color: "#f59e0b" }}>
+                  Permitir Fontes Desconhecidas
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        )}
 
         {/* Barra de Progresso do Download */}
         {downloading && (
@@ -1004,30 +1091,6 @@ export function UpdateModal({ visible, updateInfo, onClose }) {
             disabled={downloading}
             style={{ marginBottom: 10 }}
           />
-        )}
-
-        {/* Botão para Permitir Fontes Desconhecidas */}
-        {Platform.OS === "android" && (
-          <Pressable
-            onPress={handleOpenSettings}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              paddingVertical: 11,
-              paddingHorizontal: 12,
-              borderRadius: 10,
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
-              borderWidth: 1,
-              borderColor: "rgba(255, 255, 255, 0.1)",
-              marginBottom: 10
-            }}
-          >
-            <Feather name="shield" size={15} color={colors.accent || "#f59e0b"} style={{ marginRight: 8 }} />
-            <Text style={{ fontFamily: "Poppins_500Medium", fontSize: 12.5, color: colors.text }}>
-              Permitir Fontes Desconhecidas
-            </Text>
-          </Pressable>
         )}
 
         {!updateInfo.forceUpdate && !downloading && (

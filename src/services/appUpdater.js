@@ -1,4 +1,14 @@
-import * as FileSystem from 'expo-file-system';
+let FileSystem = null;
+try {
+  FileSystem = require('expo-file-system/legacy');
+} catch (_) {
+  try {
+    FileSystem = require('expo-file-system');
+  } catch (e) {
+    FileSystem = null;
+  }
+}
+
 import * as Sharing from 'expo-sharing';
 import { Linking, NativeModules, Platform } from 'react-native';
 
@@ -8,6 +18,21 @@ try {
   codePush = cp?.default || cp;
 } catch (_) {
   codePush = null;
+}
+
+/**
+ * Verifica se o aplicativo já tem permissão para instalar APKs desconhecidos no Android
+ */
+export async function canRequestPackageInstalls() {
+  if (Platform.OS !== 'android') return true;
+
+  try {
+    if (NativeModules.ApkInstaller?.canRequestPackageInstalls) {
+      return await NativeModules.ApkInstaller.canRequestPackageInstalls();
+    }
+  } catch (_) {}
+
+  return true;
 }
 
 /**
@@ -43,33 +68,52 @@ export async function openUnknownSourcesSettings() {
  */
 export async function downloadApkInternally(apkUrl, onProgress) {
   if (!apkUrl) throw new Error('URL de download do APK não informada.');
+  if (!FileSystem) throw new Error('Módulo de arquivos do sistema não disponível.');
 
+  const baseDir = FileSystem.documentDirectory || FileSystem.cacheDirectory;
   const filename = `tribo_update_${Date.now()}.apk`;
-  const targetUri = `${FileSystem.cacheDirectory}${filename}`;
+  const targetUri = `${baseDir}${filename}`;
 
-  const downloadResumable = FileSystem.createDownloadResumable(
-    apkUrl,
-    targetUri,
-    {},
-    (downloadProgress) => {
-      if (downloadProgress.totalBytesExpectedToWrite > 0) {
-        const percent = Math.min(
-          100,
-          Math.round((downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite) * 100)
-        );
-        if (onProgress) {
-          onProgress({
-            percent,
-            receivedBytes: downloadProgress.totalBytesWritten,
-            totalBytes: downloadProgress.totalBytesExpectedToWrite
-          });
+  // 1. Tenta baixar usando DownloadResumable com progresso
+  try {
+    if (typeof FileSystem.createDownloadResumable === 'function') {
+      const downloadResumable = FileSystem.createDownloadResumable(
+        apkUrl,
+        targetUri,
+        {},
+        (downloadProgress) => {
+          if (downloadProgress.totalBytesExpectedToWrite > 0) {
+            const percent = Math.min(
+              100,
+              Math.round((downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite) * 100)
+            );
+            if (onProgress) {
+              onProgress({
+                percent,
+                receivedBytes: downloadProgress.totalBytesWritten,
+                totalBytes: downloadProgress.totalBytesExpectedToWrite
+              });
+            }
+          }
         }
+      );
+
+      const result = await downloadResumable.downloadAsync();
+      if (result?.uri) {
+        return result.uri;
       }
     }
-  );
+  } catch (resumableErr) {
+    console.warn('[AppUpdater] createDownloadResumable falhou, tentando downloadAsync direto:', resumableErr);
+  }
 
-  const result = await downloadResumable.downloadAsync();
-  return result?.uri || targetUri;
+  // 2. Fallback direto downloadAsync
+  if (typeof FileSystem.downloadAsync === 'function') {
+    const directResult = await FileSystem.downloadAsync(apkUrl, targetUri);
+    return directResult?.uri || targetUri;
+  }
+
+  return targetUri;
 }
 
 /**
