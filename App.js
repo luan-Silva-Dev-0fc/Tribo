@@ -1,5 +1,5 @@
 import React, { Component, useEffect } from 'react';
-import { LogBox, Platform, View, Text, StyleSheet } from 'react-native';
+import { LogBox, Platform, View, Text, StyleSheet, AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TriboApp from './src/tribo-app';
 import { notifyUpdateApplied } from './src/services/notifications';
@@ -9,6 +9,8 @@ LogBox.ignoreLogs([
   'Listening to push token changes is not yet fully supported',
   'Animated: `useNativeDriver` is not supported'
 ]);
+
+const CODE_PUSH_KEY = 'YC1w71voeacrBX8ZiAdyVCbhJUyYEJ_rh3uD4g';
 
 let codePush = null;
 try {
@@ -50,66 +52,80 @@ class ErrorBoundary extends Component {
 function App() {
   useEffect(() => {
     if (hasCodePush && Platform.OS !== 'web') {
-      try {
-        // Notifica que o bundle atual inicializou com sucesso (evita rollback acidental)
-        codePush.notifyAppReady();
+      const syncWithRevopush = () => {
+        try {
+          // Notifica que o bundle atual inicializou com sucesso (evita rollback acidental)
+          codePush.notifyAppReady();
 
-        // Se o app acabou de inicializar com um novo bundle CodePush aplicado, dispara a notificação
-        codePush.getUpdateMetadata(codePush.UpdateState?.RUNNING ?? 0)
-          .then(async (metadata) => {
-            if (metadata?.isFirstRun) {
-              const key = `@tribo_update_notified_${metadata.label || metadata.appVersion || 'applied'}`;
-              const alreadyNotified = await AsyncStorage.getItem(key).catch(() => null);
-              if (!alreadyNotified) {
-                await AsyncStorage.setItem(key, "true").catch(() => {});
-                await notifyUpdateApplied();
+          // Se o app acabou de inicializar com um novo bundle CodePush aplicado, dispara a notificação
+          codePush.getUpdateMetadata(codePush.UpdateState?.RUNNING ?? 0)
+            .then(async (metadata) => {
+              if (metadata?.isFirstRun) {
+                const key = `@tribo_update_notified_${metadata.label || metadata.appVersion || 'applied'}`;
+                const alreadyNotified = await AsyncStorage.getItem(key).catch(() => null);
+                if (!alreadyNotified) {
+                  await AsyncStorage.setItem(key, "true").catch(() => {});
+                  await notifyUpdateApplied();
+                }
+              }
+            })
+            .catch(() => {});
+
+          // Faz a sincronização imediata
+          codePush.sync(
+            {
+              deploymentKey: CODE_PUSH_KEY,
+              installMode: codePush.InstallMode?.IMMEDIATE ?? 0,
+              mandatoryInstallMode: codePush.InstallMode?.IMMEDIATE ?? 0,
+            },
+            (status) => {
+              switch (status) {
+                case codePush.SyncStatus?.CHECKING_FOR_UPDATE:
+                  console.log('[CodePush] Verificando atualizações no Revopush...');
+                  break;
+                case codePush.SyncStatus?.DOWNLOADING_PACKAGE:
+                  console.log('[CodePush] ⬇ Baixando pacote de atualização em segundo plano...');
+                  break;
+                case codePush.SyncStatus?.INSTALLING_UPDATE:
+                  console.log('[CodePush]  Instalando atualização...');
+                  break;
+                case codePush.SyncStatus?.UP_TO_DATE:
+                  console.log('[CodePush] Aplicativo já está na versão mais recente.');
+                  break;
+                case codePush.SyncStatus?.UPDATE_INSTALLED:
+                  console.log('[CodePush]  Atualização instalada com sucesso! Disparando notificação...');
+                  notifyUpdateApplied();
+                  break;
+                case codePush.SyncStatus?.UNKNOWN_ERROR:
+                  console.log('[CodePush] Erro desconhecido durante o sync.');
+                  break;
+              }
+            },
+            ({ receivedBytes, totalBytes }) => {
+              if (totalBytes > 0) {
+                const progress = Math.round((receivedBytes / totalBytes) * 100);
+                console.log(`[CodePush]  Progresso do download: ${progress}%`);
               }
             }
-          })
-          .catch(() => {});
+          ).catch((err) => {
+            console.warn('[CodePush] Falha ao verificar atualizações (seguro ignorar):', err?.message || err);
+          });
+        } catch (err) {
+          console.warn('[CodePush] Erro na inicialização:', err);
+        }
+      };
 
-        // Faz a verificação e download em segundo plano sem travar a interface
-        // Aplica a atualização de forma silenciosa na próxima vez que o app for reiniciado/resumido
-        codePush.sync(
-          {
-            installMode: codePush.InstallMode?.IMMEDIATE ?? 0,
-            mandatoryInstallMode: codePush.InstallMode?.IMMEDIATE ?? 0,
-          },
-          (status) => {
-            switch (status) {
-              case codePush.SyncStatus?.CHECKING_FOR_UPDATE:
-                console.log('[CodePush] Verificando atualizações no Revopush...');
-                break;
-              case codePush.SyncStatus?.DOWNLOADING_PACKAGE:
-                console.log('[CodePush] ⬇ Baixando pacote de atualização em segundo plano...');
-                break;
-              case codePush.SyncStatus?.INSTALLING_UPDATE:
-                console.log('[CodePush]  Instalando atualização...');
-                break;
-              case codePush.SyncStatus?.UP_TO_DATE:
-                console.log('[CodePush] Aplicativo já está na versão mais recente.');
-                break;
-              case codePush.SyncStatus?.UPDATE_INSTALLED:
-                console.log('[CodePush]  Atualização instalada com sucesso! Disparando notificação...');
-                notifyUpdateApplied();
-                break;
-              case codePush.SyncStatus?.UNKNOWN_ERROR:
-                console.log('[CodePush] Erro desconhecido durante o sync.');
-                break;
-            }
-          },
-          ({ receivedBytes, totalBytes }) => {
-            if (totalBytes > 0) {
-              const progress = Math.round((receivedBytes / totalBytes) * 100);
-              console.log(`[CodePush]  Progresso do download: ${progress}%`);
-            }
-          }
-        ).catch((err) => {
-          console.warn('[CodePush] Falha ao verificar atualizações (seguro ignorar):', err?.message || err);
-        });
-      } catch (err) {
-        console.warn('[CodePush] Erro na inicialização:', err);
-      }
+      syncWithRevopush();
+
+      const sub = AppState.addEventListener('change', (nextState) => {
+        if (nextState === 'active') {
+          syncWithRevopush();
+        }
+      });
+
+      return () => {
+        sub?.remove();
+      };
     }
   }, []);
 
@@ -143,4 +159,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+const codePushOptions = {
+  checkFrequency: codePush?.CheckFrequency?.MANUAL ?? 2,
+};
+
+export default hasCodePush ? codePush(codePushOptions)(App) : App;

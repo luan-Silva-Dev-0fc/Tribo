@@ -168,10 +168,18 @@ export async function notifyUpdateApplied() {
   if (Platform.OS === "web") return;
   try {
     await setupNotificationChannels();
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      const req = await Notifications.requestPermissionsAsync();
+      if (req.status !== 'granted') {
+        console.log('[PushNotifications] Permissão de notificação negada pelo usuário.');
+        return;
+      }
+    }
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "★ Tribo Atualizada",
-        body: "Uma nova correção foi aplicada na Tribo.",
+        body: "Uma nova atualização foi instalada com sucesso.",
         sound: "default",
         channelId: "tribo_notifications",
         data: { type: "system_update" }

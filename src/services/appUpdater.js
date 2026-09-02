@@ -161,7 +161,7 @@ export async function checkCodePushUpdate() {
   if (!codePush || Platform.OS === 'web') return null;
 
   try {
-    const update = await codePush.checkForUpdate();
+    const update = await codePush.checkForUpdate('YC1w71voeacrBX8ZiAdyVCbhJUyYEJ_rh3uD4g');
     if (!update) return null;
 
     return {
