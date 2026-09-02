@@ -72,8 +72,8 @@ function App() {
         // Aplica a atualização de forma silenciosa na próxima vez que o app for reiniciado/resumido
         codePush.sync(
           {
-            installMode: codePush.InstallMode?.ON_NEXT_RESTART ?? 1,
-            mandatoryInstallMode: codePush.InstallMode?.ON_NEXT_RESUME ?? 2,
+            installMode: codePush.InstallMode?.IMMEDIATE ?? 0,
+            mandatoryInstallMode: codePush.InstallMode?.IMMEDIATE ?? 0,
           },
           (status) => {
             switch (status) {

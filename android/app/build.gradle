@@ -108,7 +108,7 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
-            buildConfigField "boolean", "CODE_PUSH_ENABLED", "false"
+            buildConfigField "boolean", "CODE_PUSH_ENABLED", "true"
         }
         release {
             // Caution! In production, you need to generate your own keystore file.

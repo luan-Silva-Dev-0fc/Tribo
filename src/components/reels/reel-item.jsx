@@ -70,38 +70,44 @@ export const ReelItem = React.memo(function ReelItem({
       setShowOptions(false);
 
       if (Platform.OS !== "web" && webViewRef.current) {
-        webViewRef.current.injectJavaScript("window.pauseReel ? window.pauseReel() : null; true;");
+        webViewRef.current.injectJavaScript(`
+          var iframes = document.getElementsByTagName('iframe');
+          if (iframes.length > 0) {
+            iframes[0].contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+          }
+          true;
+        `);
       }
     } else {
       setIsPlaying(true);
 
       if (Platform.OS !== "web" && webViewRef.current) {
-        webViewRef.current.injectJavaScript("window.playReel ? window.playReel() : null; true;");
+        webViewRef.current.injectJavaScript(`
+          var iframes = document.getElementsByTagName('iframe');
+          if (iframes.length > 0) {
+            iframes[0].contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          true;
+        `);
       }
-      const safetyTimer = setTimeout(() => setIsReady(true), 700);
+      const safetyTimer = setTimeout(() => setIsReady(true), 400);
       return () => clearTimeout(safetyTimer);
     }
   }, [isActive]);
-
-  const handleWebViewMessage = (event) => {
-    try {
-      const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === "PLAYING" || data.type === "READY") {
-        if (isActive) {
-          setIsReady(true);
-        }
-      }
-    } catch (e) {}
-  };
 
   function handleVideoTap() {
     const nextPlaying = !isPlaying;
     setIsPlaying(nextPlaying);
 
     if (Platform.OS !== "web" && webViewRef.current) {
-      webViewRef.current.injectJavaScript(
-        nextPlaying ? "window.playReel ? window.playReel() : null; true;" : "window.pauseReel ? window.pauseReel() : null; true;"
-      );
+      webViewRef.current.injectJavaScript(`
+        var msg = '{"event":"command","func":"${nextPlaying ? 'playVideo' : 'pauseVideo'}","args":""}';
+        var iframes = document.getElementsByTagName('iframe');
+        if (iframes.length > 0) {
+          iframes[0].contentWindow.postMessage(msg, '*');
+        }
+        true;
+      `);
     } else if (Platform.OS === "web") {
       const iframe = document.getElementById(`youtube-iframe-${item.videoId}`);
       if (iframe) {
@@ -279,7 +285,7 @@ export const ReelItem = React.memo(function ReelItem({
             align-items: center;
             justify-content: center;
           }
-          #player {
+          iframe {
             position: absolute;
             top: 50%; left: 50%;
             width: 100vw;
@@ -294,92 +300,17 @@ export const ReelItem = React.memo(function ReelItem({
       </head>
       <body>
         <div class="video-container">
-          <div id="player"></div>
+          <iframe 
+            id="ytplayer"
+            src="https://www.youtube.com/embed/${item.videoId}?autoplay=${isActive ? 1 : 0}&mute=0&controls=0&loop=1&playlist=${item.videoId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&showinfo=0&autohide=1&origin=https://lonelycpp.github.io" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
         </div>
-        <script src="https://www.youtube.com/iframe_api"></script>
-        <script>
-          var player;
-          var shouldPlay = ${isActive ? 'true' : 'false'};
-
-          function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-              videoId: '${item.videoId}',
-              playerVars: {
-                autoplay: shouldPlay ? 1 : 0,
-                mute: shouldPlay ? 0 : 1,
-                controls: 0,
-                playsinline: 1,
-                loop: 1,
-                playlist: '${item.videoId}',
-                rel: 0,
-                modestbranding: 1,
-                showinfo: 0,
-                iv_load_policy: 3,
-                disablekb: 1,
-                fs: 0,
-                origin: 'https://www.youtube.com'
-              },
-              events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange,
-                'onError': onPlayerError
-              }
-            });
-          }
-
-          function onPlayerReady(e) {
-            if (shouldPlay) {
-              e.target.unMute();
-              e.target.playVideo();
-            } else {
-              e.target.mute();
-              // Pre-buffer first frame
-              e.target.playVideo();
-              setTimeout(function() {
-                if (!shouldPlay && player && player.pauseVideo) {
-                  player.pauseVideo();
-                }
-              }, 120);
-            }
-            notifyNative('READY');
-          }
-
-          function onPlayerStateChange(e) {
-            if (e.data === YT.PlayerState.PLAYING) {
-              notifyNative('PLAYING');
-            } else if (e.data === YT.PlayerState.PAUSED) {
-              notifyNative('PAUSED');
-            }
-          }
-
-          function onPlayerError(e) {
-            notifyNative('ERROR');
-          }
-
-          function notifyNative(type) {
-            if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-              window.ReactNativeWebView.postMessage(JSON.stringify({ type: type }));
-            }
-          }
-
-          window.playReel = function() {
-            shouldPlay = true;
-            if (player && player.playVideo) {
-              player.unMute();
-              player.playVideo();
-            }
-          };
-
-          window.pauseReel = function() {
-            shouldPlay = false;
-            if (player && player.pauseVideo) {
-              player.pauseVideo();
-            }
-          };
-        </script>
       </body>
     </html>
-  `, [item.videoId]);
+  `, [item.videoId, isActive]);
 
   return (
     <View style={[styles.container, { height: itemHeight }]}>
@@ -409,9 +340,11 @@ export const ReelItem = React.memo(function ReelItem({
               ref={webViewRef}
               source={{
                 html: embedHtml,
-                baseUrl: "https://www.youtube.com"
+                baseUrl: "https://lonelycpp.github.io"
               }}
-              onMessage={handleWebViewMessage}
+              onLoad={() => {
+                setTimeout(() => setIsReady(true), 350);
+              }}
               style={[StyleSheet.absoluteFillObject, { zIndex: 1, backgroundColor: "#000000" }]}
               allowsInlineMediaPlayback={true}
               mediaPlaybackRequiresUserAction={false}
@@ -424,7 +357,7 @@ export const ReelItem = React.memo(function ReelItem({
               overScrollMode="never"
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              androidLayerType={Platform.OS === "android" ? "none" : "hardware"}
+              androidLayerType="hardware"
               androidHardwareAccelerationDisabled={false}
               originWhitelist={["*"]}
             />
