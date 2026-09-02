@@ -48,6 +48,12 @@ import {
 import { useTheme } from "../theme";
 import { useUserContext } from "../context/user-context";
 import { PostCard } from "../components/feed/PostCard";
+import {
+  downloadApkInternally,
+  installApk,
+  openUnknownSourcesSettings,
+  checkCodePushUpdate
+} from "../services/appUpdater";
 
 function belongsToUser(post, id) {
   if (!post || !id) return false;
@@ -852,60 +858,197 @@ export function FeedbackModal({ visible, onClose }) {
 
 export function UpdateModal({ visible, updateInfo, onClose }) {
   const { colors } = useTheme();
+  const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadedMB, setDownloadedMB] = useState("0.0");
+  const [totalMB, setTotalMB] = useState("0.0");
+  const [downloadedFilePath, setDownloadedFilePath] = useState(null);
+  const [installing, setInstalling] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false });
+
   if (!visible || !updateInfo) return null;
 
-  const handleDownload = () => {
-    if (updateInfo.updateUrl) {
-      Linking.openURL(updateInfo.updateUrl).catch(() => {
-        setAlertConfig({ visible: true, type: "info", title: "Erro", message: "Não foi possível abrir o link de download." });
+  const handleStartDownloadAndInstall = async () => {
+    if (downloadedFilePath) {
+      handleInstall(downloadedFilePath);
+      return;
+    }
+
+    try {
+      setDownloading(true);
+      setDownloadProgress(0);
+
+      const localUri = await downloadApkInternally(updateInfo.updateUrl, (prog) => {
+        setDownloadProgress(prog.percent || 0);
+        const recMB = ((prog.receivedBytes || 0) / (1024 * 1024)).toFixed(1);
+        const totMB = ((prog.totalBytes || 0) / (1024 * 1024)).toFixed(1);
+        setDownloadedMB(recMB);
+        setTotalMB(totMB);
+      });
+
+      setDownloadedFilePath(localUri);
+      setDownloading(false);
+      handleInstall(localUri);
+    } catch (err) {
+      console.warn("[UpdateModal] Erro ao baixar APK:", err);
+      setDownloading(false);
+      setAlertConfig({
+        visible: true,
+        type: "error",
+        title: "Erro no Download",
+        message: "Não foi possível concluir o download interno. Deseja baixar pelo navegador?",
+        buttonText: "Abrir no Navegador",
+        onClose: () => {
+          setAlertConfig({ visible: false });
+          if (updateInfo.updateUrl) {
+            Linking.openURL(updateInfo.updateUrl).catch(() => {});
+          }
+        }
       });
     }
-    onClose();
+  };
+
+  const handleInstall = async (filePath) => {
+    try {
+      setInstalling(true);
+      await installApk(filePath);
+    } catch (err) {
+      console.warn("[UpdateModal] Erro ao instalar APK:", err);
+      setAlertConfig({
+        visible: true,
+        type: "info",
+        title: "Permissão de Instalação",
+        message: "Para instalar a atualização, permita 'Instalar apps desconhecidos' para a Tribo nas configurações.",
+        buttonText: "Abrir Configurações",
+        onClose: () => {
+          setAlertConfig({ visible: false });
+          openUnknownSourcesSettings();
+        }
+      });
+    } finally {
+      setInstalling(false);
+    }
+  };
+
+  const handleOpenSettings = async () => {
+    await openUnknownSourcesSettings();
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={updateInfo.forceUpdate ? () => {} : onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={updateInfo.forceUpdate ? () => {} : onClose}
+    >
       <Pressable style={styles.modalOverlay} onPress={updateInfo.forceUpdate ? undefined : onClose} />
       <View style={[styles.optionsSheet, { backgroundColor: colors.surface, borderColor: colors.line }]}>
         <View style={styles.optionsHandle} />
+
         <View style={[styles.settingIcon, { backgroundColor: colors.accentSoft, alignSelf: "center", marginBottom: 12 }]}>
           <Feather name="download-cloud" size={20} color={colors.accent} />
         </View>
-        <Text style={[styles.optionsTitle, { color: colors.text, marginBottom: 6 }]}>
+
+        <Text style={[styles.optionsTitle, { color: colors.text, marginBottom: 4 }]}>
           {updateInfo.forceUpdate ? "Atualização Obrigatória" : "Nova Versão Disponível"}
         </Text>
-        <Text style={{ fontFamily: "Poppins_600SemiBold", fontSize: 13, color: colors.accent, textAlign: "center", marginBottom: 12 }}>
+
+        <Text style={{ fontFamily: "Poppins_600SemiBold", fontSize: 13, color: colors.accent, textAlign: "center", marginBottom: 8 }}>
           Versão {updateInfo.version || "1.1.0"}
         </Text>
-        <Text style={{ fontFamily: "Poppins_400Regular", fontSize: 13, color: colors.muted, textAlign: "center", marginBottom: 20, lineHeight: 19 }}>
+
+        <Text style={{ fontFamily: "Poppins_400Regular", fontSize: 13, color: colors.muted, textAlign: "center", marginBottom: 16, lineHeight: 19 }}>
           {updateInfo.notes || "Uma nova atualização com melhorias de segurança e performance está disponível para o aplicativo Tribo."}
         </Text>
 
-        <Button
-          title="Baixar Atualização"
-          icon="download"
-          onPress={handleDownload}
-          style={{ marginBottom: updateInfo.forceUpdate ? 0 : 10 }} />
-        
-        {!updateInfo.forceUpdate &&
-        <Button
-          title="Lembrar mais tarde"
-          variant="secondary"
-          onPress={onClose} />
+        {/* Barra de Progresso do Download */}
+        {downloading && (
+          <View style={{ marginBottom: 18, width: "100%", paddingHorizontal: 4 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+              <Text style={{ fontFamily: "Poppins_500Medium", fontSize: 12, color: colors.text }}>
+                Baixando atualização...
+              </Text>
+              <Text style={{ fontFamily: "Poppins_600SemiBold", fontSize: 12, color: colors.accent }}>
+                {downloadProgress}% ({downloadedMB}MB / {totalMB}MB)
+              </Text>
+            </View>
 
-        }
+            <View style={{ width: "100%", height: 8, backgroundColor: "rgba(255, 255, 255, 0.08)", borderRadius: 4, overflow: "hidden" }}>
+              <View
+                style={{
+                  width: `${downloadProgress}%`,
+                  height: "100%",
+                  backgroundColor: colors.accent || "#3b82f6",
+                  borderRadius: 4
+                }}
+              />
+            </View>
+          </View>
+        )}
+
+        {/* Botão Principal: Baixar / Instalar */}
+        {downloadedFilePath ? (
+          <Button
+            title={installing ? "Abrindo Instalador..." : "Instalar Atualização Agora"}
+            icon="check-circle"
+            onPress={() => handleInstall(downloadedFilePath)}
+            loading={installing}
+            style={{ marginBottom: 10 }}
+          />
+        ) : (
+          <Button
+            title={downloading ? `Baixando... (${downloadProgress}%)` : "Baixar e Instalar Internamente"}
+            icon="download"
+            onPress={handleStartDownloadAndInstall}
+            loading={downloading}
+            disabled={downloading}
+            style={{ marginBottom: 10 }}
+          />
+        )}
+
+        {/* Botão para Permitir Fontes Desconhecidas */}
+        {Platform.OS === "android" && (
+          <Pressable
+            onPress={handleOpenSettings}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingVertical: 11,
+              paddingHorizontal: 12,
+              borderRadius: 10,
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              borderWidth: 1,
+              borderColor: "rgba(255, 255, 255, 0.1)",
+              marginBottom: 10
+            }}
+          >
+            <Feather name="shield" size={15} color={colors.accent || "#f59e0b"} style={{ marginRight: 8 }} />
+            <Text style={{ fontFamily: "Poppins_500Medium", fontSize: 12.5, color: colors.text }}>
+              Permitir Fontes Desconhecidas
+            </Text>
+          </Pressable>
+        )}
+
+        {!updateInfo.forceUpdate && !downloading && (
+          <Button
+            title="Lembrar mais tarde"
+            variant="secondary"
+            onPress={onClose}
+          />
+        )}
       </View>
+
       <TriboAlertModal
         visible={alertConfig.visible}
         type={alertConfig.type}
         title={alertConfig.title}
         message={alertConfig.message}
         buttonText={alertConfig.buttonText || "Fechar"}
-        onClose={() => setAlertConfig({ visible: false })} />
-      
-    </Modal>);
-
+        onClose={alertConfig.onClose || (() => setAlertConfig({ visible: false }))}
+      />
+    </Modal>
+  );
 }
 
 export function SettingsDrawer({
@@ -1012,6 +1155,7 @@ export function Settings({
   const insets = useSafeAreaInsets();
   const { isAdultContentEnabled, setAdultContentEnabled } = useUserContext();
   const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [checkingUpdateText, setCheckingUpdateText] = useState("");
   const [updateInfo, setUpdateInfo] = useState(null);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [ageConfirmModalVisible, setAgeConfirmModalVisible] = useState(false);
@@ -1127,6 +1271,37 @@ export function Settings({
   const handleCheckUpdate = async () => {
     try {
       setCheckingUpdate(true);
+      setCheckingUpdateText("Verificando...");
+
+      // 1. Checa atualização rápida OTA (CodePush)
+      const codePushResult = await checkCodePushUpdate();
+      if (codePushResult) {
+        setAlertConfig({
+          visible: true,
+          type: "info",
+          title: "Atualização Disponível",
+          message: `Uma atualização rápida com melhorias (${codePushResult.label || "OTA"}) está disponível. Deseja baixar e aplicar agora?`,
+          buttonText: "Atualizar Agora",
+          onClose: async () => {
+            setAlertConfig({ visible: false });
+            try {
+              setCheckingUpdate(true);
+              setCheckingUpdateText("Baixando atualização...");
+              await codePushResult.downloadAndApply((prog) => {
+                setCheckingUpdateText(`Baixando... ${prog.percent}%`);
+              });
+            } catch (cpErr) {
+              console.warn("[CodePush apply error]:", cpErr);
+            } finally {
+              setCheckingUpdate(false);
+              setCheckingUpdateText("");
+            }
+          }
+        });
+        return;
+      }
+
+      // 2. Checa versão de APK no backend
       const res = await api.app.version();
       const info = res?.data || res;
 
@@ -1138,8 +1313,6 @@ export function Settings({
       };
 
       const currentVersion = Constants.expoConfig?.version || Constants.manifest?.version || "1.0.0";
-
-
 
       if (mappedInfo.version && mappedInfo.version !== currentVersion && mappedInfo.updateUrl) {
         setUpdateInfo(mappedInfo);
@@ -1164,6 +1337,7 @@ export function Settings({
       });
     } finally {
       setCheckingUpdate(false);
+      setCheckingUpdateText("");
     }
   };
 
@@ -1661,10 +1835,10 @@ export function Settings({
             </View>
             <View style={styles.flex}>
               <Text style={[styles.settingTitle, { color: colors.text }]}>
-                Verificar atualizações
+                {checkingUpdateText || "Verificar atualizações"}
               </Text>
               <Text style={[styles.settingCaption, { color: colors.muted }]}>
-                Versão atual instalada: v1.0.0
+                Versão instalada: v{Constants.expoConfig?.version || "1.0.0"}
               </Text>
             </View>
             <Feather name="chevron-right" size={18} color={colors.muted} />

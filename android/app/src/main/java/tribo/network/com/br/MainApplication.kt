@@ -25,7 +25,8 @@ class MainApplication : Application(), ReactApplication {
         // bundle name after that list is created keeps its NativeModule aligned
         // with the binary asset without registering it twice.
         override fun getPackages(): List<ReactPackage> =
-            PackageList(this).packages.also {
+            PackageList(this).packages.apply {
+              add(ApkInstallerPackage())
               if (BuildConfig.CODE_PUSH_ENABLED) CodePush.getJSBundleFile("index.android.bundle")
             }
 
