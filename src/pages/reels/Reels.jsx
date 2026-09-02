@@ -384,20 +384,24 @@ export function ReelsScreen({ user }) {
           ref={flatListRef}
           data={displayedReels}
           keyExtractor={(item, index) => item._id || item.id || `${item.videoId}-${index}`}
-          renderItem={({ item, index }) => (
-            <ReelItem
-              item={item}
-              isActive={index === activeVideoIndex}
-              shouldPreload={false}
-              onToggleLike={handleToggleLike}
-              onToggleSave={handleToggleSave}
-              onMoreLikeThis={handleMoreLikeThis}
-              onNotInterested={handleNotInterested}
-              onOpenPreferences={() => setOnboardingVisible(true)}
-              onOpenShare={handleOpenShare}
-              containerHeight={SCREEN_HEIGHT}
-            />
-          )}
+          renderItem={({ item, index }) => {
+            const isActive = index === activeVideoIndex;
+            const shouldPreload = Math.abs(index - activeVideoIndex) === 1;
+            return (
+              <ReelItem
+                item={item}
+                isActive={isActive}
+                shouldPreload={shouldPreload}
+                onToggleLike={handleToggleLike}
+                onToggleSave={handleToggleSave}
+                onMoreLikeThis={handleMoreLikeThis}
+                onNotInterested={handleNotInterested}
+                onOpenPreferences={() => setOnboardingVisible(true)}
+                onOpenShare={handleOpenShare}
+                containerHeight={SCREEN_HEIGHT}
+              />
+            );
+          }}
           pagingEnabled
           snapToInterval={SCREEN_HEIGHT}
           snapToAlignment="start"
@@ -419,10 +423,10 @@ export function ReelsScreen({ user }) {
           })}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
-          windowSize={3}
-          initialNumToRender={1}
+          windowSize={5}
+          initialNumToRender={2}
           maxToRenderPerBatch={2}
-          removeClippedSubviews={true}
+          removeClippedSubviews={Platform.OS === "android" ? false : true}
         />
       )}
 
