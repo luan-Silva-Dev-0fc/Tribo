@@ -231,7 +231,10 @@ export function DirectChatScreen({
         data={messages}
         inverted
         keyExtractor={(item, index) => String(item.id || index)}
-        contentContainerStyle={styles.chatListContent}
+        contentContainerStyle={[
+          styles.chatListContent,
+          messages.length === 0 && { flexGrow: 1, justifyContent: "center" }
+        ]}
         onScroll={notifyChatScroll}
         scrollEventThrottle={16}
         renderItem={({ item }) => {
@@ -603,9 +606,11 @@ export function DirectChatScreen({
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
           !loading && (
-            <EmptyState icon="message-circle">
-              Sem mensagens ainda. Envie uma figurinha ou diga olá!
-            </EmptyState>
+            <View style={{ transform: [{ scaleY: -1 }], alignItems: "center", justifyContent: "center" }}>
+              <EmptyState icon="message-circle">
+                Sem mensagens ainda. Envie uma figurinha ou diga olá!
+              </EmptyState>
+            </View>
           )
         }
       />
