@@ -18,15 +18,16 @@ import { getSavedStickers } from "../../services/stickerInventory";
 
 const StickerGridItem = React.memo(function StickerGridItem({
   item,
+  isVisible,
   onSelect,
   onLongPress
 }) {
   const videoUrl =
-  item.video_url ||
-  item.videoUrl ||
-  item.media_url ||
-  item.mediaUrl ||
-  item.url;
+    item.video_url ||
+    item.videoUrl ||
+    item.media_url ||
+    item.mediaUrl ||
+    item.url;
 
   if (!videoUrl) return null;
 
@@ -35,15 +36,34 @@ const StickerGridItem = React.memo(function StickerGridItem({
       onPress={() => onSelect(item)}
       onLongPress={() => onLongPress(item)}
       style={({ pressed }) => [
-      styles.gridItem,
-      {
-        transform: [{ scale: pressed ? 0.94 : 1 }]
-      }]
-      }>
-      
-      <SafeGridVideo key={videoUrl} url={videoUrl} />
-    </Pressable>);
-
+        styles.gridItem,
+        {
+          transform: [{ scale: pressed ? 0.94 : 1 }]
+        }
+      ]}
+    >
+      {isVisible ? (
+        <SafeGridVideo key={videoUrl} url={videoUrl} />
+      ) : (
+        <View
+          style={[
+            styles.gridVideo,
+            {
+              backgroundColor: "#18181b",
+              alignItems: "center",
+              justifyContent: "center"
+            }
+          ]}
+        >
+          <Ionicons
+            name="film-outline"
+            size={22}
+            color="rgba(255,255,255,0.25)"
+          />
+        </View>
+      )}
+    </Pressable>
+  );
 });
 
 class VideoViewSafeGuard extends React.Component {
@@ -100,6 +120,7 @@ function SafeGridVideo({ url }) {
         nativeControls={false}
         contentFit="cover"
         style={styles.gridVideo}
+        pointerEvents="none"
       />
     </VideoViewSafeGuard>
   );
@@ -118,6 +139,21 @@ export function StickerPickerModal({
   const [selectedPack, setSelectedPack] = useState("Todos");
   const [searchQuery, setSearchQuery] = useState("");
   const [detailModalItem, setDetailModalItem] = useState(null);
+  const [viewableItemsMap, setViewableItemsMap] = useState({});
+
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    const map = {};
+    viewableItems.forEach((vi) => {
+      const key = String(vi.item.id || vi.item.sticker_id || vi.item.video_url || vi.index);
+      map[key] = true;
+    });
+    setViewableItemsMap(map);
+  }).current;
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 20,
+    minimumViewTime: 80,
+  }).current;
 
   const isUserGold = Boolean(
     currentUser?.badge_type === "GOLD" ||
@@ -181,6 +217,8 @@ export function StickerPickerModal({
     const desc = (item.description || "").toLowerCase();
     return name.includes(q) || author.includes(q) || desc.includes(q);
   });
+
+  if (!visible) return null;
 
   return (
     <Modal
@@ -383,21 +421,33 @@ export function StickerPickerModal({
           <FlatList
             data={filteredStickers}
             keyExtractor={(item, index) =>
-            String(item.id || item.sticker_id || index)
+              String(item.id || item.sticker_id || item.video_url || item.media_url || index)
             }
             numColumns={3}
             contentContainerStyle={{ paddingBottom: 24, paddingTop: 4 }}
             columnWrapperStyle={{ gap: 10, marginBottom: 10 }}
-            renderItem={({ item }) =>
-            <StickerGridItem
-              item={item}
-              onSelect={(stk) => {
-                onClose();
-                onSelectSticker?.(stk);
-              }}
-              onLongPress={(stk) => setDetailModalItem(stk)} />
-
-            } />
+            initialNumToRender={9}
+            maxToRenderPerBatch={6}
+            windowSize={3}
+            removeClippedSubviews={Platform.OS === "android"}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+            renderItem={({ item, index }) => {
+              const key = String(item.id || item.sticker_id || item.video_url || item.media_url || index);
+              const isVisible = index < 9 || Boolean(viewableItemsMap[key]);
+              return (
+                <StickerGridItem
+                  item={item}
+                  isVisible={isVisible}
+                  onSelect={(stk) => {
+                    onClose();
+                    onSelectSticker?.(stk);
+                  }}
+                  onLongPress={(stk) => setDetailModalItem(stk)}
+                />
+              );
+            }}
+          />
 
           }
         </Pressable>
