@@ -154,6 +154,8 @@ function ActiveStickerVideoInner({
         if (!player.playing) {
           Promise.resolve(player.play()).catch(() => {});
         }
+      } else {
+        player.volume = 0;
       }
     } catch (e) {}
   }, [player, isMuted]);
@@ -161,7 +163,7 @@ function ActiveStickerVideoInner({
   useStickerSpatialAudio(player, targetRef);
 
   return (
-    <View ref={localRef} style={style} collapsable={false}>
+    <View ref={localRef} style={style} collapsable={false} pointerEvents="none">
       {isMountedRef.current && player ? (
         <VideoViewSafeGuard fallbackStyle={{ width: "100%", height: "100%", backgroundColor: "#18181b" }}>
           <VideoView
@@ -170,6 +172,7 @@ function ActiveStickerVideoInner({
             nativeControls={false}
             contentFit="cover"
             style={{ width: "100%", height: "100%" }}
+            pointerEvents="none"
           />
         </VideoViewSafeGuard>
       ) : (
@@ -331,7 +334,7 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
             setOptionsVisible(true);
           }
         }}
-        delayLongPress={220}
+        delayLongPress={450}
         style={({ pressed }) => [
         styles.stickerFrame,
         {
