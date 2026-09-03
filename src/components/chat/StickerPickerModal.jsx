@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -19,7 +19,6 @@ import { getSavedStickers } from "../../services/stickerInventory";
 
 const StickerGridItem = React.memo(function StickerGridItem({
   item,
-  isVisible,
   onSelect,
   onLongPress
 }) {
@@ -43,26 +42,7 @@ const StickerGridItem = React.memo(function StickerGridItem({
         }
       ]}
     >
-      {isVisible ? (
-        <SafeGridVideo key={videoUrl} url={videoUrl} />
-      ) : (
-        <View
-          style={[
-            styles.gridVideo,
-            {
-              backgroundColor: "#18181b",
-              alignItems: "center",
-              justifyContent: "center"
-            }
-          ]}
-        >
-          <Ionicons
-            name="film-outline"
-            size={22}
-            color="rgba(255,255,255,0.25)"
-          />
-        </View>
-      )}
+      <SafeGridVideo key={videoUrl} url={videoUrl} />
     </Pressable>
   );
 });
@@ -83,7 +63,7 @@ class VideoViewSafeGuard extends React.Component {
             this.props.fallbackStyle || {
               width: "100%",
               height: "100%",
-              backgroundColor: "#1e1e1e"
+              backgroundColor: "#18181b"
             }
           ]}
         />
@@ -94,6 +74,50 @@ class VideoViewSafeGuard extends React.Component {
 }
 
 function SafeGridVideo({ url }) {
+  const isMountedRef = useRef(true);
+  const [readyToLoad, setReadyToLoad] = useState(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    // Delay de 150ms: se a pessoa estiver rolando a lista,
+    // NÃO cria o player nativo em C++, garantindo rolagem a 60 FPS sem engasgos!
+    const timer = setTimeout(() => {
+      if (isMountedRef.current) {
+        setReadyToLoad(true);
+      }
+    }, 150);
+
+    return () => {
+      isMountedRef.current = false;
+      clearTimeout(timer);
+    };
+  }, [url]);
+
+  if (!readyToLoad) {
+    return (
+      <View
+        style={[
+          styles.gridVideo,
+          {
+            backgroundColor: "#18181b",
+            alignItems: "center",
+            justifyContent: "center"
+          }
+        ]}
+      >
+        <Ionicons
+          name="film-outline"
+          size={22}
+          color="rgba(255,255,255,0.2)"
+        />
+      </View>
+    );
+  }
+
+  return <ActiveGridVideo url={url} />;
+}
+
+function ActiveGridVideo({ url }) {
   const isMountedRef = useRef(true);
 
   useEffect(() => {
@@ -106,11 +130,13 @@ function SafeGridVideo({ url }) {
   const player = useVideoPlayer(url || "", (p) => {
     p.loop = true;
     p.muted = true;
-    try {Promise.resolve(p.play()).catch(() => {});} catch (e) {}
+    try {
+      Promise.resolve(p.play()).catch(() => {});
+    } catch (e) {}
   });
 
   if (!url || !player || !isMountedRef.current) {
-    return <View style={[styles.gridVideo, { backgroundColor: "#1e1e1e" }]} />;
+    return <View style={[styles.gridVideo, { backgroundColor: "#18181b" }]} />;
   }
 
   return (
@@ -140,21 +166,6 @@ export function StickerPickerModal({
   const [selectedPack, setSelectedPack] = useState("Todos");
   const [searchQuery, setSearchQuery] = useState("");
   const [detailModalItem, setDetailModalItem] = useState(null);
-  const [viewableItemsMap, setViewableItemsMap] = useState({});
-
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
-    const map = {};
-    viewableItems.forEach((vi) => {
-      const key = String(vi.item.id || vi.item.sticker_id || vi.item.video_url || vi.index);
-      map[key] = true;
-    });
-    setViewableItemsMap(map);
-  }).current;
-
-  const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 20,
-    minimumViewTime: 80,
-  }).current;
 
   const isUserGold = Boolean(
     currentUser?.badge_type === "GOLD" ||
@@ -185,39 +196,39 @@ export function StickerPickerModal({
     }
   }, [visible]);
 
+  const availablePacks = useMemo(() => [
+    "Todos",
+    ...new Set([
+      "Memes",
+      "Reações",
+      "Tribo",
+      "Gerais",
+      ...stickers.map((s) => s.pack_name || s.packName).filter(Boolean)
+    ])
+  ], [stickers]);
 
-  const availablePacks = [
-  "Todos",
-  ...new Set([
-  "Memes",
-  "Reações",
-  "Tribo",
-  "Gerais",
-  ...stickers.map((s) => s.pack_name || s.packName).filter(Boolean)]
-  )];
+  const filteredStickers = useMemo(() => {
+    return stickers.filter((item) => {
+      const itemPack = item.pack_name || item.packName || "Gerais";
+      const matchesPack =
+        selectedPack === "Todos" ||
+        itemPack.toLowerCase() === selectedPack.toLowerCase();
 
+      if (!matchesPack) return false;
 
-
-  const filteredStickers = stickers.filter((item) => {
-    const itemPack = item.pack_name || item.packName || "Gerais";
-    const matchesPack =
-    selectedPack === "Todos" ||
-    itemPack.toLowerCase() === selectedPack.toLowerCase();
-
-    if (!matchesPack) return false;
-
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    const name = (
-    item.sticker_name ||
-    item.stickerName ||
-    item.name ||
-    "").
-    toLowerCase();
-    const author = (item.author_name || item.authorName || "").toLowerCase();
-    const desc = (item.description || "").toLowerCase();
-    return name.includes(q) || author.includes(q) || desc.includes(q);
-  });
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const name = (
+        item.sticker_name ||
+        item.stickerName ||
+        item.name ||
+        ""
+      ).toLowerCase();
+      const author = (item.author_name || item.authorName || "").toLowerCase();
+      const desc = (item.description || "").toLowerCase();
+      return name.includes(q) || author.includes(q) || desc.includes(q);
+    });
+  }, [stickers, selectedPack, searchQuery]);
 
   if (!visible) return null;
 
@@ -427,27 +438,20 @@ export function StickerPickerModal({
             numColumns={3}
             contentContainerStyle={{ paddingBottom: 24, paddingTop: 4 }}
             columnWrapperStyle={{ gap: 10, marginBottom: 10 }}
-            initialNumToRender={9}
+            initialNumToRender={6}
             maxToRenderPerBatch={6}
             windowSize={3}
             removeClippedSubviews={Platform.OS === "android"}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewabilityConfig}
-            renderItem={({ item, index }) => {
-              const key = String(item.id || item.sticker_id || item.video_url || item.media_url || index);
-              const isVisible = index < 9 || Boolean(viewableItemsMap[key]);
-              return (
-                <StickerGridItem
-                  item={item}
-                  isVisible={isVisible}
-                  onSelect={(stk) => {
-                    onClose();
-                    onSelectSticker?.(stk);
-                  }}
-                  onLongPress={(stk) => setDetailModalItem(stk)}
-                />
-              );
-            }}
+            renderItem={({ item }) => (
+              <StickerGridItem
+                item={item}
+                onSelect={(stk) => {
+                  onClose();
+                  onSelectSticker?.(stk);
+                }}
+                onLongPress={(stk) => setDetailModalItem(stk)}
+              />
+            )}
           />
 
           }
