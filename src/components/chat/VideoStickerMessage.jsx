@@ -81,6 +81,7 @@ function ActiveStickerVideoInner({
   const targetRef = externalRef || localRef;
   const isMountedRef = useRef(true);
   const hasCompletedFirstPlayRef = useRef(false);
+  const lastTimeRef = useRef(0);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -90,7 +91,7 @@ function ActiveStickerVideoInner({
   }, []);
 
   const player = useVideoPlayer(url || "", (p) => {
-    p.loop = false; // Primeiro ciclo toca até o fim com áudio
+    p.loop = true; // Mantém loop nativo ativo para vídeo 100% contínuo sem travar
     p.muted = false;
     p.volume = 1.0;
     try {
@@ -98,39 +99,40 @@ function ActiveStickerVideoInner({
     } catch (e) {}
   });
 
-  // Garante que o primeiro ciclo toque todo com áudio e depois passe a ficar mudo
+  // Muta suavemente após a 1ª reprodução completa sem pausar nem engasgar o vídeo
   useEffect(() => {
     if (!player) return;
 
     let subEnd = null;
     let subTime = null;
 
-    const finishFirstPlay = () => {
+    const muteAfterFirstCycle = () => {
       if (!hasCompletedFirstPlayRef.current && isMountedRef.current) {
         hasCompletedFirstPlayRef.current = true;
         try {
-          player.loop = true;
           player.muted = true;
+          player.volume = 0;
           player._triboMuted = true;
           onMuteChange?.(true);
-          Promise.resolve(player.play()).catch(() => {});
         } catch (e) {}
       }
     };
 
     try {
       if (typeof player.addListener === "function") {
-        subEnd = player.addListener("playToEnd", finishFirstPlay);
+        subEnd = player.addListener("playToEnd", muteAfterFirstCycle);
 
         subTime = player.addListener("timeUpdate", (payload) => {
           const ct = payload?.currentTime ?? player.currentTime ?? 0;
           const dur = player.duration || 0;
 
-          if (!hasCompletedFirstPlayRef.current && dur > 0.8) {
-            if (ct >= dur - 0.2) {
-              finishFirstPlay();
+          if (!hasCompletedFirstPlayRef.current && dur > 0.6) {
+            // Se o tempo anterior estava no fim do vídeo e agora resetou pro início (deu a volta no loop):
+            if (lastTimeRef.current >= dur - 0.35 && ct <= 0.4) {
+              muteAfterFirstCycle();
             }
           }
+          lastTimeRef.current = ct;
         });
       }
     } catch (e) {}
