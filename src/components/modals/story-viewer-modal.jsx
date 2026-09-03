@@ -5,6 +5,7 @@ import {
   Animated,
   Dimensions,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -24,6 +25,7 @@ import { errorMessage, formatRelativeTime, userName } from "../../lib/format";
 import { useTheme } from "../../theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeOptimization } from "../../services/nativeOptimization";
+import { TriboAlertModal } from "./tribo-alert-modal";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const STORY_PHOTO_DURATION = 6000;
@@ -95,6 +97,34 @@ export function StoryViewerModal({
   const [myGroups, setMyGroups] = useState([]);
   const [shareTab, setShareTab] = useState("followers");
   const [localLikes, setLocalLikes] = useState({});
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [alertConfig, setAlertConfig] = useState({
+    visible: false,
+    type: "success",
+    title: "",
+    message: "",
+    buttonText: "OK"
+  });
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+        setPaused(true);
+      }
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const progressAnim = useRef(new Animated.Value(0)).current;
 
@@ -224,7 +254,13 @@ export function StoryViewerModal({
       onStoryDeleted?.(currentStory.id);
       handleCloseViewer();
     } catch (err) {
-      Alert.alert("Erro ao excluir", errorMessage(err));
+      setAlertConfig({
+        visible: true,
+        type: "error",
+        title: "Erro ao excluir",
+        message: errorMessage(err) || "Não foi possível excluir o story.",
+        buttonText: "Entendido"
+      });
     }
   };
 
@@ -236,7 +272,13 @@ export function StoryViewerModal({
       currentStory.caption = captionValue.trim();
       setEditingCaption(false);
     } catch (err) {
-      Alert.alert("Erro ao editar legenda", errorMessage(err));
+      setAlertConfig({
+        visible: true,
+        type: "error",
+        title: "Erro ao editar",
+        message: errorMessage(err) || "Não foi possível editar a legenda.",
+        buttonText: "Entendido"
+      });
     } finally {
       setSavingCaption(false);
     }
@@ -256,9 +298,22 @@ export function StoryViewerModal({
       });
 
       setReplyText("");
-      Alert.alert("Sucesso", "Resposta enviada com sucesso!");
+      Keyboard.dismiss();
+      setAlertConfig({
+        visible: true,
+        type: "success",
+        title: "Sucesso",
+        message: "Resposta enviada com sucesso!",
+        buttonText: "OK"
+      });
     } catch (err) {
-      Alert.alert("Erro ao enviar", errorMessage(err));
+      setAlertConfig({
+        visible: true,
+        type: "error",
+        title: "Erro ao enviar",
+        message: errorMessage(err) || "Não foi possível enviar a resposta.",
+        buttonText: "Entendido"
+      });
     } finally {
       setSendingReply(false);
     }
@@ -320,9 +375,21 @@ export function StoryViewerModal({
       });
       setShareModalVisible(false);
       setPaused(false);
-      Alert.alert("Enviado", `Story enviado para @${targetUser.username || targetUser.name}`);
+      setAlertConfig({
+        visible: true,
+        type: "success",
+        title: "Enviado",
+        message: `Story enviado para @${targetUser.username || targetUser.name}`,
+        buttonText: "OK"
+      });
     } catch (e) {
-      Alert.alert("Erro", "Não foi possível compartilhar.");
+      setAlertConfig({
+        visible: true,
+        type: "error",
+        title: "Erro ao compartilhar",
+        message: "Não foi possível compartilhar este story.",
+        buttonText: "Entendido"
+      });
     }
   };
 
@@ -337,9 +404,21 @@ export function StoryViewerModal({
       });
       setShareModalVisible(false);
       setPaused(false);
-      Alert.alert("Enviado", `Story compartilhado no grupo ${group.name}`);
+      setAlertConfig({
+        visible: true,
+        type: "success",
+        title: "Enviado",
+        message: `Story compartilhado no grupo ${group.name}`,
+        buttonText: "OK"
+      });
     } catch (e) {
-      Alert.alert("Erro", "Não foi possível compartilhar no grupo.");
+      setAlertConfig({
+        visible: true,
+        type: "error",
+        title: "Erro ao compartilhar",
+        message: "Não foi possível compartilhar no grupo.",
+        buttonText: "Entendido"
+      });
     }
   };
 
@@ -469,7 +548,16 @@ export function StoryViewerModal({
             />
           </View>
 
-          <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, 16) + 6 }]}>
+          <View
+            style={[
+              styles.bottomContainer,
+              {
+                paddingBottom:
+                  keyboardHeight > 0
+                    ? keyboardHeight + (Platform.OS === "android" ? 12 : 8)
+                    : Math.max(insets.bottom, 16) + 6
+              }
+            ]}>
             {!!currentStory.caption && !editingCaption && (
               <View style={styles.captionContainer}>
                 <Text style={styles.captionText}>{currentStory.caption}</Text>
@@ -531,6 +619,10 @@ export function StoryViewerModal({
                     onChangeText={setReplyText}
                     style={styles.replyInput}
                     editable={!sendingReply}
+                    onFocus={() => setPaused(true)}
+                    onBlur={() => {
+                      if (!replyText.trim()) setPaused(false);
+                    }}
                   />
                   {!!replyText.trim() && (
                     <Pressable
@@ -725,6 +817,15 @@ export function StoryViewerModal({
             </Pressable>
           </View>
         )}
+
+        <TriboAlertModal
+          visible={alertConfig.visible}
+          type={alertConfig.type}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          buttonText={alertConfig.buttonText}
+          onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
+        />
       </KeyboardAvoidingView>
     </Modal>
   );
