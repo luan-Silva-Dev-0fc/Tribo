@@ -32,37 +32,61 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const STORY_PHOTO_DURATION = 6000;
 
 function SafeStoryVideoView({ url, paused, style, onVideoEnd }) {
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const player = useVideoPlayer(url, (p) => {
     p.loop = false;
     p.muted = false;
     if (!paused) {
-      p.play();
+      try {
+        p.play();
+      } catch (_) {}
     }
   });
 
   useEffect(() => {
-    if (!player) return;
-    if (paused) {
-      player.pause();
-    } else {
-      player.play();
-    }
+    if (!player || !isMountedRef.current) return;
+    try {
+      if (paused) {
+        player.pause();
+      } else {
+        player.play();
+      }
+    } catch (_) {}
   }, [paused, player]);
 
   useEffect(() => {
-    if (!player) return;
-    const sub = player.addListener("playToEnd", () => {
-      onVideoEnd?.();
-    });
+    if (!player || !isMountedRef.current) return;
+    let sub = null;
+    try {
+      sub = player.addListener("playToEnd", () => {
+        if (isMountedRef.current) {
+          onVideoEnd?.();
+        }
+      });
+    } catch (_) {}
+
     return () => {
-      sub?.remove?.();
+      try {
+        sub?.remove?.();
+      } catch (_) {}
     };
   }, [player, onVideoEnd]);
 
-  if (!url) return null;
+  if (!url || !player) {
+    return <View style={[style, { backgroundColor: "#000000" }]} />;
+  }
 
   return (
     <VideoView
+      key={url}
       player={player}
       style={style}
       contentFit="contain"
@@ -446,6 +470,7 @@ export function StoryViewerModal({
           <View style={styles.mediaWrapper}>
             {isVideo ? (
               <SafeStoryVideoView
+                key={mediaUri}
                 url={mediaUri}
                 paused={paused || menuVisible || editingCaption || shareModalVisible}
                 style={styles.fullscreenMedia}
