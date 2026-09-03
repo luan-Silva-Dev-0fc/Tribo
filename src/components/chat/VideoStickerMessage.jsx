@@ -80,8 +80,7 @@ function ActiveStickerVideoInner({
   const localRef = useRef(null);
   const targetRef = externalRef || localRef;
   const isMountedRef = useRef(true);
-  const hasPlayedOnceRef = useRef(false);
-  const lastTimeRef = useRef(0);
+  const hasCompletedFirstPlayRef = useRef(false);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -91,7 +90,7 @@ function ActiveStickerVideoInner({
   }, []);
 
   const player = useVideoPlayer(url || "", (p) => {
-    p.loop = true;
+    p.loop = false; // Primeiro ciclo toca até o fim com áudio
     p.muted = false;
     p.volume = 1.0;
     try {
@@ -99,38 +98,39 @@ function ActiveStickerVideoInner({
     } catch (e) {}
   });
 
-  // Detecta o fim da primeira reprodução e muta automaticamente
+  // Garante que o primeiro ciclo toque todo com áudio e depois passe a ficar mudo
   useEffect(() => {
     if (!player) return;
 
     let subEnd = null;
     let subTime = null;
 
+    const finishFirstPlay = () => {
+      if (!hasCompletedFirstPlayRef.current && isMountedRef.current) {
+        hasCompletedFirstPlayRef.current = true;
+        try {
+          player.loop = true;
+          player.muted = true;
+          player._triboMuted = true;
+          onMuteChange?.(true);
+          Promise.resolve(player.play()).catch(() => {});
+        } catch (e) {}
+      }
+    };
+
     try {
       if (typeof player.addListener === "function") {
-        subEnd = player.addListener("playToEnd", () => {
-          if (!hasPlayedOnceRef.current) {
-            hasPlayedOnceRef.current = true;
-            player.muted = true;
-            player._triboMuted = true;
-            onMuteChange?.(true);
-          }
-        });
+        subEnd = player.addListener("playToEnd", finishFirstPlay);
 
         subTime = player.addListener("timeUpdate", (payload) => {
           const ct = payload?.currentTime ?? player.currentTime ?? 0;
           const dur = player.duration || 0;
 
-          if (!hasPlayedOnceRef.current) {
-            // Se chegou ao fim do vídeo ou fez o loop (tempo resetou)
-            if (dur > 0 && (ct >= dur - 0.25 || (lastTimeRef.current > dur * 0.7 && ct < 0.5))) {
-              hasPlayedOnceRef.current = true;
-              player.muted = true;
-              player._triboMuted = true;
-              onMuteChange?.(true);
+          if (!hasCompletedFirstPlayRef.current && dur > 0.8) {
+            if (ct >= dur - 0.2) {
+              finishFirstPlay();
             }
           }
-          lastTimeRef.current = ct;
         });
       }
     } catch (e) {}
@@ -149,8 +149,11 @@ function ActiveStickerVideoInner({
     try {
       player._triboMuted = Boolean(isMuted);
       player.muted = Boolean(isMuted);
-      if (!isMuted && !player.playing) {
-        Promise.resolve(player.play()).catch(() => {});
+      if (!isMuted) {
+        player.volume = 1.0;
+        if (!player.playing) {
+          Promise.resolve(player.play()).catch(() => {});
+        }
       }
     } catch (e) {}
   }, [player, isMuted]);
@@ -345,31 +348,6 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
           externalRef={containerRef}
           isMuted={isMuted}
           onMuteChange={setIsMuted} />
-
-        {/* Botão de Áudio (Mudo / Desmudo) */}
-        <Pressable
-          onPress={(e) => {
-            e.stopPropagation();
-            setIsMuted((prev) => !prev);
-          }}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          style={({ pressed }) => [
-            styles.audioBadge,
-            {
-              backgroundColor: isMuted
-                ? "rgba(0, 0, 0, 0.75)"
-                : "rgba(34, 197, 94, 0.85)",
-              opacity: pressed ? 0.8 : 1
-            }
-          ]}
-          accessibilityLabel={isMuted ? "Desmutar figurinha" : "Mutar figurinha"}
-        >
-          <Feather
-            name={isMuted ? "volume-x" : "volume-2"}
-            size={16}
-            color="#ffffff"
-          />
-        </Pressable>
         
 
         {/* Botão rápido de favoritar/salvar */}
@@ -688,24 +666,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 8,
     right: 8,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    zIndex: 9999,
-    elevation: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.3)",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.45,
-    shadowRadius: 4
-  },
-  audioBadge: {
-    position: "absolute",
-    top: 8,
-    left: 8,
     width: 36,
     height: 36,
     borderRadius: 18,
