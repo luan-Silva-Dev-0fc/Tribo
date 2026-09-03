@@ -1134,9 +1134,11 @@ export function SettingsDrawer({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max((insets?.bottom || 0) + 24, 40);
+  const [securityModalVisible, setSecurityModalVisible] = useState(false);
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={onClose}>
+    <>
+      <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-end" }} onPress={onClose}>
         <Pressable
           style={{
@@ -1191,11 +1193,29 @@ export function SettingsDrawer({
               <Feather name="chevron-right" size={20} color={colors.muted} />
             </Pressable>
 
-
+            <Pressable
+              style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", padding: 16, backgroundColor: pressed ? colors.surfaceAlt : "transparent" }]}
+              onPress={() => {
+                onClose();
+                setTimeout(() => setSecurityModalVisible(true), 150);
+              }}>
+              
+              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(16,185,129,0.12)", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+                <Ionicons name="shield-checkmark" size={18} color="#10b981" />
+              </View>
+              <Text style={{ fontFamily: "Poppins_500Medium", fontSize: 15, color: colors.text, flex: 1 }}>Segurança & Biometria</Text>
+              <Feather name="chevron-right" size={20} color={colors.muted} />
+            </Pressable>
           </View>
         </Pressable>
       </Pressable>
-    </Modal>);
+    </Modal>
+
+    <SecuritySettingsModal
+      visible={securityModalVisible}
+      onClose={() => setSecurityModalVisible(false)}
+    />
+  </>);
 
 }
 
@@ -1839,10 +1859,33 @@ export function Settings({
             <Feather name="chevron-right" size={20} color={colors.muted} />
           </Pressable>
 
-          {}
+          {/* Segurança & Biometria */}
+          <Pressable
+            style={[
+              styles.settingRow,
+              { backgroundColor: colors.surface, borderColor: colors.line }
+            ]}
+            onPress={() => setSecurityModalVisible(true)}
+          >
+            <View
+              style={[
+                styles.settingIcon,
+                { backgroundColor: "rgba(16, 185, 129, 0.12)" }
+              ]}
+            >
+              <Ionicons name="shield-checkmark" size={18} color="#10b981" />
+            </View>
+            <View style={styles.flex}>
+              <Text style={[styles.settingTitle, { color: colors.text }]}>
+                Segurança & Biometria
+              </Text>
+              <Text style={[styles.settingCaption, { color: colors.muted }]}>
+                Proteja o app, postagens e tribos com digital.
+              </Text>
+            </View>
+            <Feather name="chevron-right" size={20} color={colors.muted} />
+          </Pressable>
 
-
-          {}
           <Pressable
             onPress={handleCheckUpdate}
             disabled={checkingUpdate}
@@ -2354,6 +2397,11 @@ export function Settings({
           }}
           secondaryButtonText={alertConfig.secondaryButtonText}
           onSecondaryPress={alertConfig.onSecondaryPress} />
+
+        <SecuritySettingsModal
+          visible={securityModalVisible}
+          onClose={() => setSecurityModalVisible(false)}
+        />
         
       </View>
   );

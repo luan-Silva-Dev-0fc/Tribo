@@ -16,6 +16,7 @@ import { Avatar } from "../ui/ui";
 import { errorMessage, userName } from "../../lib/format";
 import { api } from "../../api";
 import { useUserContext } from "../../context/user-context";
+import { SecuritySettingsModal } from "../modals/SecuritySettingsModal";
 
 export function ProfileDrawer({
   visible,
@@ -39,6 +40,7 @@ export function ProfileDrawer({
   const [verifyCode, setVerifyCode] = React.useState("");
   const [verifying, setVerifying] = React.useState(false);
   const [resendingCode, setResendingCode] = React.useState(false);
+  const [securityVisible, setSecurityVisible] = React.useState(false);
 
   const handleOpenVerify = async () => {
     try {
@@ -91,6 +93,16 @@ export function ProfileDrawer({
     onPress: () => {
       onClose();
       onOpenSettings?.();
+    }
+  },
+  {
+    id: "security",
+    label: "Segurança & Biometria",
+    icon: "shield",
+    color: "#10b981",
+    onPress: () => {
+      onClose();
+      setTimeout(() => setSecurityVisible(true), 150);
     }
   },
   {
@@ -315,6 +327,11 @@ export function ProfileDrawer({
         </View>
       </View>
     </Modal>
+
+    <SecuritySettingsModal
+      visible={securityVisible}
+      onClose={() => setSecurityVisible(false)}
+    />
     </>);
 
 }
