@@ -7,6 +7,7 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
+  LayoutAnimation,
   Modal,
   Platform,
   Pressable,
@@ -110,13 +111,19 @@ export function StoryViewerModal({
     const showSub = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       (e) => {
-        setKeyboardHeight(e.endCoordinates.height);
+        try {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        } catch (_) {}
+        setKeyboardHeight(e.endCoordinates?.height || 0);
         setPaused(true);
       }
     );
     const hideSub = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
+        try {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        } catch (_) {}
         setKeyboardHeight(0);
       }
     );
@@ -428,7 +435,7 @@ export function StoryViewerModal({
     <Modal
       visible={visible}
       animationType="fade"
-      transparent={false}
+      transparent={true}
       statusBarTranslucent={true}
       onRequestClose={handleCloseViewer}>
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
@@ -552,9 +559,13 @@ export function StoryViewerModal({
             style={[
               styles.bottomContainer,
               {
+                bottom:
+                  keyboardHeight > 0
+                    ? keyboardHeight + (Platform.OS === "android" ? 20 : 10)
+                    : 0,
                 paddingBottom:
                   keyboardHeight > 0
-                    ? keyboardHeight + (Platform.OS === "android" ? 12 : 8)
+                    ? 8
                     : Math.max(insets.bottom, 16) + 6
               }
             ]}>
