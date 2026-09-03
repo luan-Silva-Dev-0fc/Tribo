@@ -1185,16 +1185,7 @@ export function SettingsDrawer({
               <Feather name="chevron-right" size={20} color={colors.muted} />
             </Pressable>
 
-            <Pressable
-              style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", padding: 16, backgroundColor: pressed ? colors.surfaceAlt : "transparent" }]}
-              onPress={() => {onClose();onOpenAppearance?.();}}>
-              
-              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(168,85,247,0.1)", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
-                <Feather name="layout" size={18} color="#a855f7" />
-              </View>
-              <Text style={{ fontFamily: "Poppins_500Medium", fontSize: 15, color: colors.text, flex: 1 }}>Aparência</Text>
-              <Feather name="chevron-right" size={20} color={colors.muted} />
-            </Pressable>
+
           </View>
         </Pressable>
       </Pressable>
@@ -1842,38 +1833,7 @@ export function Settings({
           </Pressable>
 
           {}
-          <Pressable
-            style={[
-            styles.settingRow,
-            { backgroundColor: colors.surface, borderColor: colors.line }]
-            }
-            onPress={() => {
-              onClose();
-              if (onOpenAppearance) onOpenAppearance();
-            }}>
-            
-            <View
-              style={[
-              styles.settingIcon,
-              { backgroundColor: colors.accentSoft }]
-              }>
-              
-              <Feather
-                name="monitor"
-                size={18}
-                color={colors.accent} />
-              
-            </View>
-            <View style={styles.flex}>
-              <Text style={[styles.settingTitle, { color: colors.text }]}>
-                Aparência
-              </Text>
-              <Text style={[styles.settingCaption, { color: colors.muted }]}>
-                Ajuste o tema e as cores para você.
-              </Text>
-            </View>
-            <Feather name="chevron-right" size={20} color={colors.muted} />
-          </Pressable>
+
 
           {}
           <Pressable

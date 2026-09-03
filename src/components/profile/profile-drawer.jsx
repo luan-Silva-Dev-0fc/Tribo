@@ -113,16 +113,7 @@ export function ProfileDrawer({
       onOpenSavedPosts?.();
     }
   },
-  {
-    id: "appearance",
-    label: "Aparência",
-    icon: "monitor",
-    color: colors.text,
-    onPress: () => {
-      onClose();
-      onOpenAppearance?.();
-    }
-  },
+
   {
     id: "verify",
     label: "Receber o selo de verificação",
