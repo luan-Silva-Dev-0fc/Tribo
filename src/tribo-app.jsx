@@ -41,6 +41,8 @@ import { AppearanceScreen } from "./pages/aparencia/Aparencia";
 import { AppShell } from "./components/layout/app-shell";
 import { SuspendedModal } from "./components/modals/suspended-modal";
 import { PlatformSuspendedScreen } from "./components/modals/PlatformSuspendedScreen";
+import { BiometricAuthModal } from "./components/modals/BiometricAuthModal";
+import { getSecuritySettings } from "./services/biometricsService";
 import { PublicProfile } from "./components/profile/public-profile";
 import { ThemeProvider, useTheme } from "./theme";
 import { UserProvider } from "./context/user-context";
@@ -75,6 +77,44 @@ function TriboRoot() {
   const [bannedMessage, setBannedMessage] = useState(null);
   const [platformSuspended, setPlatformSuspended] = useState(null);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [isAppUnlocked, setIsAppUnlocked] = useState(true);
+  const [biometricPrompt, setBiometricPrompt] = useState({ visible: false });
+
+  useEffect(() => {
+    async function checkAppLock() {
+      try {
+        const security = await getSecuritySettings();
+        if (security.appLock) {
+          setIsAppUnlocked(false);
+        }
+      } catch (e) {}
+    }
+    checkAppLock();
+  }, []);
+
+  const handleOpenTribeSecurely = useCallback(async (id) => {
+    try {
+      const security = await getSecuritySettings();
+      if (security.groupLock) {
+        setBiometricPrompt({
+          visible: true,
+          title: "Tribo Protegida",
+          reason: "Confirme sua digital para acessar esta tribo",
+          onSuccess: () => {
+            setBiometricPrompt({ visible: false });
+            setActiveGroupId(id);
+            navigate("tribe_details");
+          },
+          onCancel: () => {
+            setBiometricPrompt({ visible: false });
+          }
+        });
+        return;
+      }
+    } catch (e) {}
+    setActiveGroupId(id);
+    navigate("tribe_details");
+  }, [navigate]);
   // Invalida respostas de sessao iniciadas antes de um login/logout.
   const authEpochRef = useRef(0);
   const lastBackPressRef = useRef(0);
@@ -313,8 +353,7 @@ function TriboRoot() {
         {
           const groupId = data.groupId || data.group_id;
           if (groupId) {
-            setActiveGroupId(groupId);
-            navigate("tribe_details");
+            handleOpenTribeSecurely(groupId);
           } else {
             navigate("tribes_list");
           }
@@ -558,10 +597,7 @@ function TriboRoot() {
     <TribosListScreen
       onBack={goBack}
       onCreateTribe={() => navigate("tribe_create")}
-      onOpenTribe={(id) => {
-        setActiveGroupId(id);
-        navigate("tribe_details");
-      }} />,
+      onOpenTribe={handleOpenTribeSecurely} />,
 
 
     tribe_create:
@@ -684,6 +720,29 @@ function TriboRoot() {
             message={platformSuspended?.message}
             reason={platformSuspended?.reason}
             onRetry={checkPlatformStatus} />
+
+          {/* Bloqueio de Inicialização do App com Biometria */}
+          {!isAppUnlocked && (
+            <BiometricAuthModal
+              visible={!isAppUnlocked}
+              title="Tribo Bloqueada"
+              reason="Confirme sua digital para entrar no aplicativo"
+              cancellable={false}
+              onSuccess={() => setIsAppUnlocked(true)}
+            />
+          )}
+
+          {/* Prompt de Biometria para Ações Protegidas (ex: abrir tribos/grupos) */}
+          {biometricPrompt.visible && (
+            <BiometricAuthModal
+              visible={biometricPrompt.visible}
+              title={biometricPrompt.title}
+              reason={biometricPrompt.reason}
+              cancellable={true}
+              onSuccess={biometricPrompt.onSuccess}
+              onCancel={biometricPrompt.onCancel}
+            />
+          )}
           
         </SafeAreaView>
       </UserProvider>);

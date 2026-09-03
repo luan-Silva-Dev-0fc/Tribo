@@ -21,6 +21,7 @@ import { IconButton } from "../ui/ui";
 import { errorMessage } from "../../lib/format";
 import { useTheme } from "../../theme";
 import { NativeOptimization } from "../../services/nativeOptimization";
+import { getSecuritySettings, authenticateWithBiometrics } from "../../services/biometricsService";
 
 export function CreateStoryModal({ visible, onClose, onSuccess }) {
   const { colors } = useTheme();
@@ -109,6 +110,16 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
   const handleUpload = async () => {
     if (!media) return;
     try {
+      const security = await getSecuritySettings();
+      if (security.postLock) {
+        const auth = await authenticateWithBiometrics(
+          "Confirme sua digital para publicar este Story"
+        );
+        if (!auth.success && !auth.bypassed) {
+          return;
+        }
+      }
+
       setUploading(true);
       const isVideo = media.type === "video" || media.mimeType?.includes("video") || media.uri?.match(/\.(mp4|mov|mkv|webm)$/i);
       const fileName = media.fileName || (isVideo ? "story.mp4" : "story.jpg");

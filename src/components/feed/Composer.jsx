@@ -38,6 +38,7 @@ import { ReportModal } from "../../components/modals/report-modal";
 import { AppLayout } from "../../components/layout/AppLayout";
 import { StoriesBar } from "../../components/stories/stories-bar";
 import { CommunityGuidelinesModal } from "../../components/modals/community-guidelines-modal";
+import { getSecuritySettings, authenticateWithBiometrics } from "../../services/biometricsService";
 import { MediaViewerModal } from "../../components/modals/media-viewer-modal";
 import { RepostModal } from "../../components/modals/repost-modal";
 import { TriboAlertModal } from "../../components/modals/tribo-alert-modal";
@@ -165,6 +166,18 @@ export function Composer({ user, onPublished, onCreate }) {
         youtube_url: attachedYoutubeUrl || undefined,
         type: attachedYoutubeId ? "youtube" : undefined
       };
+
+      // Proteção de publicação por biometria
+      const security = await getSecuritySettings();
+      if (security.postLock) {
+        const auth = await authenticateWithBiometrics(
+          "Confirme sua digital para autorizar a publicação"
+        );
+        if (!auth.success && !auth.bypassed) {
+          setPosting(false);
+          return;
+        }
+      }
 
       if (onCreate) {
         await onCreate(postData);

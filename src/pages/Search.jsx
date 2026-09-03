@@ -17,7 +17,8 @@ import {
   TextInput } from
 "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { SecuritySettingsModal } from "../components/modals/SecuritySettingsModal";
 import { api, getUploadUrl } from "../api";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
@@ -377,7 +378,12 @@ export function SearchScreen({ onOpenProfile, user }) {
         onClose={() => setReportModal((prev) => ({ ...prev, visible: false }))}
         onSuccess={handleReportSuccess} />
       
-      <TriboAlertModal
+      <SecuritySettingsModal
+          visible={securityModalVisible}
+          onClose={() => setSecurityModalVisible(false)}
+        />
+
+        <TriboAlertModal
         visible={alertConfig.visible}
         type={alertConfig.type}
         title={alertConfig.title}
@@ -1209,6 +1215,7 @@ export function Settings({
   const insets = useSafeAreaInsets();
   const { isAdultContentEnabled, setAdultContentEnabled } = useUserContext();
   const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [securityModalVisible, setSecurityModalVisible] = useState(false);
   const [checkingUpdateText, setCheckingUpdateText] = useState("");
   const [updateInfo, setUpdateInfo] = useState(null);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
