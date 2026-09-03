@@ -1671,6 +1671,15 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
               item.sender?.username ||
               "Usuário";
 
+            const resolvedUser =
+              item.user ||
+              item.sender ||
+              item.author || {
+                id: item.userId || item.user_id,
+                name: item.userName || authorName,
+                username: item.userUsername || (authorName !== "Usuário" ? authorName : "")
+              };
+
             const isDeleted = Boolean(
               item.is_deleted ||
               item.isDeleted ||
@@ -1884,12 +1893,12 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
                                     item.media_type === "VIDEO" || String(item.media_url || item.mediaUrl).toLowerCase().endsWith(".mp4") ? (
                                       <ChatVideoThumbnail
                                         url={item.media_url || item.mediaUrl}
-                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "video", user: item.user, message: item })}
+                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "video", user: resolvedUser, message: item })}
                                         onLongPress={handleLongPress}
                                       />
                                     ) : (
                                       <Pressable
-                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "image", user: item.user, message: item })}
+                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "image", user: resolvedUser, message: item })}
                                         onLongPress={handleLongPress}
                                       >
                                         <Image
@@ -1983,12 +1992,12 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
                                     item.media_type === "VIDEO" || String(item.media_url || item.mediaUrl).toLowerCase().endsWith(".mp4") ? (
                                       <ChatVideoThumbnail
                                         url={item.media_url || item.mediaUrl}
-                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "video", user: item.user, message: item })}
+                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "video", user: resolvedUser, message: item })}
                                         onLongPress={handleLongPress}
                                       />
                                     ) : (
                                       <Pressable
-                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "image", user: item.user, message: item })}
+                                        onPress={() => setViewerMedia({ url: item.media_url || item.mediaUrl, type: "image", user: resolvedUser, message: item })}
                                         onLongPress={handleLongPress}
                                       >
                                         <Image

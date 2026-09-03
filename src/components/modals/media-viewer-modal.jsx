@@ -124,11 +124,25 @@ export function MediaViewerModal({
     effectiveMedia?.user ||
     effectiveMedia?.author ||
     effectiveMedia?.sender ||
-    null;
-  const authorName = author ?
-    (userName(author) || author.name || author.username) :
-    "Membro";
-  const authorHandle = author?.username ? `${author.username.replace(/^@/, '')}` : "membro";
+    effectiveMedia?.message?.user ||
+    effectiveMedia?.message?.author ||
+    effectiveMedia?.message?.sender ||
+    (effectiveMedia?.message ? {
+      id: effectiveMedia.message.userId || effectiveMedia.message.user_id || effectiveMedia.message.sender_id,
+      name: effectiveMedia.message.userName || effectiveMedia.message.user_name || effectiveMedia.message.name,
+      username: effectiveMedia.message.userUsername || effectiveMedia.message.user_username || effectiveMedia.message.username,
+      avatar_url: effectiveMedia.message.userAvatar || effectiveMedia.message.avatar_url || effectiveMedia.message.avatar
+    } : null);
+
+  const rawAuthorName = author ? (userName(author) || author.name || author.username) : "";
+  const authorName =
+    rawAuthorName && rawAuthorName !== "Membro" && rawAuthorName !== "membro"
+      ? rawAuthorName
+      : (author?.username ? `@${author.username.replace(/^@/, "")}` : "Usuário");
+
+  const authorHandle = author?.username
+    ? `${author.username.replace(/^@/, "")}`
+    : (author?.name ? author.name.toLowerCase().replace(/\s+/g, "") : "usuario");
   const postDate =
     effectiveMedia?.created_at || effectiveMedia?.createdAt ?
     formatRelativeTime(effectiveMedia.created_at || effectiveMedia.createdAt) :

@@ -111,6 +111,16 @@ export function useStickerSpatialAudio(player, containerRef) {
 
   const updatePlayerVolume = () => {
     if (!player || !isMountedRef.current) return;
+
+    // Se o player estiver explicitamente mutado (após a 1ª reprodução ou clique do usuário), preserva o mudo
+    if (player._triboMuted || player.muted === true) {
+      try {
+        player.volume = 0;
+        player.muted = true;
+      } catch (e) {}
+      return;
+    }
+
     const recordingFactor = isRecordingRef.current ? 0.18 : 1.0;
     const targetVolume = proximityRef.current * recordingFactor;
 

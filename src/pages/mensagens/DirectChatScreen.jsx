@@ -51,6 +51,21 @@ export function DirectChatScreen({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
+  const [activeTargetUser, setActiveTargetUser] = useState(targetUser);
+
+  useEffect(() => {
+    setActiveTargetUser(targetUser);
+    const uid = targetUser?.id || targetUser?.userId;
+    if (uid && (!targetUser?.username || targetUser?.username === "usuario" || !targetUser?.name)) {
+      api.users.get(uid).then((res) => {
+        const u = res?.user || res?.data || res;
+        if (u && (u.username || u.name)) {
+          setActiveTargetUser((prev) => ({ ...prev, ...u }));
+        }
+      }).catch(() => {});
+    }
+  }, [targetUser]);
+
   const {
     messages,
     content,
@@ -110,7 +125,7 @@ export function DirectChatScreen({
     Platform.OS === "android" ? StatusBar.currentHeight || 24 : 0
   );
 
-  const isOnline = Boolean(targetUser?.is_online || targetUser?.isOnline);
+  const isOnline = Boolean(activeTargetUser?.is_online || activeTargetUser?.isOnline);
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -128,10 +143,10 @@ export function DirectChatScreen({
 
         <Pressable
           style={styles.headerUserPressable}
-          onPress={() => onOpenProfile?.(targetUser)}
+          onPress={() => onOpenProfile?.(activeTargetUser)}
         >
           <View style={{ position: "relative" }}>
-            <Avatar user={targetUser} size={42} />
+            <Avatar user={activeTargetUser} size={42} />
             {isOnline && (
               <View
                 style={[
@@ -148,9 +163,9 @@ export function DirectChatScreen({
                 numberOfLines={1}
                 style={[styles.headerUserName, { color: colors.text }]}
               >
-                {userName(targetUser)}
+                {userName(activeTargetUser)}
               </Text>
-              <VerificationBadge user={targetUser} size={14} />
+              <VerificationBadge user={activeTargetUser} size={14} />
             </View>
             <Text
               numberOfLines={1}
@@ -165,7 +180,7 @@ export function DirectChatScreen({
                 ? `Visto ${formatRelativeTime(
                     targetUser?.last_seen || targetUser?.lastSeen
                   )}`
-                : `@${targetUser?.username || "usuario"}`}
+                : `@${activeTargetUser?.username || "usuario"}`}
             </Text>
           </View>
         </Pressable>
@@ -455,7 +470,11 @@ export function DirectChatScreen({
                                   }
                                 ]}
                               >
-                                Story de @{targetUser?.username || "usuario"}
+                                {storyData?.username
+                                  ? `Story de @${storyData.username}`
+                                  : isMe
+                                  ? `Story de @${activeTargetUser?.username || "usuario"}`
+                                  : "Seu story"}
                               </Text>
                             </View>
                             {storyData?.mediaUrl && (
@@ -502,7 +521,7 @@ export function DirectChatScreen({
                               setViewerMedia({
                                 url: mediaUrl,
                                 type: "image",
-                                user: isMe ? currentUser : targetUser,
+                                user: isMe ? currentUser : activeTargetUser,
                                 created_at: item.createdAt || item.created_at,
                                 content: item.content || "",
                                 message: item
@@ -527,7 +546,7 @@ export function DirectChatScreen({
                               setViewerMedia({
                                 url: mediaUrl,
                                 type: "video",
-                                user: isMe ? currentUser : targetUser,
+                                user: isMe ? currentUser : activeTargetUser,
                                 created_at: item.createdAt || item.created_at,
                                 content: item.content || "",
                                 message: item
@@ -881,8 +900,9 @@ export function DirectChatScreen({
 
       <MediaViewerModal
         visible={Boolean(viewerMedia)}
+        media={viewerMedia}
         mediaUrl={viewerMedia?.url}
-        isVideo={viewerMedia?.isVideo}
+        isVideo={viewerMedia?.isVideo || viewerMedia?.type === "video"}
         onClose={() => setViewerMedia(null)}
         onDelete={
           viewerMedia?.message &&

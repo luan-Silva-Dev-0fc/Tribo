@@ -249,16 +249,52 @@ function TriboRoot() {
 
         const type = data.type || data.notification_type;
 
-        if (type === "chat" || type === "message") {
+        if (
+          type === "chat" ||
+          type === "message" ||
+          type === "story_reply" ||
+          type === "story_reaction" ||
+          type === "story"
+        ) {
           const senderId =
-          data.senderId || data.sender_id || data.userId || data.user_id;
+            data.senderId ||
+            data.sender_id ||
+            data.userId ||
+            data.user_id ||
+            data.authorId ||
+            data.author_id ||
+            data.sender?.id ||
+            data.user?.id;
           const senderUsername =
-          data.senderUsername ||
-          data.sender_username ||
-          data.username ||
-          "usuario";
+            data.senderUsername ||
+            data.sender_username ||
+            data.username ||
+            data.sender?.username ||
+            data.user?.username ||
+            "";
+          const senderName =
+            data.senderName ||
+            data.sender_name ||
+            data.name ||
+            data.sender?.name ||
+            data.user?.name ||
+            "";
+          const senderAvatar =
+            data.senderAvatar ||
+            data.sender_avatar ||
+            data.avatar ||
+            data.avatar_url ||
+            data.sender?.avatar_url ||
+            data.user?.avatar_url ||
+            "";
+
           if (senderId) {
-            handleOpenChat({ id: senderId, username: senderUsername });
+            handleOpenChat({
+              id: senderId,
+              username: senderUsername,
+              name: senderName,
+              avatar_url: senderAvatar
+            });
           } else {
             navigate("conversations");
           }

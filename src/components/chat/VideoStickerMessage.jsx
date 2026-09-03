@@ -50,7 +50,9 @@ class VideoViewSafeGuard extends React.Component {
 const SafeStickerVideo = React.memo(function SafeStickerVideo({
   url,
   style,
-  externalRef
+  externalRef,
+  isMuted,
+  onMuteChange
 }) {
   if (!url || typeof url !== "string" || !url.trim()) {
     return <View style={[style, { backgroundColor: "#18181b" }]} />;
@@ -61,15 +63,25 @@ const SafeStickerVideo = React.memo(function SafeStickerVideo({
         url={url}
         style={style}
         externalRef={externalRef}
+        isMuted={isMuted}
+        onMuteChange={onMuteChange}
       />
     </VideoViewSafeGuard>
   );
 });
 
-function ActiveStickerVideoInner({ url, style, externalRef }) {
+function ActiveStickerVideoInner({
+  url,
+  style,
+  externalRef,
+  isMuted,
+  onMuteChange
+}) {
   const localRef = useRef(null);
   const targetRef = externalRef || localRef;
   const isMountedRef = useRef(true);
+  const hasPlayedOnceRef = useRef(false);
+  const lastTimeRef = useRef(0);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -86,6 +98,62 @@ function ActiveStickerVideoInner({ url, style, externalRef }) {
       Promise.resolve(p.play()).catch(() => {});
     } catch (e) {}
   });
+
+  // Detecta o fim da primeira reprodução e muta automaticamente
+  useEffect(() => {
+    if (!player) return;
+
+    let subEnd = null;
+    let subTime = null;
+
+    try {
+      if (typeof player.addListener === "function") {
+        subEnd = player.addListener("playToEnd", () => {
+          if (!hasPlayedOnceRef.current) {
+            hasPlayedOnceRef.current = true;
+            player.muted = true;
+            player._triboMuted = true;
+            onMuteChange?.(true);
+          }
+        });
+
+        subTime = player.addListener("timeUpdate", (payload) => {
+          const ct = payload?.currentTime ?? player.currentTime ?? 0;
+          const dur = player.duration || 0;
+
+          if (!hasPlayedOnceRef.current) {
+            // Se chegou ao fim do vídeo ou fez o loop (tempo resetou)
+            if (dur > 0 && (ct >= dur - 0.25 || (lastTimeRef.current > dur * 0.7 && ct < 0.5))) {
+              hasPlayedOnceRef.current = true;
+              player.muted = true;
+              player._triboMuted = true;
+              onMuteChange?.(true);
+            }
+          }
+          lastTimeRef.current = ct;
+        });
+      }
+    } catch (e) {}
+
+    return () => {
+      try {
+        subEnd?.remove?.();
+        subTime?.remove?.();
+      } catch (e) {}
+    };
+  }, [player, onMuteChange]);
+
+  // Aplica o mudo quando alterado pelo usuário (ao tocar na figurinha)
+  useEffect(() => {
+    if (!player) return;
+    try {
+      player._triboMuted = Boolean(isMuted);
+      player.muted = Boolean(isMuted);
+      if (!isMuted && !player.playing) {
+        Promise.resolve(player.play()).catch(() => {});
+      }
+    } catch (e) {}
+  }, [player, isMuted]);
 
   useStickerSpatialAudio(player, targetRef);
 
@@ -172,6 +240,7 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   const isViewOnce = Boolean(item?.is_view_once || item?.isViewOnce);
   const videoUrl =
@@ -251,7 +320,7 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
       style={[styles.container, isMe ? styles.alignRight : styles.alignLeft]}>
       
       <Pressable
-        onPress={() => setOptionsVisible(true)}
+        onPress={() => setIsMuted((prev) => !prev)}
         onLongPress={() => {
           if (onLongPress) {
             onLongPress(item);
@@ -259,6 +328,7 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
             setOptionsVisible(true);
           }
         }}
+        delayLongPress={220}
         style={({ pressed }) => [
         styles.stickerFrame,
         {
@@ -272,7 +342,34 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
         <SafeStickerVideo
           url={videoUrl}
           style={styles.video}
-          externalRef={containerRef} />
+          externalRef={containerRef}
+          isMuted={isMuted}
+          onMuteChange={setIsMuted} />
+
+        {/* Botão de Áudio (Mudo / Desmudo) */}
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+            setIsMuted((prev) => !prev);
+          }}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={({ pressed }) => [
+            styles.audioBadge,
+            {
+              backgroundColor: isMuted
+                ? "rgba(0, 0, 0, 0.75)"
+                : "rgba(34, 197, 94, 0.85)",
+              opacity: pressed ? 0.8 : 1
+            }
+          ]}
+          accessibilityLabel={isMuted ? "Desmutar figurinha" : "Mutar figurinha"}
+        >
+          <Feather
+            name={isMuted ? "volume-x" : "volume-2"}
+            size={16}
+            color="#ffffff"
+          />
+        </Pressable>
         
 
         {/* Botão rápido de favoritar/salvar */}
@@ -591,6 +688,24 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 8,
     right: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    zIndex: 9999,
+    elevation: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.45,
+    shadowRadius: 4
+  },
+  audioBadge: {
+    position: "absolute",
+    top: 8,
+    left: 8,
     width: 36,
     height: 36,
     borderRadius: 18,
