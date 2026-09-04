@@ -1123,29 +1123,33 @@ const styles = StyleSheet.create({
   },
   replyInputContainer: {
     flex: 1,
-    flexDirection: "row",
+    minHeight: 50,
+    height: 50,
+    justifyContent: "center",
     alignItems: "center",
-    borderRadius: 24,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    minHeight: 48
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    borderRadius: 25,
+    borderWidth: 1
   },
   replyInput: {
     flex: 1,
     color: "#ffffff",
-    fontSize: 14,
     fontFamily: "Poppins_400Regular",
-    paddingVertical: 0,
+    fontSize: 16,
     includeFontPadding: false,
+    paddingVertical: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
     textAlignVertical: "center"
   },
   sendReplyBtn: {
     padding: 4
   },
   iconCircleBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: "rgba(0,0,0,0.6)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",

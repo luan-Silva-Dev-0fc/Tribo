@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   },
   buttonText: { fontFamily: "Poppins_600SemiBold", fontSize: 13 },
   buttonTextCompact: { fontFamily: "Poppins_600SemiBold", fontSize: 11 },
-  input: { minHeight: 52, borderWidth: 1, borderRadius: 16, paddingHorizontal: 16, fontFamily: "Poppins_400Regular", fontSize: 14 },
+  input: { minHeight: 52, borderWidth: 1, borderRadius: 16, paddingHorizontal: 16, fontFamily: "Poppins_400Regular", fontSize: 16, includeFontPadding: false, paddingVertical: 0, textAlignVertical: "center" },
   textarea: { minHeight: 112, paddingTop: 15, textAlignVertical: "top" },
   avatar: { alignItems: "center", justifyContent: "center" },
   header: { paddingHorizontal: 22, paddingBottom: 8 },
