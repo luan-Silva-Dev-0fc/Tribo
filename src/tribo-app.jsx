@@ -42,6 +42,7 @@ import { AppShell } from "./components/layout/app-shell";
 import { SuspendedModal } from "./components/modals/suspended-modal";
 import { PlatformSuspendedScreen } from "./components/modals/PlatformSuspendedScreen";
 import { BiometricAuthModal } from "./components/modals/BiometricAuthModal";
+import { BiometricLockScreen } from "./components/security/BiometricLockScreen";
 import { getSecuritySettings } from "./services/biometricsService";
 import { PublicProfile } from "./components/profile/public-profile";
 import { ThemeProvider, useTheme } from "./theme";
@@ -78,18 +79,31 @@ function TriboRoot() {
   const [platformSuspended, setPlatformSuspended] = useState(null);
   const [showAdminAuth, setShowAdminAuth] = useState(false);
   const [isAppUnlocked, setIsAppUnlocked] = useState(true);
+  const [appLockEnabled, setAppLockEnabled] = useState(false);
   const [biometricPrompt, setBiometricPrompt] = useState({ visible: false });
 
   useEffect(() => {
     async function checkAppLock() {
       try {
         const security = await getSecuritySettings();
-        if (security.appLock) {
+        const isEnabled = Boolean(security?.appLock);
+        setAppLockEnabled(isEnabled);
+        if (isEnabled) {
           setIsAppUnlocked(false);
+        } else {
+          setIsAppUnlocked(true);
         }
       } catch (e) {}
     }
     checkAppLock();
+
+    const sub = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        checkAppLock();
+      }
+    });
+
+    return () => sub.remove();
   }, []);
 
   const handleOpenTribeSecurely = useCallback(async (id) => {
@@ -721,14 +735,12 @@ function TriboRoot() {
             reason={platformSuspended?.reason}
             onRetry={checkPlatformStatus} />
 
-          {/* Bloqueio de Inicialização do App com Biometria */}
-          {!isAppUnlocked && (
-            <BiometricAuthModal
-              visible={!isAppUnlocked}
-              title="Tribo Bloqueada"
-              reason="Confirme sua digital para entrar no aplicativo"
-              cancellable={false}
-              onSuccess={() => setIsAppUnlocked(true)}
+          {/* Bloqueio de Inicialização do App com Biometria Moderna */}
+          {appLockEnabled && !isAppUnlocked && (
+            <BiometricLockScreen
+              visible={appLockEnabled && !isAppUnlocked}
+              user={user}
+              onUnlock={() => setIsAppUnlocked(true)}
             />
           )}
 
@@ -818,6 +830,26 @@ function TriboRoot() {
             reason={platformSuspended?.reason}
             onRetry={checkPlatformStatus} />
           
+          {/* Bloqueio de Inicialização do App com Biometria Moderna */}
+          {appLockEnabled && !isAppUnlocked && (
+            <BiometricLockScreen
+              visible={appLockEnabled && !isAppUnlocked}
+              user={user}
+              onUnlock={() => setIsAppUnlocked(true)}
+            />
+          )}
+
+          {/* Prompt de Biometria para Ações Protegidas (ex: abrir tribos/grupos) */}
+          {biometricPrompt.visible && (
+            <BiometricAuthModal
+              visible={biometricPrompt.visible}
+              title={biometricPrompt.title}
+              reason={biometricPrompt.reason}
+              cancellable={true}
+              onSuccess={biometricPrompt.onSuccess}
+              onCancel={biometricPrompt.onCancel}
+            />
+          )}
         </View>
       </View>
     </UserProvider>);
