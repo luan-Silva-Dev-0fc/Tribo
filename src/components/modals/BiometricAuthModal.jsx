@@ -93,8 +93,8 @@ export function BiometricAuthModal({
           style={[
             styles.card,
             {
-              backgroundColor: colors.card || "#18181b",
-              borderColor: colors.border || "#27272a"
+              backgroundColor: "#000000",
+              borderColor: "rgba(255, 255, 255, 0.12)"
             }
           ]}
         >

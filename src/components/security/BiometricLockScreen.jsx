@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Easing,
+  Image,
   Modal,
   Pressable,
   StatusBar,
@@ -15,6 +16,8 @@ import { authenticateWithBiometrics } from "../../services/biometricsService";
 import { Avatar } from "../ui/ui";
 import { userName } from "../../lib/format";
 
+const triboLogo = require("../../../assets/icon.png");
+
 export function BiometricLockScreen({
   visible,
   user,
@@ -23,7 +26,7 @@ export function BiometricLockScreen({
   const [errorMsg, setErrorMsg] = useState(null);
   const [authenticating, setAuthenticating] = useState(false);
 
-  // Concentric pulsing rings
+  // Animacoes de pulso concentrico
   const pulse1 = useRef(new Animated.Value(0)).current;
   const pulse2 = useRef(new Animated.Value(0)).current;
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -54,7 +57,7 @@ export function BiometricLockScreen({
     );
     anim.start();
 
-    // Auto trigger biometric prompt
+    // Disparo automatico rapido do prompt biometrico nativo
     const timer = setTimeout(() => {
       handleTriggerAuth();
     }, 250);
@@ -113,20 +116,20 @@ export function BiometricLockScreen({
 
   const ring1Scale = pulse1.interpolate({
     inputRange: [0, 1],
-    outputRange: [1, 1.6]
+    outputRange: [1, 1.65]
   });
   const ring1Opacity = pulse1.interpolate({
     inputRange: [0, 0.4, 1],
-    outputRange: [0.7, 0.35, 0]
+    outputRange: [0.65, 0.3, 0]
   });
 
   const ring2Scale = pulse2.interpolate({
     inputRange: [0, 1],
-    outputRange: [1, 1.95]
+    outputRange: [1, 2.0]
   });
   const ring2Opacity = pulse2.interpolate({
     inputRange: [0, 0.4, 1],
-    outputRange: [0.5, 0.25, 0]
+    outputRange: [0.45, 0.2, 0]
   });
 
   return (
@@ -137,41 +140,45 @@ export function BiometricLockScreen({
       statusBarTranslucent={true}
       onRequestClose={() => {}}
     >
-      <StatusBar barStyle="light-content" backgroundColor="#050507" />
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
       <View style={styles.container}>
-        {/* Glow Superior */}
+        
+        {/* Glow Superior Suave Verde */}
         <View style={styles.ambientGlow} />
 
-        {/* Topo / Header da Marca */}
+        {/* Topo: Logo Oficial e Nome Tribo */}
         <View style={styles.header}>
-          <View style={styles.shieldBadge}>
-            <Ionicons name="shield-checkmark" size={16} color="#10b981" />
-            <Text style={styles.shieldText}>TRIBO SEGURA</Text>
-            <View style={styles.activeDot} />
+          <View style={styles.logoBorder}>
+            <Image
+              source={triboLogo}
+              style={styles.logoImage}
+              resizeMode="cover"
+            />
+          </View>
+          <Text style={styles.brandTitle}>Tribo</Text>
+          <View style={styles.securityBadge}>
+            <View style={styles.statusDot} />
+            <Text style={styles.securityText}>App Protegido por Biometria</Text>
           </View>
         </View>
 
-        {/* Conteudo Central */}
-        <View style={styles.content}>
-          {/* Avatar do Usuario com anel de seguranca */}
-          <View style={styles.avatarWrapper}>
-            <View style={styles.avatarBorder}>
-              <Avatar user={user} size={72} />
+        {/* Centro: Usuario e Sensor */}
+        <View style={styles.centerSection}>
+          {/* Card do Usuario */}
+          {user && (
+            <View style={styles.userCard}>
+              <Avatar user={user} size={38} />
+              <View style={styles.userTextContainer}>
+                <Text style={styles.userGreeting}>Olá, {displayName}</Text>
+                <Text style={styles.userStatus}>Toque para entrar</Text>
+              </View>
+              <Ionicons name="lock-closed" size={16} color="#10b981" />
             </View>
-            <View style={styles.lockBadge}>
-              <Ionicons name="lock-closed" size={13} color="#ffffff" />
-            </View>
-          </View>
+          )}
 
-          {/* Nome e Titulo */}
-          <Text style={styles.greetingText}>Olá, {displayName}</Text>
-          <Text style={styles.titleText}>Tribo Bloqueada</Text>
-          <Text style={styles.subtitleText}>
-            Confirme sua impressão digital ou Face ID para acessar sua conta
-          </Text>
-
-          {/* Sensor Biometrico com Aneis Pulsantes */}
-          <Animated.View style={[styles.sensorContainer, { transform: [{ translateX: shakeAnim }] }]}>
+          {/* Sensor Biometrico Pulsante */}
+          <Animated.View style={[styles.sensorWrapper, { transform: [{ translateX: shakeAnim }] }]}>
+            {/* Anéis Pulsantes */}
             <Animated.View
               style={[
                 styles.pulseRing,
@@ -193,6 +200,7 @@ export function BiometricLockScreen({
               ]}
             />
 
+            {/* Botao Central Redondo */}
             <Pressable
               onPress={handleTriggerAuth}
               disabled={authenticating}
@@ -200,8 +208,8 @@ export function BiometricLockScreen({
                 styles.sensorButton,
                 {
                   backgroundColor: errorMsg
-                    ? "rgba(239, 68, 68, 0.14)"
-                    : "rgba(16, 185, 129, 0.12)",
+                    ? "rgba(239, 68, 68, 0.12)"
+                    : "#0a0a0c",
                   borderColor: errorMsg ? "#ef4444" : "#10b981",
                   transform: [{ scale: pressed ? 0.94 : 1 }]
                 }
@@ -209,43 +217,44 @@ export function BiometricLockScreen({
             >
               <Ionicons
                 name="finger-print"
-                size={52}
+                size={54}
                 color={errorMsg ? "#ef4444" : "#10b981"}
               />
             </Pressable>
           </Animated.View>
 
-          {/* Mensagem de Erro com Badge */}
+          {/* Mensagem de Erro se houver */}
           {Boolean(errorMsg) && (
-            <View style={styles.errorContainer}>
+            <View style={styles.errorBox}>
               <Feather name="alert-circle" size={15} color="#ef4444" />
               <Text style={styles.errorText}>{errorMsg}</Text>
             </View>
           )}
         </View>
 
-        {/* Rodapé / Botao de Acao */}
+        {/* Rodapé: Botao de Acao */}
         <View style={styles.footer}>
           <Pressable
             onPress={handleTriggerAuth}
             disabled={authenticating}
             style={({ pressed }) => [
-              styles.actionButton,
+              styles.authBtn,
               {
                 backgroundColor: "#10b981",
                 opacity: pressed || authenticating ? 0.85 : 1
               }
             ]}
           >
-            <Ionicons name="finger-print-outline" size={20} color="#ffffff" />
-            <Text style={styles.actionButtonText}>
-              {authenticating ? "Lendo Biometria..." : "Desbloquear com Biometria"}
+            <Ionicons name="finger-print" size={20} color="#ffffff" />
+            <Text style={styles.authBtnText}>
+              {authenticating ? "Aguardando Leitura..." : "Desbloquear com Biometria"}
             </Text>
           </Pressable>
-          <Text style={styles.footerHint}>
-            Toque no sensor do celular ou no botão acima
+          <Text style={styles.hintText}>
+            Use a digital cadastrada no seu aparelho
           </Text>
         </View>
+
       </View>
     </Modal>
   );
@@ -254,100 +263,107 @@ export function BiometricLockScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#08090A",
+    backgroundColor: "#000000",
     justifyContent: "space-between",
     paddingHorizontal: 24,
-    paddingTop: 56,
-    paddingBottom: 40
+    paddingTop: 64,
+    paddingBottom: 44
   },
   ambientGlow: {
     position: "absolute",
-    top: -120,
+    top: -100,
     alignSelf: "center",
-    width: 320,
-    height: 320,
-    borderRadius: 160,
-    backgroundColor: "rgba(16, 185, 129, 0.07)"
+    width: 340,
+    height: 340,
+    borderRadius: 170,
+    backgroundColor: "rgba(16, 185, 129, 0.08)"
   },
   header: {
     alignItems: "center",
-    marginTop: 12
+    marginTop: 8
   },
-  shieldBadge: {
+  logoBorder: {
+    width: 76,
+    height: 76,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+    overflow: "hidden",
+    marginBottom: 14,
+    backgroundColor: "#000000",
+    shadowColor: "#10b981",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8
+  },
+  logoImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 22
+  },
+  brandTitle: {
+    fontSize: 28,
+    fontFamily: "Poppins_700Bold",
+    color: "#ffffff",
+    letterSpacing: 1.5,
+    marginBottom: 6
+  },
+  securityBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    backgroundColor: "rgba(16, 185, 129, 0.12)",
-    borderColor: "rgba(16, 185, 129, 0.3)",
+    gap: 7,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 16
   },
-  shieldText: {
-    color: "#10b981",
-    fontSize: 12,
-    fontFamily: "Poppins_700Bold",
-    letterSpacing: 1.2
-  },
-  activeDot: {
+  statusDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: "#10b981"
   },
-  content: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 20
-  },
-  avatarWrapper: {
-    position: "relative",
-    marginBottom: 16
-  },
-  avatarBorder: {
-    padding: 3,
-    borderRadius: 42,
-    borderWidth: 2,
-    borderColor: "#10b981",
-    backgroundColor: "rgba(16, 185, 129, 0.1)"
-  },
-  lockBadge: {
-    position: "absolute",
-    bottom: -2,
-    right: -2,
-    backgroundColor: "#10b981",
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#08090A"
-  },
-  greetingText: {
+  securityText: {
     color: "#94a3b8",
-    fontSize: 14,
-    fontFamily: "Poppins_500Medium",
-    marginBottom: 4
+    fontSize: 12,
+    fontFamily: "Poppins_500Medium"
   },
-  titleText: {
+  centerSection: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10
+  },
+  userCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: "#0d0d10",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginBottom: 24,
+    width: "100%",
+    maxWidth: 320
+  },
+  userTextContainer: {
+    flex: 1
+  },
+  userGreeting: {
     color: "#ffffff",
-    fontSize: 26,
-    fontFamily: "Poppins_700Bold",
-    marginBottom: 6,
-    letterSpacing: -0.3
+    fontSize: 14,
+    fontFamily: "Poppins_600SemiBold"
   },
-  subtitleText: {
+  userStatus: {
     color: "#64748b",
-    fontSize: 13.5,
-    fontFamily: "Poppins_400Regular",
-    textAlign: "center",
-    maxWidth: 280,
-    lineHeight: 20,
-    marginBottom: 28
+    fontSize: 11.5,
+    fontFamily: "Poppins_400Regular"
   },
-  sensorContainer: {
+  sensorWrapper: {
     width: 140,
     height: 140,
     alignItems: "center",
@@ -357,29 +373,29 @@ const styles = StyleSheet.create({
   },
   pulseRing: {
     position: "absolute",
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+    width: 106,
+    height: 106,
+    borderRadius: 53,
     borderWidth: 1.5
   },
   sensorButton: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    borderWidth: 1.5,
+    borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#10b981",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
     elevation: 8
   },
-  errorContainer: {
+  errorBox: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "rgba(239, 68, 68, 0.12)",
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
     borderColor: "rgba(239, 68, 68, 0.3)",
     borderWidth: 1,
     paddingHorizontal: 16,
@@ -400,7 +416,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12
   },
-  actionButton: {
+  authBtn: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
@@ -410,17 +426,17 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     shadowColor: "#10b981",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
     elevation: 4
   },
-  actionButtonText: {
+  authBtnText: {
     color: "#ffffff",
     fontSize: 15.5,
     fontFamily: "Poppins_600SemiBold"
   },
-  footerHint: {
-    color: "#475569",
+  hintText: {
+    color: "#64748b",
     fontSize: 12,
     fontFamily: "Poppins_400Regular"
   }
