@@ -26,9 +26,7 @@ class VideoViewSafeGuard extends React.Component {
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-  componentDidCatch(error) {
-    // Silencia erros de player liberado pelo expo-video durante unmount
-  }
+  componentDidCatch(error) {}
   render() {
     if (this.state.hasError) {
       return (
@@ -91,7 +89,7 @@ function ActiveStickerVideoInner({
   }, []);
 
   const player = useVideoPlayer(url || "", (p) => {
-    p.loop = true; // Mantém loop nativo ativo para vídeo 100% contínuo sem travar
+    p.loop = true;
     p.muted = false;
     p.volume = 1.0;
     try {
@@ -99,7 +97,6 @@ function ActiveStickerVideoInner({
     } catch (e) {}
   });
 
-  // Muta suavemente após a 1ª reprodução completa sem pausar nem engasgar o vídeo
   useEffect(() => {
     if (!player) return;
 
@@ -127,7 +124,6 @@ function ActiveStickerVideoInner({
           const dur = player.duration || 0;
 
           if (!hasCompletedFirstPlayRef.current && dur > 0.6) {
-            // Se o tempo anterior estava no fim do vídeo e agora resetou pro início (deu a volta no loop):
             if (lastTimeRef.current >= dur - 0.35 && ct <= 0.4) {
               muteAfterFirstCycle();
             }
@@ -145,7 +141,6 @@ function ActiveStickerVideoInner({
     };
   }, [player, onMuteChange]);
 
-  // Aplica o mudo quando alterado pelo usuário (ao tocar na figurinha)
   useEffect(() => {
     if (!player) return;
     try {
@@ -259,7 +254,6 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
   item.url;
   const stickerId = item.sticker_id || item.stickerId || item.id;
 
-
   useEffect(() => {
     let mounted = true;
     if (stickerId || videoUrl) {
@@ -355,7 +349,6 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
           onMuteChange={setIsMuted} />
         
 
-        {/* Botão rápido de favoritar/salvar */}
         <Pressable
           onPress={(e) => {
             e.stopPropagation();
@@ -381,7 +374,6 @@ export const VideoStickerMessage = React.memo(function VideoStickerMessage({
           
         </Pressable>
 
-        {/* Badge da Figurinha */}
         <View style={styles.badgeContainer} pointerEvents="none">
           <View style={styles.badgePill}>
             <MaterialCommunityIcons

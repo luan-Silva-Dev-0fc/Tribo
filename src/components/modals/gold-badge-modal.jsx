@@ -5,29 +5,46 @@ import { useTheme } from "../../theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../context/user-context";
 
-export function GoldBadgeModal() {
+export function GoldBadgeModal({ user: propUser }) {
   const { colors } = useTheme();
-  const { user } = useUserContext();
+  const { user: contextUser } = useUserContext();
+  const activeUser = propUser || contextUser;
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const checkBadgeStatus = async () => {
-      if (user?.badge_type === "GOLD" || user?.badgeType === "GOLD") {
-        const hasSeen = await AsyncStorage.getItem(`has_seen_gold_badge_${user.id}`);
+      if (!activeUser?.id) return;
+      const rawBadge = activeUser?.badge || activeUser?.badge_type || activeUser?.badgeType || "";
+      const isGold = String(rawBadge).toUpperCase() === "GOLD";
+
+      if (isGold) {
+        const hasSeen = await AsyncStorage.getItem(`has_seen_gold_badge_${activeUser.id}`);
         if (!hasSeen) {
           setVisible(true);
+          try {
+            const Notifications = require("expo-notifications");
+            Notifications.scheduleNotificationAsync({
+              content: {
+                title: "Parabéns! Selo Dourado Concedido ",
+                body: "Você recebeu o Selo Dourado de verificação oficial da Tribo!",
+                data: { type: "GOLD_BADGE" }
+              },
+              trigger: null
+            }).catch(() => {});
+          } catch (_) {}
         }
       }
     };
-    if (user) {
+
+    if (activeUser) {
       checkBadgeStatus();
     }
-  }, [user]);
+  }, [activeUser]);
 
   const handleClose = async () => {
     setVisible(false);
-    if (user?.id) {
-      await AsyncStorage.setItem(`has_seen_gold_badge_${user.id}`, "true");
+    if (activeUser?.id) {
+      await AsyncStorage.setItem(`has_seen_gold_badge_${activeUser.id}`, "true");
     }
   };
 
@@ -36,33 +53,32 @@ export function GoldBadgeModal() {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
       <View style={styles.overlay}>
-        <View style={[styles.modalContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={styles.iconContainer}>
+        <View style={[styles.modalContainer, { backgroundColor: colors.card || "#18181b", borderColor: "#fbbf24" }]}>
+          <View style={[styles.iconContainer, { backgroundColor: "rgba(251, 191, 36, 0.15)" }]}>
             <MaterialCommunityIcons name="check-decagram" size={60} color="#fbbf24" />
           </View>
           
-          <Text style={[styles.title, { color: colors.text }]}>Parabéns!</Text>
-          <Text style={[styles.subtitle, { color: colors.text }]}>
-            Agora você está com o selo dourado.
+          <Text style={[styles.title, { color: colors.text || "#ffffff" }]}>Parabéns! Selo Dourado Concedido 🎉</Text>
+          <Text style={[styles.subtitle, { color: "#fbbf24" }]}>
+            Você recebeu o Selo Dourado de verificação oficial da Tribo!
           </Text>
           
-          <Text style={[styles.message, { color: colors.subtext }]}>
-            Você conseguiu ter o selo dourado concedido pelo administrador geral da plataforma. 
+          <Text style={[styles.message, { color: colors.subtext || "#a1a1aa" }]}>
+            Seu perfil agora conta com o Selo Dourado concedido oficialmente pela administração da Tribo.
             {"\n\n"}
-            Este selo indica que você é uma pessoa próxima e conhecida da comunidade. 
-            Usuários com este selo têm maior prioridade em sugestões de amizade e recebem novidades em primeira mão.
+            Com este selo, você possui destaque VIP, acesso a recursos exclusivos como Voz ao Vivo no Chat, novidades antecipadas e máxima visibilidade na comunidade.
           </Text>
 
           <Pressable
-            style={[styles.button, { backgroundColor: "#fbbf24" }]}
+            style={[styles.button, { backgroundColor: "#fbbf24", marginTop: 18 }]}
             onPress={handleClose}>
             
-            <Text style={styles.buttonText}>Entendi, obrigado!</Text>
+            <Text style={[styles.buttonText, { color: "#000000", fontFamily: "Poppins_700Bold" }]}>Entendi, aproveitar!</Text>
           </Pressable>
         </View>
       </View>
-    </Modal>);
-
+    </Modal>
+  );
 }
 
 export function GoldBadgeBenefitsModal({ visible, onClose, featureName = "Voz ao Vivo no Chat" }) {

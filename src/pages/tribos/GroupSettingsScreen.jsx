@@ -497,7 +497,6 @@ export function GroupSettingsScreen({
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <AppHeader
         title="Configurações"
-        onBack={onBack}
         onBack={onBack} />
       
 

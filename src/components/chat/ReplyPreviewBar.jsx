@@ -236,7 +236,6 @@ export function ReplyPreviewBar({ replyMessage, onCancelReply }) {
           }
         ]}
       >
-        {/* Linha de Destaque */}
         <View style={styles.accentLine} />
 
         <View style={styles.contentColumn}>

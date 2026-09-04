@@ -6,9 +6,6 @@ const recordingListeners = new Set();
 const scrollListeners = new Set();
 let isRecordingActive = false;
 
-
-
-
 export function setAudioRecordingActive(active) {
   const nextVal = Boolean(active);
   if (isRecordingActive === nextVal) return;
@@ -34,9 +31,6 @@ export function subscribeAudioRecording(listener) {
   };
 }
 
-
-
-
 let lastScrollNotify = 0;
 export function notifyChatScroll() {
   const now = Date.now();
@@ -55,9 +49,6 @@ export function subscribeChatScroll(listener) {
     scrollListeners.delete(listener);
   };
 }
-
-
-
 
 export async function setOptimizedAudioMode(forRecording = false) {
   try {
@@ -95,14 +86,6 @@ export async function initGlobalAudioMode() {
   return setOptimizedAudioMode(false);
 }
 
-
-
-
-
-
-
-
-
 export function useStickerSpatialAudio(player, containerRef) {
   const proximityRef = useRef(1.0);
   const isRecordingRef = useRef(isRecordingActive);
@@ -114,7 +97,6 @@ export function useStickerSpatialAudio(player, containerRef) {
   const applyVolumeWithSmoothing = (target) => {
     if (!player || !isMountedRef.current) return;
 
-    // Se o player estiver explicitamente mutado, preserva o mudo imediatamente
     if (player._triboMuted || player.muted === true) {
       try {
         player.volume = 0;
@@ -129,7 +111,6 @@ export function useStickerSpatialAudio(player, containerRef) {
 
     targetVolumeRef.current = target;
 
-    // Se a animação já estiver rodando, o loop já lerpará até o novo targetVolumeRef
     if (lerpAnimationRef.current) return;
 
     const step = () => {
@@ -164,7 +145,6 @@ export function useStickerSpatialAudio(player, containerRef) {
         return;
       }
 
-      // Amortecimento acústico suave (lerp 0.28 por frame de ~16ms)
       currentVolumeRef.current += diff * 0.28;
       const v = currentVolumeRef.current;
       try {
@@ -220,20 +200,16 @@ export function useStickerSpatialAudio(player, containerRef) {
         const stickerHeight = height || 190;
         const cardCenterY = y + stickerHeight / 2;
 
-        // Se estiver completamente fora da tela visível
         if (y + stickerHeight <= 0 || y >= screenHeight) {
           proximityRef.current = 0;
           updatePlayerVolume();
           return;
         }
 
-        // Ponto central da tela do celular
         const screenCenterY = screenHeight / 2;
         const distanceFromCenter = Math.abs(cardCenterY - screenCenterY);
 
-        // Raio central onde o áudio é 100% nítido (zona de leitura)
         const fullZone = screenHeight * 0.10;
-        // Distância onde o áudio vai desvanecendo aos poucos até sumir suavemente
         const maxZone = screenHeight * 0.56;
 
         let factor = 1.0;
@@ -242,7 +218,6 @@ export function useStickerSpatialAudio(player, containerRef) {
         } else if (distanceFromCenter >= maxZone) {
           factor = 0.0;
         } else {
-          // Curva acústica Hann S-curve progressiva (fade out muito suave e natural)
           const t = (distanceFromCenter - fullZone) / (maxZone - fullZone);
           factor = 0.5 * (1 + Math.cos(t * Math.PI));
         }
@@ -266,16 +241,13 @@ export function useStickerSpatialAudio(player, containerRef) {
       Promise.resolve(player.play()).catch(() => {});
     } catch (e) {}
 
-
     measureAndApply();
     const t1 = setTimeout(measureAndApply, 100);
     const t2 = setTimeout(measureAndApply, 350);
 
-
     const unsubscribeScroll = subscribeChatScroll(() => {
       measureAndApply();
     });
-
 
     const unsubscribeRecording = subscribeAudioRecording((isRec) => {
       if (!isMountedRef.current) return;

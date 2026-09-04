@@ -52,9 +52,7 @@ class VideoViewSafeGuard extends React.Component {
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-  componentDidCatch(error) {
-    // Silencia erros de unmount
-  }
+  componentDidCatch(error) {}
   render() {
     if (this.state.hasError) {
       return (
@@ -79,8 +77,6 @@ function SafeGridVideo({ url }) {
 
   useEffect(() => {
     isMountedRef.current = true;
-    // Delay de 150ms: se a pessoa estiver rolando a lista,
-    // NÃO cria o player nativo em C++, garantindo rolagem a 60 FPS sem engasgos!
     const timer = setTimeout(() => {
       if (isMountedRef.current) {
         setReadyToLoad(true);

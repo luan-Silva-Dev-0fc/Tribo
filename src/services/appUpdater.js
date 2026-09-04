@@ -20,9 +20,6 @@ try {
   codePush = null;
 }
 
-/**
- * Verifica se o aplicativo já tem permissão para instalar APKs desconhecidos no Android
- */
 export async function canRequestPackageInstalls() {
   if (Platform.OS !== 'android') return true;
 
@@ -35,9 +32,6 @@ export async function canRequestPackageInstalls() {
   return true;
 }
 
-/**
- * Abre a tela do Android para permitir instalação de fontes desconhecidas para o app
- */
 export async function openUnknownSourcesSettings() {
   if (Platform.OS !== 'android') return false;
 
@@ -63,9 +57,6 @@ export async function openUnknownSourcesSettings() {
   }
 }
 
-/**
- * Baixa o APK da atualização internamente no app com acompanhamento de progresso
- */
 export async function downloadApkInternally(apkUrl, onProgress) {
   if (!apkUrl) throw new Error('URL de download do APK não informada.');
   if (!FileSystem) throw new Error('Módulo de arquivos do sistema não disponível.');
@@ -74,7 +65,6 @@ export async function downloadApkInternally(apkUrl, onProgress) {
   const filename = `tribo_update_${Date.now()}.apk`;
   const targetUri = `${baseDir}${filename}`;
 
-  // 1. Tenta baixar usando DownloadResumable com progresso
   try {
     if (typeof FileSystem.createDownloadResumable === 'function') {
       const downloadResumable = FileSystem.createDownloadResumable(
@@ -107,7 +97,6 @@ export async function downloadApkInternally(apkUrl, onProgress) {
     console.warn('[AppUpdater] createDownloadResumable falhou, tentando downloadAsync direto:', resumableErr);
   }
 
-  // 2. Fallback direto downloadAsync
   if (typeof FileSystem.downloadAsync === 'function') {
     const directResult = await FileSystem.downloadAsync(apkUrl, targetUri);
     return directResult?.uri || targetUri;
@@ -116,9 +105,6 @@ export async function downloadApkInternally(apkUrl, onProgress) {
   return targetUri;
 }
 
-/**
- * Dispara o instalador de pacotes do Android diretamente para o arquivo baixado
- */
 export async function installApk(localUri) {
   if (!localUri) throw new Error('Caminho do arquivo APK inválido.');
 
@@ -128,7 +114,6 @@ export async function installApk(localUri) {
 
   const rawPath = localUri.startsWith('file://') ? localUri.replace('file://', '') : localUri;
 
-  // 1. Tenta instalar usando o módulo nativo com permissão FileProvider
   if (NativeModules.ApkInstaller?.installApk) {
     try {
       return await NativeModules.ApkInstaller.installApk(rawPath);
@@ -137,7 +122,6 @@ export async function installApk(localUri) {
     }
   }
 
-  // 2. Fallback usando expo-sharing com MIME type oficial do instalador Android
   if (await Sharing.isAvailableAsync()) {
     try {
       return await Sharing.shareAsync(localUri, {
@@ -150,13 +134,9 @@ export async function installApk(localUri) {
     }
   }
 
-  // 3. Fallback para abertura direta
   return await Linking.openURL(localUri);
 }
 
-/**
- * Verifica se há atualizações OTA via CodePush e permite download e instalação imediata
- */
 export async function checkCodePushUpdate() {
   if (!codePush || Platform.OS === 'web') return null;
 

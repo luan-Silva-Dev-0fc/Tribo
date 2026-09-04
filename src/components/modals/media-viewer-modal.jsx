@@ -346,7 +346,6 @@ export function MediaViewerModal({
       <StatusBar barStyle="light-content" backgroundColor="#000000" translucent />
       
       <View style={styles.overlay}>
-        {/* Media Container */}
         <Animated.View
           style={[
             styles.mediaContainer,
@@ -393,7 +392,6 @@ export function MediaViewerModal({
           )}
         </Animated.View>
 
-        {/* Top Floating Glass Header + Caption */}
         <Animated.View
           style={[
             styles.topHeaderContainer,
@@ -404,9 +402,7 @@ export function MediaViewerModal({
           ]}
           pointerEvents={controlsVisible ? "auto" : "none"}>
           
-          {/* Row 1: Author Pill + Actions */}
           <View style={styles.topBarRow}>
-            {/* Author Glass Pill */}
             <View style={styles.authorPill}>
               <Avatar user={author} size={36} style={styles.avatarBorder} />
               <View style={styles.authorTexts}>
@@ -422,7 +418,6 @@ export function MediaViewerModal({
               </View>
             </View>
 
-            {/* Top Actions: Share, Download, Delete, Close */}
             <View style={styles.topActions}>
               <Pressable
                 style={({ pressed }) => [
@@ -482,7 +477,6 @@ export function MediaViewerModal({
             </View>
           </View>
 
-          {/* Row 2: Caption Card at the Top (Cleanly positioned under Author & Actions) */}
           {!!postContent && (
             <Pressable
               onPress={() => setExpandedText(!expandedText)}

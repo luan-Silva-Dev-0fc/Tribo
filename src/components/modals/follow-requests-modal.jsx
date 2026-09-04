@@ -28,6 +28,8 @@ import {
   VerificationBadge } from
 "../ui/ui";
 import { CustomModal } from "./CustomModal";
+import { GoldBadgeBenefitsModal } from "./gold-badge-modal";
+import { useUserContext } from "../../context/user-context";
 
 export function FollowRequestsModal({
   visible,
@@ -38,11 +40,13 @@ export function FollowRequestsModal({
 }) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+  const { user } = useUserContext();
   const [requests, setRequests] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [activeTab, setActiveTab] = useState("notifications");
+  const [goldModalVisible, setGoldModalVisible] = useState(false);
   const [modalAlert, setModalAlert] = useState({
     visible: false,
     type: "info",
@@ -73,6 +77,27 @@ export function FollowRequestsModal({
 
         }) :
         [];
+
+        const rawBadge = user?.badge || user?.badge_type || user?.badgeType || "";
+        const isGold = String(rawBadge).toUpperCase() === "GOLD";
+        const hasGoldNotif = filtered.some(
+          (n) =>
+            (n.type || "").toUpperCase() === "GOLD_BADGE" ||
+            (n.message || "").toLowerCase().includes("selo dourado")
+        );
+
+        if (isGold && !hasGoldNotif) {
+          filtered.unshift({
+            id: "gold_badge_official_system",
+            type: "GOLD_BADGE",
+            title: "Parabéns! Selo Dourado Concedido 🎉",
+            message: "Você recebeu o Selo Dourado de verificação oficial da Tribo!",
+            is_read: true,
+            isRead: true,
+            created_at: new Date().toISOString()
+          });
+        }
+
         setNotifications(filtered);
       }
     } catch (error) {
@@ -80,7 +105,7 @@ export function FollowRequestsModal({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (visible) {
@@ -159,7 +184,17 @@ export function FollowRequestsModal({
     let actionLabel = rawMsg;
     let notifType = "generic";
 
-    if (type === "LIKE" || lowerMsg.includes("curtiu")) {
+    if (
+      type === "GOLD_BADGE" ||
+      type === "GOLD" ||
+      lowerMsg.includes("selo dourado") ||
+      lowerMsg.includes("dourado")
+    ) {
+      icon = "award";
+      iconBg = "#fbbf24";
+      notifType = "gold_badge";
+      actionLabel = "Você recebeu o Selo Dourado de verificação oficial da Tribo!";
+    } else if (type === "LIKE" || lowerMsg.includes("curtiu")) {
       icon = "heart";
       iconBg = "#ef4444";
       notifType = "like";
@@ -213,7 +248,9 @@ export function FollowRequestsModal({
   };
 
   const handlePressNotification = (item, parsed) => {
-    if (parsed.notifType === "follow") {
+    if (parsed.notifType === "gold_badge") {
+      setGoldModalVisible(true);
+    } else if (parsed.notifType === "follow") {
       onClose();
       onOpenProfile?.(parsed.actor);
     } else if (item.post_id || item.postId || item.post) {
@@ -454,13 +491,22 @@ export function FollowRequestsModal({
                   {}
                   <View style={styles.notificationContent}>
                     <Text style={styles.notificationText}>
-                      <Text style={styles.actorName}>{parsed.name} </Text>
-                      <Text style={styles.actionText}>
-                        {parsed.actionLabel}{" "}
-                      </Text>
-                      <Text style={styles.timeText}>
-                        · {parsed.timeAgo || "agora"}
-                      </Text>
+                      {parsed.notifType === "gold_badge" ? (
+                        <>
+                          <Text style={[styles.actorName, { color: "#fbbf24" }]}>Parabéns! Selo Dourado Concedido 🎉 </Text>
+                          <Text style={styles.actionText}>{parsed.actionLabel}</Text>
+                        </>
+                      ) : (
+                        <>
+                          <Text style={styles.actorName}>{parsed.name} </Text>
+                          <Text style={styles.actionText}>
+                            {parsed.actionLabel}{" "}
+                          </Text>
+                          <Text style={styles.timeText}>
+                            · {parsed.timeAgo || "agora"}
+                          </Text>
+                        </>
+                      )}
                     </Text>
                   </View>
 
@@ -498,6 +544,10 @@ export function FollowRequestsModal({
         title={modalAlert.title}
         message={modalAlert.message}
         onClose={() => setModalAlert({ ...modalAlert, visible: false })} />
+
+      <GoldBadgeBenefitsModal
+        visible={goldModalVisible}
+        onClose={() => setGoldModalVisible(false)} />
       
     </Modal>);
 

@@ -16,7 +16,7 @@ import { Feather } from "@expo/vector-icons";
 import { getUserAvatar } from "../../lib/format";
 import { useTheme } from "../../theme";
 
-export function IconButton({ name, onPress, label, color, small = false, style }) {
+export const IconButton = React.memo(function IconButton({ name, onPress, label, color, small = false, style }) {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -37,9 +37,9 @@ export function IconButton({ name, onPress, label, color, small = false, style }
       <Feather name={name} size={small ? 16 : 20} color={color || colors.text} />
     </Pressable>);
 
-}
+});
 
-export function Button({
+export const Button = React.memo(function Button({
   title,
   onPress,
   icon,
@@ -123,90 +123,107 @@ export function Button({
       }
     </Pressable>);
 
-}
+});
 
 export function Input({ style, multiline, ...props }) {
   const { colors } = useTheme();
   return <TextInput placeholderTextColor={colors.muted} multiline={multiline} style={[styles.input, multiline && styles.textarea, { backgroundColor: colors.surfaceAlt, borderColor: colors.line, color: colors.text }, style]} {...props} />;
 }
 
-export function Avatar({ user, url, uri, fallback, fallbackUser, size = 42, style }) {
+export const Avatar = React.memo(function Avatar({
+  user,
+  url,
+  uri,
+  fallback,
+  fallbackUser,
+  size = 42,
+  style,
+  hasStory = false,
+  hasUnseenStory = false
+}) {
   const { colors } = useTheme();
   const [imgError, setImgError] = React.useState(false);
 
   const safeUser =
-  typeof user === "object" && user !== null ?
-  user?.author || user?.user || user :
-  {};
+    typeof user === "object" && user !== null
+      ? user?.author || user?.user || user
+      : {};
 
   const userAvatar =
-  url || uri || (typeof user === "string" ? user : getUserAvatar(safeUser, fallbackUser));
+    url || uri || (typeof user === "string" ? user : getUserAvatar(safeUser, fallbackUser));
 
   React.useEffect(() => {
     setImgError(false);
   }, [userAvatar]);
 
   const fallbackName =
-  fallback ||
-  safeUser.name ||
-  safeUser.username ||
-  safeUser.firstName || (
-  typeof user === "string" ?
-  "U" :
-  fallbackUser?.name || fallbackUser?.username || "M");
+    fallback ||
+    safeUser.name ||
+    safeUser.username ||
+    safeUser.firstName ||
+    (typeof user === "string"
+      ? "U"
+      : fallbackUser?.name || fallbackUser?.username || "M");
 
   const label = (fallbackName || "M").slice(0, 1).toUpperCase();
 
-  return userAvatar && !imgError ?
-  <Image
-    source={{ uri: userAvatar }}
-    onError={() => setImgError(true)}
-    style={[
-    {
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-      backgroundColor: colors.line,
-      borderWidth: 1,
-      borderColor: colors.line
-    },
-    style]
-    } /> :
+  const ringBorderColor = hasStory
+    ? hasUnseenStory
+      ? "#3b82f6"
+      : "rgba(255, 255, 255, 0.15)"
+    : colors.line;
+  const ringBorderWidth = hasStory ? (hasUnseenStory ? 2.5 : 1.5) : 1;
 
-
-  <View
-    style={[
-    styles.avatar,
-    {
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-      backgroundColor: colors.accentSoft,
-      borderWidth: 1,
-      borderColor: colors.line
-    },
-    style]
-    }>
-    
+  return userAvatar && !imgError ? (
+    <Image
+      source={{ uri: userAvatar }}
+      onError={() => setImgError(true)}
+      style={[
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: colors.line,
+          borderWidth: ringBorderWidth,
+          borderColor: ringBorderColor
+        },
+        style
+      ]}
+    />
+  ) : (
+    <View
+      style={[
+        styles.avatar,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: colors.accentSoft,
+          borderWidth: ringBorderWidth,
+          borderColor: ringBorderColor
+        },
+        style
+      ]}
+    >
       <Text
-      style={{
-        color: colors.accent,
-        fontFamily: "Poppins_700Bold",
-        fontSize: Math.max(12, Math.floor(size * 0.38))
-      }}>
-      
+        style={{
+          color: colors.accent,
+          fontFamily: "Poppins_700Bold",
+          fontSize: Math.max(12, Math.floor(size * 0.38))
+        }}
+      >
         {label}
       </Text>
-    </View>;
-
-}
+    </View>
+  );
+});
 
 export const BADGE_URLS = {
   BLUE: "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/selo%20de%20verificacao/selo%20azul.png",
   GOLD: "https://pub-34192334d7d14328ace69168b62cc510.r2.dev/selo%20de%20verificacao/selo%20dourado.png"
 };
 
-export function VerificationBadge({ user, badgeType, size = 15, style }) {
+export const VerificationBadge = React.memo(function VerificationBadge({ user, badgeType, size = 15, style }) {
   const [modalVisible, setModalVisible] = useState(false);
   const { colors } = useTheme();
 
@@ -335,7 +352,7 @@ export function VerificationBadge({ user, badgeType, size = 15, style }) {
       </Modal>
     </>);
 
-}
+});
 
 export function AppHeader({ title, subtitle, onBack, right, style }) {
   const { colors } = useTheme();
@@ -369,10 +386,10 @@ export function AppHeader({ title, subtitle, onBack, right, style }) {
 
 }
 
-export function EmptyState({ icon = "inbox", children }) {
+export const EmptyState = React.memo(function EmptyState({ icon = "inbox", children }) {
   const { colors } = useTheme();
   return <View style={styles.empty}><View style={[styles.emptyIcon, { backgroundColor: colors.accentSoft }]}><Feather name={icon} size={24} color={colors.accent} /></View><Text selectable style={[styles.emptyText, { color: colors.muted }]}>{children}</Text></View>;
-}
+});
 
 const styles = StyleSheet.create({
   iconButton: { width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center" },

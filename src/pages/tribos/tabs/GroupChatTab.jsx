@@ -108,9 +108,7 @@ class VideoViewSafeGuard extends React.Component {
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-  componentDidCatch(error) {
-    // Silencia erros de player liberado
-  }
+  componentDidCatch(error) {}
   render() {
     if (this.state.hasError) {
       return (
@@ -1549,7 +1547,6 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
 
   return (
     <View style={{ flex: 1, backgroundColor: "#000000" }}>
-      {/* Barra de Voz ao Vivo (Discreta, Compacta e Moderna) */}
       <View style={{ alignItems: "center", marginVertical: 4, paddingHorizontal: 12 }}>
         <Pressable
           onPress={handleToggleLiveVoice}
@@ -1653,6 +1650,11 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
           contentContainerStyle={{ paddingBottom: 8, paddingTop: 8 }}
           onScroll={notifyChatScroll}
           scrollEventThrottle={16}
+          removeClippedSubviews={Platform.OS === "android"}
+          initialNumToRender={15}
+          maxToRenderPerBatch={10}
+          windowSize={7}
+          updateCellsBatchingPeriod={50}
           renderItem={({ item, index }) => {
             const isMe = [
               item.userId,
@@ -2310,9 +2312,4 @@ export const GroupChatTab = React.forwardRef(function GroupChatTab(
     </View>
   );
 });
-
-
-
-
-
 

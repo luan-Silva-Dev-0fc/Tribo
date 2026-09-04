@@ -24,16 +24,11 @@ export function configureGoogleSignIn() {
   }
 }
 
-
-
-
-
 export async function signOutGoogle() {
   configureGoogleSignIn();
   try {
     await GoogleSignin.signOut();
   } catch (error) {
-    // A conta pode nao ter usado Google; nao ha sessao de provedor para remover.
     console.warn("[GoogleAuth] Nao foi possivel encerrar a sessao Google:", error?.message);
   }
 }
@@ -42,7 +37,6 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
   try {
     configureGoogleSignIn();
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-
 
     try {
       await GoogleSignin.signOut();
@@ -78,7 +72,6 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
     let authenticatedUser = null;
     let token = null;
 
-
     try {
       const googlePayload = {
         idToken,
@@ -113,7 +106,6 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
         backendRes?.data?.user ||
         backendRes?.data;
 
-      // Se retornou token mas não veio o objeto de usuário completo, busca via api.me()
       if (token && (!authenticatedUser || !authenticatedUser.id)) {
         try {
           const meRes = await api.me();
@@ -159,7 +151,6 @@ export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
         googleProfile: profileData
       };
     }
-
 
     if (onNewUser) {
       onNewUser(profileData);

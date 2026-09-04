@@ -150,7 +150,6 @@ export function useDirectChat(targetUser, currentUser) {
 
         const reversedMsgs = uniqueMsgs.reverse();
         setMessages((prev) => {
-          // Preserva mensagens pendentes que ainda estão sendo enviadas
           const pending = prev.filter(
             (m) =>
               (String(m.id).startsWith("temp_") || m.sending === true) &&
@@ -227,7 +226,6 @@ export function useDirectChat(targetUser, currentUser) {
         const isFromMe = senderId === myId;
 
         setMessages((prev) => {
-          // 1. Verifica se já existe pelo id exato do servidor
           const existingByIdx = msgId
             ? prev.findIndex((m) => String(m.id || m._id) === msgId)
             : -1;
@@ -243,7 +241,6 @@ export function useDirectChat(targetUser, currentUser) {
             return updated;
           }
 
-          // 2. Se for uma mensagem enviada por mim, encontra o item temporário/otimista
           let pendingIdx = -1;
           if (tempId) {
             pendingIdx = prev.findIndex(
@@ -862,7 +859,6 @@ export function useDirectChat(targetUser, currentUser) {
     const msgId = String(message.id || message._id || "");
     const tempId = message.tempId || message.temp_id;
 
-    // IMEDIATAMENTE (0ms) atualiza o estado local e o storage persistente
     setMessages((prev) => {
       let updated;
       if (forEveryone) {
@@ -907,7 +903,6 @@ export function useDirectChat(targetUser, currentUser) {
       return updated;
     });
 
-    // Notifica o outro usuário via WebSockets em tempo real
     try {
       const socket = getChatSocket();
       if (socket && forEveryone && msgId) {
@@ -924,7 +919,6 @@ export function useDirectChat(targetUser, currentUser) {
       }
     } catch (_) {}
 
-    // Executa no servidor em segundo plano
     if (msgId && !msgId.startsWith("temp_")) {
       api.messages.delete(msgId, { forEveryone }).catch((err) => {
         console.warn("Erro ao apagar mensagem no servidor:", err);

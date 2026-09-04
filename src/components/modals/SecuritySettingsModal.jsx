@@ -54,7 +54,6 @@ export function SecuritySettingsModal({ visible, onClose }) {
     const newValue = !currentValue;
     const actionLabel = newValue ? "ativar" : "desativar";
 
-    // Sempre exige biometria para alterar a trava de segurança
     const auth = await authenticateWithBiometrics(
       `Confirme sua digital para ${actionLabel} esta proteção`
     );
@@ -92,7 +91,6 @@ export function SecuritySettingsModal({ visible, onClose }) {
           ]}
           onPress={(e) => e.stopPropagation()}
         >
-          {/* Handle */}
           <View
             style={[
               styles.handle,
@@ -100,7 +98,6 @@ export function SecuritySettingsModal({ visible, onClose }) {
             ]}
           />
 
-          {/* Header */}
           <View style={styles.header}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
               <View
@@ -130,7 +127,6 @@ export function SecuritySettingsModal({ visible, onClose }) {
               contentContainerStyle={{ paddingBottom: 30, gap: 14 }}
               showsVerticalScrollIndicator={false}
             >
-              {/* Aviso caso aparelho não tenha biometria cadastrada */}
               {bioAvail && !bioAvail.isEnrolled && (
                 <View style={styles.warningBox}>
                   <Feather name="alert-triangle" size={18} color="#f59e0b" />
@@ -140,7 +136,6 @@ export function SecuritySettingsModal({ visible, onClose }) {
                 </View>
               )}
 
-              {/* Opção 1: Entrar com Biometria */}
               <View
                 style={[
                   styles.settingCard,
@@ -174,7 +169,6 @@ export function SecuritySettingsModal({ visible, onClose }) {
                 />
               </View>
 
-              {/* Opção 2: Biometria nas Publicações */}
               <View
                 style={[
                   styles.settingCard,
@@ -208,7 +202,6 @@ export function SecuritySettingsModal({ visible, onClose }) {
                 />
               </View>
 
-              {/* Opção 3: Proteger Grupos com Biometria */}
               <View
                 style={[
                   styles.settingCard,

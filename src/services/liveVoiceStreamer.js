@@ -34,7 +34,6 @@ class LiveVoiceStreamer {
     this.nextRecorder = null;
     this.sequence = 0;
 
-    // Playback Queue (Jitter Buffer)
     this.playbackQueue = [];
     this.isPlayingQueue = false;
     this.currentSound = null;
@@ -107,18 +106,15 @@ class LiveVoiceStreamer {
           playThroughEarpieceAndroid: false
         });
 
-        // Ping-pong recording to eliminate any gap between chunks
         const createAndPrepare = async () => {
           const rec = new Audio.Recording();
           await rec.prepareToRecordAsync(RECORDING_OPTIONS_HQ);
           return rec;
         };
 
-        // Start first recorder
         this.activeRecorder = await createAndPrepare();
         await this.activeRecorder.startAsync();
 
-        // Pre-prepare next recorder in background
         createAndPrepare()
           .then((next) => {
             if (this.isStreaming) {
@@ -133,19 +129,16 @@ class LiveVoiceStreamer {
           if (!this.isStreaming) return;
 
           try {
-            // 1. Ensure next recorder is ready before switching
             let next = this.nextRecorder;
             if (!next) {
               next = await createAndPrepare();
             }
 
-            // 2. Start next recorder IMMEDIATELY (0ms gap!)
             await next.startAsync();
             const prevRecorder = this.activeRecorder;
             this.activeRecorder = next;
             this.nextRecorder = null;
 
-            // 3. Immediately prepare the next recorder in background for the next cycle
             createAndPrepare()
               .then((readyRec) => {
                 if (this.isStreaming) {
@@ -156,7 +149,6 @@ class LiveVoiceStreamer {
               })
               .catch(() => {});
 
-            // 4. Stop and extract audio from the finished recorder
             if (prevRecorder) {
               (async () => {
                 try {
@@ -240,7 +232,6 @@ class LiveVoiceStreamer {
     console.log("[LIVE VOICE STREAMER] Transmissão de microfone encerrada com sucesso.");
   }
 
-  // Jitter-Buffered Sequential Playback Queue
   async playChunk(payload, currentUserId) {
     if (!payload?.audioBase64) return;
 
@@ -252,7 +243,6 @@ class LiveVoiceStreamer {
       ? payload.audioBase64
       : "data:" + (payload.mimeType || "audio/m4a") + ";base64," + payload.audioBase64;
 
-    // Add to queue
     this.playbackQueue.push({
       uri: soundUri,
       mimeType: payload.mimeType,
@@ -260,7 +250,6 @@ class LiveVoiceStreamer {
       timestamp: payload.timestamp || Date.now()
     });
 
-    // If queue gets too long (> 4 chunks backlog), drop older chunks to stay real-time
     if (this.playbackQueue.length > 4) {
       this.playbackQueue = this.playbackQueue.slice(-3);
     }
@@ -286,10 +275,9 @@ class LiveVoiceStreamer {
             audioEl.onended = resolve;
             audioEl.onerror = resolve;
             audioEl.play().catch(resolve);
-            setTimeout(resolve, 3000); // Safety fallback
+            setTimeout(resolve, 3000);
           });
         } else {
-          // Write chunk to unique temp file to ensure fast native hardware decoding
           const tempPath = `${FileSystem.cacheDirectory}live_voice_${Date.now()}_${Math.random().toString(36).substring(7)}.m4a`;
           let playUri = item.uri;
 
@@ -318,7 +306,6 @@ class LiveVoiceStreamer {
               })
               .catch(resolve);
 
-            // Safety timeout: max 2.5s per chunk
             setTimeout(resolve, 2500);
           });
 

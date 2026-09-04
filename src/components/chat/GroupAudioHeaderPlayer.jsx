@@ -52,7 +52,6 @@ export function GroupAudioHeaderPlayer({
     };
   }, [isPlaying]);
 
-  // Se nenhuma música estiver tocando
   if (!currentTrack) {
     if (isGold) {
       return (
@@ -96,20 +95,17 @@ export function GroupAudioHeaderPlayer({
 
   return (
     <View style={styles.container}>
-      {/* Barra de Progresso Superior Dourada */}
       <View style={styles.progressBarTrack}>
         <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
       </View>
 
       <View style={styles.content}>
-        {/* Disco de Vinil Animado */}
         <TouchableOpacity activeOpacity={0.8} onPress={onOpenQueue} style={styles.discWrapper}>
           <Animated.View style={[styles.disc, { transform: [{ rotate: spin }] }]}>
             <Ionicons name="disc" size={40} color="#FFB800" />
           </Animated.View>
         </TouchableOpacity>
 
-        {/* Informações da Música */}
         <TouchableOpacity activeOpacity={0.8} onPress={onOpenQueue} style={styles.infoWrapper}>
           <View style={styles.liveBadgeRow}>
             <View style={styles.pulseDot} />
@@ -136,7 +132,6 @@ export function GroupAudioHeaderPlayer({
           </View>
         </TouchableOpacity>
 
-        {/* Ações e Controles */}
         <View style={styles.actionsRow}>
           {isGold ? (
             <>
@@ -174,7 +169,6 @@ export function GroupAudioHeaderPlayer({
             </TouchableOpacity>
           )}
 
-          {/* Botão de Fila */}
           <TouchableOpacity
             onPress={onOpenQueue}
             style={styles.queueButton}

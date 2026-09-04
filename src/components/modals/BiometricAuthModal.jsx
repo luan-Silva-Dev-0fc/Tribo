@@ -24,7 +24,6 @@ export function BiometricAuthModal({
   const [errorMsg, setErrorMsg] = useState(null);
   const [authenticating, setAuthenticating] = useState(false);
 
-  // Animação de pulso do ícone biométrico
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -32,7 +31,6 @@ export function BiometricAuthModal({
 
     setErrorMsg(null);
 
-    // Inicia a animação pulsante
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
@@ -98,7 +96,6 @@ export function BiometricAuthModal({
             }
           ]}
         >
-          {/* Ícone de Escudo / Digital com Pulso */}
           <View style={styles.iconContainer}>
             <Animated.View
               style={[
@@ -127,11 +124,9 @@ export function BiometricAuthModal({
             </View>
           </View>
 
-          {/* Título & Mensagem */}
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
           <Text style={[styles.reason, { color: colors.muted }]}>{reason}</Text>
 
-          {/* Mensagem de Erro se houver */}
           {Boolean(errorMsg) && (
             <View style={styles.errorBox}>
               <Feather name="alert-circle" size={14} color="#ef4444" />
@@ -139,7 +134,6 @@ export function BiometricAuthModal({
             </View>
           )}
 
-          {/* Botão de Tentar Novamente / Autenticar */}
           <Pressable
             onPress={handleTriggerAuth}
             disabled={authenticating}
@@ -157,7 +151,6 @@ export function BiometricAuthModal({
             </Text>
           </Pressable>
 
-          {/* Botão de Cancelar (se permitido) */}
           {cancellable && (
             <Pressable
               onPress={onCancel}

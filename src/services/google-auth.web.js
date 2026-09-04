@@ -5,12 +5,7 @@ export function configureGoogleSignIn() {
 
 }
 
-
-
-
-export async function signOutGoogle() {
-  // O login Google web nao e oferecido neste aplicativo.
-}
+export async function signOutGoogle() {}
 
 export async function handleGoogleLogin({ onAuthenticated, onNewUser } = {}) {
   throw new Error(

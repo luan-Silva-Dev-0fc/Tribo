@@ -70,13 +70,18 @@ export function StoriesBar({ user, onStoryChange }) {
       const others = [];
 
       groupsMap.forEach((group, id) => {
+        const hasUnseen = group.stories.some(
+          (s) => !s.is_seen && !s.isSeen && !s.viewed && !s.has_viewed
+        );
+        const updatedGroup = { ...group, hasUnseen };
+
         if (id === currentUid) {
           own = {
-            ...group,
+            ...updatedGroup,
             user: user || group.user
           };
         } else {
-          others.push(group);
+          others.push(updatedGroup);
         }
       });
 
@@ -102,6 +107,45 @@ export function StoriesBar({ user, onStoryChange }) {
     loadStories();
     onStoryChange?.();
   };
+
+  const handleStoryViewed = useCallback((storyId, uId) => {
+    if (!storyId) return;
+    const strStoryId = String(storyId);
+    const strUId = String(uId || "");
+
+    setUserGroups((prev) =>
+      prev.map((group) => {
+        if (!strUId || String(group.userId) === strUId) {
+          const updatedStories = group.stories.map((s) =>
+            String(s.id) === strStoryId
+              ? { ...s, is_seen: true, isSeen: true, viewed: true, has_viewed: true }
+              : s
+          );
+          const hasUnseen = updatedStories.some(
+            (s) => !s.is_seen && !s.isSeen && !s.viewed && !s.has_viewed
+          );
+          return { ...group, stories: updatedStories, hasUnseen };
+        }
+        return group;
+      })
+    );
+
+    setMyGroup((prev) => {
+      if (!prev) return null;
+      if (!strUId || String(prev.userId) === strUId) {
+        const updatedStories = prev.stories.map((s) =>
+          String(s.id) === strStoryId
+            ? { ...s, is_seen: true, isSeen: true, viewed: true, has_viewed: true }
+            : s
+        );
+        const hasUnseen = updatedStories.some(
+          (s) => !s.is_seen && !s.isSeen && !s.viewed && !s.has_viewed
+        );
+        return { ...prev, stories: updatedStories, hasUnseen };
+      }
+      return prev;
+    });
+  }, []);
 
   const hasMyStory = Boolean(myGroup && myGroup.stories && myGroup.stories.length > 0);
   const allGroupsForViewer = myGroup ? [myGroup, ...userGroups] : userGroups;
@@ -131,8 +175,12 @@ export function StoriesBar({ user, onStoryChange }) {
                 style={[
                 styles.storyRing,
                 {
-                  borderColor: hasMyStory ? colors.accent : colors.line,
-                  borderWidth: hasMyStory ? 2.5 : 1
+                  borderColor: hasMyStory
+                    ? myGroup?.hasUnseen
+                      ? "#3b82f6"
+                      : "rgba(255, 255, 255, 0.15)"
+                    : colors.line,
+                  borderWidth: hasMyStory ? (myGroup?.hasUnseen ? 2.5 : 1.5) : 1
                 }]
                 }>
                 
@@ -186,7 +234,9 @@ export function StoriesBar({ user, onStoryChange }) {
                 style={[
                 styles.storyRing,
                 {
-                  borderColor: group.hasUnseen ? colors.accent : colors.line,
+                  borderColor: group.hasUnseen
+                    ? "#3b82f6"
+                    : "rgba(255, 255, 255, 0.15)",
                   borderWidth: group.hasUnseen ? 2.5 : 1.5
                 }]
                 }>
@@ -227,7 +277,8 @@ export function StoriesBar({ user, onStoryChange }) {
           setViewerVisible(false);
           setSelectedGroup(null);
         }}
-        onStoryDeleted={handleStoryDeleted} />
+        onStoryDeleted={handleStoryDeleted}
+        onStoryViewed={handleStoryViewed} />
       
     </View>);
 

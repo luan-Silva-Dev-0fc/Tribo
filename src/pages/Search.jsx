@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -151,6 +151,54 @@ function SearchUserOptionsModal({ user, visible, onClose, onBlock, onReport }) {
 
 }
 
+const SearchPersonRow = React.memo(function SearchPersonRow({
+  item,
+  colors,
+  styles,
+  onOpenProfile,
+  onOptionsUser
+}) {
+  return (
+    <View
+      style={[
+        styles.personRow,
+        { backgroundColor: colors.surface || colors.card, borderColor: colors.border }
+      ]}
+    >
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Abrir perfil de ${userName(item)}`}
+        onPress={() => onOpenProfile(item)}
+        style={styles.personTrigger}
+      >
+        <Avatar user={item} />
+        <View style={styles.flex}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text selectable style={[styles.personName, { color: colors.text }]}>
+              {userName(item)}
+            </Text>
+            <VerificationBadge user={item} size={14} />
+          </View>
+          <Text selectable style={[styles.personHandle, { color: colors.subtext }]}>
+            @{item.username || "tribo"}
+          </Text>
+          {!!item.bio && (
+            <Text numberOfLines={1} style={[styles.personBio, { color: colors.subtext }]}>
+              {item.bio}
+            </Text>
+          )}
+        </View>
+      </Pressable>
+      <IconButton
+        name="more-horizontal"
+        small
+        label="Ações do perfil"
+        onPress={() => onOptionsUser(item)}
+      />
+    </View>
+  );
+});
+
 export function SearchScreen({ onOpenProfile, user }) {
   const { colors } = useTheme();
   const [alertConfig, setAlertConfig] = useState({ visible: false });
@@ -191,30 +239,30 @@ export function SearchScreen({ onOpenProfile, user }) {
 
   const currentUserId = user?.id || user?.sub;
 
-  const filtered = items.filter((item) => {
+  const filtered = useMemo(() => {
+    return items.filter((item) => {
+      if (currentUserId && String(item.id) === String(currentUserId)) return false;
 
-    if (currentUserId && String(item.id) === String(currentUserId)) return false;
+      const handle = String(item?.username || "").toLowerCase();
+      const name = String(userName(item) || "").toLowerCase();
+      if (
+        handle.startsWith("user_a_") ||
+        handle.startsWith("user_b_") ||
+        handle.startsWith("tester_") ||
+        name.startsWith("user a ") ||
+        name.startsWith("user b ") ||
+        name.startsWith("tester ")
+      ) {
+        return false;
+      }
 
-
-    const handle = String(item?.username || "").toLowerCase();
-    const name = String(userName(item) || "").toLowerCase();
-    if (
-    handle.startsWith("user_a_") ||
-    handle.startsWith("user_b_") ||
-    handle.startsWith("tester_") ||
-    name.startsWith("user a ") ||
-    name.startsWith("user b ") ||
-    name.startsWith("tester "))
-    {
-      return false;
-    }
-
-    if (!query.trim()) return true;
-    return [userName(item), item.username].
-    join(" ").
-    toLowerCase().
-    includes(query.toLowerCase());
-  });
+      if (!query.trim()) return true;
+      return [userName(item), item.username]
+        .join(" ")
+        .toLowerCase()
+        .includes(query.toLowerCase());
+    });
+  }, [items, query, currentUserId]);
 
   const block = (user) => {
     const handle = user?.username || userName(user);
@@ -288,6 +336,19 @@ export function SearchScreen({ onOpenProfile, user }) {
 
   };
 
+  const renderItem = useCallback(
+    ({ item }) => (
+      <SearchPersonRow
+        item={item}
+        colors={colors}
+        styles={styles}
+        onOpenProfile={onOpenProfile}
+        onOptionsUser={setOptionsUser}
+      />
+    ),
+    [colors, onOpenProfile]
+  );
+
   return (
     <AppLayout
       tagText="★ Tribo"
@@ -317,45 +378,11 @@ export function SearchScreen({ onOpenProfile, user }) {
         refreshing={loading}
         onRefresh={load}
         ListHeaderComponent={renderTrends}
-        renderItem={({ item }) =>
-        <View
-          style={[
-          styles.personRow,
-          { backgroundColor: colors.surface || colors.card, borderColor: colors.border }]
-          }>
-          
-            <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Abrir perfil de ${userName(item)}`}
-            onPress={() => onOpenProfile(item)}
-            style={styles.personTrigger}>
-            
-              <Avatar user={item} />
-              <View style={styles.flex}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text selectable style={[styles.personName, { color: colors.text }]}>
-                    {userName(item)}
-                  </Text>
-                  <VerificationBadge user={item} size={14} />
-                </View>
-                <Text selectable style={[styles.personHandle, { color: colors.subtext }]}>
-                  @{item.username || "tribo"}
-                </Text>
-                {!!item.bio &&
-              <Text numberOfLines={1} style={[styles.personBio, { color: colors.subtext }]}>
-                    {item.bio}
-                  </Text>
-              }
-              </View>
-            </Pressable>
-            <IconButton
-            name="more-horizontal"
-            small
-            label="Ações do perfil"
-            onPress={() => setOptionsUser(item)} />
-          
-          </View>
-        }
+        renderItem={renderItem}
+        removeClippedSubviews={Platform.OS === "android"}
+        initialNumToRender={12}
+        maxToRenderPerBatch={10}
+        windowSize={7}
         ListEmptyComponent={
         !loading &&
         <EmptyState icon="search">Nenhum usuário encontrado.</EmptyState>
@@ -377,11 +404,6 @@ export function SearchScreen({ onOpenProfile, user }) {
         targetName={reportModal.targetName}
         onClose={() => setReportModal((prev) => ({ ...prev, visible: false }))}
         onSuccess={handleReportSuccess} />
-      
-      <SecuritySettingsModal
-          visible={securityModalVisible}
-          onClose={() => setSecurityModalVisible(false)}
-        />
 
         <TriboAlertModal
         visible={alertConfig.visible}

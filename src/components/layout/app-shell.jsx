@@ -14,7 +14,7 @@ import { api } from "../../api";
 import { listFrom } from "../../lib/format";
 import { FollowRequestsModal } from "../modals/follow-requests-modal";
 
-export function AppShell({
+export const AppShell = React.memo(function AppShell({
   children,
   active,
   onNavigate,
@@ -55,7 +55,6 @@ export function AppShell({
 
   return (
     <View style={styles.root}>
-      {/* Header Superior */}
       <View
         style={[
           styles.header,
@@ -95,12 +94,10 @@ export function AppShell({
         </View>
       </View>
 
-      {/* Conteúdo Principal */}
       <View style={styles.content}>
         {children}
       </View>
 
-      {/* Bottom Navigation Bar */}
       <View style={styles.footerContainer}>
         <View
           style={[
@@ -110,7 +107,6 @@ export function AppShell({
             }
           ]}
         >
-          {/* Feed Tab */}
           <Pressable
             onPress={() => onNavigate("feed")}
             style={styles.tab}
@@ -140,7 +136,6 @@ export function AppShell({
             }}
           </Pressable>
 
-          {/* Reels Tab */}
           <Pressable
             onPress={() => onNavigate("reels")}
             style={styles.tab}
@@ -170,7 +165,6 @@ export function AppShell({
             }}
           </Pressable>
 
-          {/* Busca Tab */}
           <Pressable
             onPress={() => onNavigate("search")}
             style={styles.tab}
@@ -200,7 +194,6 @@ export function AppShell({
             }}
           </Pressable>
 
-          {/* Perfil Tab */}
           <Pressable
             onPress={() => onNavigate("profile")}
             style={styles.tab}
@@ -242,7 +235,7 @@ export function AppShell({
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   root: {

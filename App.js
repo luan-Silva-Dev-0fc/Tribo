@@ -54,10 +54,8 @@ function App() {
     if (hasCodePush && Platform.OS !== 'web') {
       const syncWithRevopush = () => {
         try {
-          // Notifica que o bundle atual inicializou com sucesso (evita rollback acidental)
           codePush.notifyAppReady();
 
-          // Se o app acabou de inicializar com um novo bundle CodePush aplicado, dispara a notificação
           codePush.getUpdateMetadata(codePush.UpdateState?.RUNNING ?? 0)
             .then(async (metadata) => {
               if (metadata?.isFirstRun) {
@@ -71,7 +69,6 @@ function App() {
             })
             .catch(() => {});
 
-          // Faz a sincronização imediata
           codePush.sync(
             {
               deploymentKey: CODE_PUSH_KEY,

@@ -292,6 +292,35 @@ export function ReelsScreen({ user }) {
     itemVisiblePercentThreshold: 70
   }).current;
 
+  const renderItem = useCallback(
+    ({ item, index }) => {
+      const isActive = index === activeVideoIndex;
+      const shouldPreload = Math.abs(index - activeVideoIndex) === 1;
+      return (
+        <ReelItem
+          item={item}
+          isActive={isActive}
+          shouldPreload={shouldPreload}
+          onToggleLike={handleToggleLike}
+          onToggleSave={handleToggleSave}
+          onMoreLikeThis={handleMoreLikeThis}
+          onNotInterested={handleNotInterested}
+          onOpenPreferences={() => setOnboardingVisible(true)}
+          onOpenShare={handleOpenShare}
+          containerHeight={SCREEN_HEIGHT}
+        />
+      );
+    },
+    [
+      activeVideoIndex,
+      handleToggleLike,
+      handleToggleSave,
+      handleMoreLikeThis,
+      handleNotInterested,
+      handleOpenShare
+    ]
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.topHeader}>
@@ -384,24 +413,7 @@ export function ReelsScreen({ user }) {
           ref={flatListRef}
           data={displayedReels}
           keyExtractor={(item, index) => item._id || item.id || `${item.videoId}-${index}`}
-          renderItem={({ item, index }) => {
-            const isActive = index === activeVideoIndex;
-            const shouldPreload = Math.abs(index - activeVideoIndex) === 1;
-            return (
-              <ReelItem
-                item={item}
-                isActive={isActive}
-                shouldPreload={shouldPreload}
-                onToggleLike={handleToggleLike}
-                onToggleSave={handleToggleSave}
-                onMoreLikeThis={handleMoreLikeThis}
-                onNotInterested={handleNotInterested}
-                onOpenPreferences={() => setOnboardingVisible(true)}
-                onOpenShare={handleOpenShare}
-                containerHeight={SCREEN_HEIGHT}
-              />
-            );
-          }}
+          renderItem={renderItem}
           pagingEnabled
           snapToInterval={SCREEN_HEIGHT}
           snapToAlignment="start"

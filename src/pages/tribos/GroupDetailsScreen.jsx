@@ -266,7 +266,6 @@ export function GroupDetailsScreen({
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      {/* Cabeçalho Superior */}
       <View
         style={{
           flexDirection: "row",
@@ -349,7 +348,6 @@ export function GroupDetailsScreen({
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          {/* Botão de Música e Fila da Tribo */}
           <Pressable
             onPress={() => setQueueVisible(true)}
             style={{
@@ -398,7 +396,6 @@ export function GroupDetailsScreen({
         </View>
       </View>
 
-      {/* Mini-Player de Áudio Sincronizado */}
       <GroupAudioHeaderPlayer
         currentTrack={audioState.current_track}
         isPlaying={audioState.is_playing}
@@ -413,7 +410,6 @@ export function GroupDetailsScreen({
         onOpenQueue={() => setQueueVisible(true)}
       />
 
-      {/* Barra de Abas (Chat, Feed, Trends) */}
       {(enableTriboFeed || enableTriboTrends) && (
         <View
           style={{
@@ -477,7 +473,6 @@ export function GroupDetailsScreen({
         </View>
       )}
 
-      {/* Conteúdo da Aba */}
       <View style={styles.content}>
         {activeTab === "feed" && enableTriboFeed && (
           <GroupFeedTab
@@ -518,7 +513,6 @@ export function GroupDetailsScreen({
         )}
       </View>
 
-      {/* Menu de Opções do Grupo */}
       <Modal
         visible={groupMenuVisible}
         transparent
@@ -631,7 +625,6 @@ export function GroupDetailsScreen({
         </Pressable>
       </Modal>
 
-      {/* Confirmação de Limpeza de Conversa */}
       <TriboAlertModal
         visible={clearChatConfirmVisible}
         type="danger"
@@ -643,7 +636,6 @@ export function GroupDetailsScreen({
         onClose={handleClearChatConfirmed}
       />
 
-      {/* Alertas Customizados */}
       <TriboAlertModal
         visible={customAlert.visible}
         type={customAlert.type}
@@ -661,7 +653,6 @@ export function GroupDetailsScreen({
         }}
       />
 
-      {/* Modal de Visualização / Edição da Foto do Grupo */}
       <Modal
         visible={avatarModalVisible}
         transparent
@@ -750,7 +741,6 @@ export function GroupDetailsScreen({
         </Pressable>
       </Modal>
 
-      {/* BottomSheet da Fila Compartilhada */}
       <GroupAudioQueueBottomSheet
         visible={queueVisible}
         onClose={() => setQueueVisible(false)}
@@ -769,7 +759,6 @@ export function GroupDetailsScreen({
         }}
       />
 
-      {/* Modal Seletor de Músicas da Galeria */}
       <SelectTrackModal
         visible={selectTrackVisible}
         onClose={() => setSelectTrackVisible(false)}
@@ -779,7 +768,6 @@ export function GroupDetailsScreen({
         }}
       />
 
-      {/* Toast Notifier */}
       {Boolean(toastMessage) && (
         <View style={styles.toastContainer}>
           <Ionicons name="checkmark-circle" size={20} color="#22c55e" />

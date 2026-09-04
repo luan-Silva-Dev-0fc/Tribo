@@ -5,7 +5,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PUSH_TOKEN_KEY = "@tribo_push_token";
 
-
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
@@ -14,9 +13,6 @@ Notifications.setNotificationHandler({
     shouldShowList: true
   })
 });
-
-
-
 
 export async function setupNotificationChannels() {
   if (Platform.OS === "android") {
@@ -42,9 +38,6 @@ export async function setupNotificationChannels() {
     }
   }
 }
-
-
-
 
 export async function registerForPushNotificationsAsync(apiClient) {
   if (Platform.OS === "web") return null;
@@ -88,10 +81,8 @@ export async function registerForPushNotificationsAsync(apiClient) {
 
     const tokenStr = typeof token === "string" ? token : JSON.stringify(token);
 
-
     await AsyncStorage.setItem(PUSH_TOKEN_KEY, tokenStr);
 
-    // Só envia para o backend se houver sessão autenticada com token
     try {
       const { session } = require("../api");
       if (!session?.token) {
@@ -114,7 +105,6 @@ export async function registerForPushNotificationsAsync(apiClient) {
         apiErr?.message?.includes("Token de autenticação ausente") ||
         apiErr?.status === 401
       ) {
-        // Usuário ainda não logado; o token já está salvo localmente para sincronização futura
         return tokenStr;
       }
       console.warn("[PushNotifications] Erro ao sincronizar token com o backend:", apiErr?.message);
@@ -131,9 +121,6 @@ export async function registerForPushNotificationsAsync(apiClient) {
     return null;
   }
 }
-
-
-
 
 export async function unregisterPushNotificationsAsync(apiClient) {
   try {
@@ -152,9 +139,6 @@ export async function unregisterPushNotificationsAsync(apiClient) {
     console.warn("[PushNotifications] Erro ao remover token:", error);
   }
 }
-
-
-
 
 export async function getCurrentPushToken() {
   try {

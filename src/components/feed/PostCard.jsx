@@ -495,7 +495,7 @@ export function CommentOptionsModal({
 
 }
 
-function InlineVideo({ url, onOpenMedia, post, styles }) {
+function InlineVideo({ url, onOpenMedia, post, styles, isCentered = false }) {
   if (!url) return null;
 
   return (
@@ -509,7 +509,7 @@ function InlineVideo({ url, onOpenMedia, post, styles }) {
       }]
       }>
       
-      <SafePostInlineVideo key={url} url={url} styles={styles} />
+      <SafePostInlineVideo key={url} url={url} styles={styles} isCentered={isCentered} />
       <View style={styles.expandPill}>
         <Feather
           name="maximize-2"
@@ -523,12 +523,27 @@ function InlineVideo({ url, onOpenMedia, post, styles }) {
 
 }
 
-function SafePostInlineVideo({ url, styles }) {
-  const player = useVideoPlayer(url, (p) => {
+function SafePostInlineVideo({ url, styles, isCentered = false }) {
+  const player = useVideoPlayer(url || "", (p) => {
     p.loop = true;
     p.muted = false;
-    p.play();
+    if (isCentered) {
+      p.play();
+    } else {
+      p.pause();
+    }
   });
+
+  useEffect(() => {
+    if (!player) return;
+    try {
+      if (isCentered) {
+        player.play();
+      } else {
+        player.pause();
+      }
+    } catch (_) {}
+  }, [player, isCentered]);
 
   if (!url || !player) {
     return (
@@ -579,7 +594,7 @@ function QuoteVideo({ url, styles }) {
 
 }
 
-export function PostCard({
+export const PostCard = React.memo(function PostCard({
   post,
   onLike,
   onComment,
@@ -901,7 +916,8 @@ export function PostCard({
                   url={item.url}
                   onOpenMedia={onOpenMedia}
                   post={post}
-                  styles={styles} /> :
+                  styles={styles}
+                  isCentered={isCentered} /> :
 
 
                 <Pressable
@@ -1180,7 +1196,7 @@ export function PostCard({
       </View>
     </View>);
 
-}
+});
 
 function Action({ icon, value, onPress, iconColor, textColor }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;

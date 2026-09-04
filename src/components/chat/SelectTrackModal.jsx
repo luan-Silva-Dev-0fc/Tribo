@@ -119,7 +119,6 @@ export function SelectTrackModal({ visible, onClose, onSelectTrack }) {
         <View style={[styles.content, { paddingBottom: bottomPadding }]}>
           <View style={styles.dragHandle} />
 
-          {/* Header */}
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Escolher Música para o Grupo</Text>
@@ -130,7 +129,6 @@ export function SelectTrackModal({ visible, onClose, onSelectTrack }) {
             </TouchableOpacity>
           </View>
 
-          {/* Dica / Instrução Rápida */}
           <View style={styles.tipBox}>
             <MaterialCommunityIcons name="lightbulb-on-outline" size={16} color="#FFB800" />
             <Text style={styles.tipText}>
@@ -138,7 +136,6 @@ export function SelectTrackModal({ visible, onClose, onSelectTrack }) {
             </Text>
           </View>
 
-          {/* Abas */}
           <View style={styles.tabRow}>
             <TouchableOpacity
               style={[styles.tabButton, activeTab === "device" && styles.tabButtonActive]}
@@ -175,7 +172,6 @@ export function SelectTrackModal({ visible, onClose, onSelectTrack }) {
             </TouchableOpacity>
           </View>
 
-          {/* Busca */}
           <View style={styles.searchBar}>
             <Ionicons name="search" size={16} color="#8E8E93" />
             <TextInput
@@ -192,7 +188,6 @@ export function SelectTrackModal({ visible, onClose, onSelectTrack }) {
             )}
           </View>
 
-          {/* Lista: Celular */}
           {activeTab === "device" && (
             loadingDevice || uploading ? (
               <View style={{ alignItems: "center", marginVertical: 35 }}>
@@ -246,7 +241,6 @@ export function SelectTrackModal({ visible, onClose, onSelectTrack }) {
             )
           )}
 
-          {/* Lista: Nuvem */}
           {activeTab === "cloud" && (
             loading ? (
               <ActivityIndicator size="large" color="#FFB800" style={{ marginVertical: 30 }} />

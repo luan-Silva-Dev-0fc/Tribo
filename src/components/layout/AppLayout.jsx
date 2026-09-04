@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from "react";
-import { StyleSheet, Text, View, Platform, Animated } from "react-native";
+import React from "react";
+import { StyleSheet, Text, View, Platform } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
-import { GoldBadgeModal } from "../modals/gold-badge-modal";
 
-export function AppLayout({
+export const AppLayout = React.memo(function AppLayout({
   children,
   tagText = "★ Tribo",
   title,
@@ -15,17 +14,6 @@ export function AppLayout({
   contentStyle
 }) {
   const { colors, mode } = useTheme();
-
-
-  const animValue = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.spring(animValue, {
-      toValue: 1,
-      friction: 4,
-      tension: 20,
-      useNativeDriver: true
-    }).start();
-  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.card }, style]}>
@@ -70,10 +58,9 @@ export function AppLayout({
         {}
         <View style={[styles.content, contentStyle]}>{children}</View>
       </View>
-      <GoldBadgeModal />
     </View>);
 
-}
+});
 
 export default AppLayout;
 

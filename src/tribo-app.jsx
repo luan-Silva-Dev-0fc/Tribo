@@ -45,6 +45,7 @@ import { BiometricAuthModal } from "./components/modals/BiometricAuthModal";
 import { BiometricLockScreen } from "./components/security/BiometricLockScreen";
 import { getSecuritySettings } from "./services/biometricsService";
 import { PublicProfile } from "./components/profile/public-profile";
+import { GoldBadgeModal } from "./components/modals/gold-badge-modal";
 import { ThemeProvider, useTheme } from "./theme";
 import { UserProvider } from "./context/user-context";
 
@@ -129,7 +130,6 @@ function TriboRoot() {
     setActiveGroupId(id);
     navigate("tribe_details");
   }, [navigate]);
-  // Invalida respostas de sessao iniciadas antes de um login/logout.
   const authEpochRef = useRef(0);
   const lastBackPressRef = useRef(0);
 
@@ -197,7 +197,6 @@ function TriboRoot() {
       });
     });
 
-
     const socket = getChatSocket();
     const handleStatusChangedSocket = (payload) => {
       if (payload?.platform_status && payload.platform_status !== "ACTIVE") {
@@ -216,10 +215,8 @@ function TriboRoot() {
       socket.on("platform_status_changed", handleStatusChangedSocket);
     }
 
-
     checkPlatformStatus();
 
-    // Re-check and reconnect when app returns from background / becomes active
     const appStateSub = AppState.addEventListener("change", (nextState) => {
       if (nextState === "active") {
         checkPlatformStatus();
@@ -232,7 +229,6 @@ function TriboRoot() {
       }
     });
 
-    // Gentle fallback check every 60s (WebSocket delivers instant updates)
     const interval = setInterval(checkPlatformStatus, 60000);
 
     return () => {
@@ -457,8 +453,6 @@ function TriboRoot() {
       const authEpoch = authEpochRef.current;
       try {
         const hasToken = await session.restore();
-        // SecureStore e assincrono: se houve logout enquanto ele lia o token,
-        // nunca permita que o valor antigo restaure a conta novamente.
         if (authEpoch !== authEpochRef.current) {
           await session.clear();
           return;
@@ -496,8 +490,6 @@ function TriboRoot() {
   };
 
   const logout = async () => {
-    // Atualiza a interface e invalida imediatamente requisicoes pendentes.
-    // Assim, uma resposta antiga de /me nao pode recolocar o usuario na conta.
     authEpochRef.current += 1;
     setUser(null);
     setScreenStack(["feed"]);
@@ -543,7 +535,6 @@ function TriboRoot() {
         onRetry={checkPlatformStatus}
         onAdminLogin={() => setShowAdminAuth(true)} />);
 
-
   }
 
   if (!user) {
@@ -554,124 +545,144 @@ function TriboRoot() {
           authenticated(current);
         }} />);
 
-
   }
 
   if (showIntro) {
     return <IntroScreen onFinish={() => setShowIntro(false)} />;
   }
 
-  const pages = {
-    feed: <FeedScreen user={user} onOpenProfile={setProfileToOpen} />,
-    reels: <ReelsScreen user={user} />,
-    search: <SearchScreen user={user} onOpenProfile={setProfileToOpen} />,
-    trends: <TrendsScreen />,
-    profile:
-    <ProfileScreen
-      user={user}
-      onRefresh={refreshUser}
-      onLogout={logout}
-      onOpenProfile={setProfileToOpen}
-      onOpenSettings={() => navigate("settings")}
-      onOpenAppearance={() => navigate("appearance")}
-      onOpenSavedPosts={() => navigate("saved_posts")}
-      onOpenArchivedPosts={() => navigate("archived_posts")}
-      onUpdateUser={(next) =>
-      setUser(typeof next === "function" ? next : normalizeUser(next))
-      } />,
-
-    settings:
-    <Settings
-      user={user}
-      onClose={goBack}
-      onLogout={logout}
-      onOpenAppearance={() => navigate("appearance")}
-      onOpenSavedPosts={() => navigate("saved_posts")}
-      onOpenArchivedPosts={() => navigate("archived_posts")}
-      onUpdateUser={(next) =>
-      setUser(typeof next === "function" ? next : normalizeUser(next))
-      } />,
-
-    appearance: <AppearanceScreen onBack={goBack} />,
-    saved_posts:
-    <SavedPostsScreen
-      user={user}
-      onBack={goBack}
-      onOpenProfile={setProfileToOpen} />,
-
-
-    archived_posts:
-    <ArchivedPostsScreen
-      user={user}
-      onBack={goBack}
-      onOpenProfile={setProfileToOpen} />,
-
-
-    tribes_list:
-    <TribosListScreen
-      onBack={goBack}
-      onCreateTribe={() => navigate("tribe_create")}
-      onOpenTribe={handleOpenTribeSecurely} />,
-
-
-    tribe_create:
-    <CreateTribeScreen
-      user={user}
-      onBack={goBack}
-      onCreated={(id) => {
-        setActiveGroupId(id);
-        navigate("tribe_details");
-      }} />,
-
-
-    tribe_details:
-    <GroupDetailsScreen
-      groupId={activeGroupId}
-      user={user}
-      onBack={goBack}
-      onSettings={(grp) => {
-        setActiveGroupObject(grp);
-        navigate("tribe_settings");
-      }}
-      onInvite={() => navigate("tribe_invite")}
-      onOpenProfile={setProfileToOpen} />,
-
-
-    tribe_settings:
-    <GroupSettingsScreen
-      group={activeGroupObject}
-      user={user}
-      onBack={goBack}
-      onInvite={() => navigate("tribe_invite")}
-      onGroupDeleted={() => navigate("tribes_list")}
-      onLeft={() => navigate("tribes_list")} />,
-
-
-    tribe_invite:
-    <InviteMembersScreen
-      groupId={activeGroupId}
-      user={user}
-      onBack={goBack} />,
-
-
-    conversations:
-    <ConversationsListScreen
-      user={user}
-      onBack={goBack}
-      onOpenChat={handleOpenChat}
-      onOpenProfile={setProfileToOpen} />,
-
-
-    chat:
-    <DirectChatScreen
-      targetUser={chatToOpen}
-      currentUser={user}
-      onBack={goBack}
-      onOpenProfile={setProfileToOpen} />
-
-
+  const renderScreen = (screenName) => {
+    switch (screenName) {
+      case "feed":
+        return <FeedScreen user={user} onOpenProfile={setProfileToOpen} />;
+      case "reels":
+        return <ReelsScreen user={user} />;
+      case "search":
+        return <SearchScreen user={user} onOpenProfile={setProfileToOpen} />;
+      case "trends":
+        return <TrendsScreen />;
+      case "profile":
+        return (
+          <ProfileScreen
+            user={user}
+            onRefresh={refreshUser}
+            onLogout={logout}
+            onOpenProfile={setProfileToOpen}
+            onOpenSettings={() => navigate("settings")}
+            onOpenAppearance={() => navigate("appearance")}
+            onOpenSavedPosts={() => navigate("saved_posts")}
+            onOpenArchivedPosts={() => navigate("archived_posts")}
+            onUpdateUser={(next) =>
+              setUser(typeof next === "function" ? next : normalizeUser(next))
+            }
+          />
+        );
+      case "settings":
+        return (
+          <Settings
+            user={user}
+            onClose={goBack}
+            onLogout={logout}
+            onOpenAppearance={() => navigate("appearance")}
+            onOpenSavedPosts={() => navigate("saved_posts")}
+            onOpenArchivedPosts={() => navigate("archived_posts")}
+            onUpdateUser={(next) =>
+              setUser(typeof next === "function" ? next : normalizeUser(next))
+            }
+          />
+        );
+      case "appearance":
+        return <AppearanceScreen onBack={goBack} />;
+      case "saved_posts":
+        return (
+          <SavedPostsScreen
+            user={user}
+            onBack={goBack}
+            onOpenProfile={setProfileToOpen}
+          />
+        );
+      case "archived_posts":
+        return (
+          <ArchivedPostsScreen
+            user={user}
+            onBack={goBack}
+            onOpenProfile={setProfileToOpen}
+          />
+        );
+      case "tribes_list":
+        return (
+          <TribosListScreen
+            onBack={goBack}
+            onCreateTribe={() => navigate("tribe_create")}
+            onOpenTribe={handleOpenTribeSecurely}
+          />
+        );
+      case "tribe_create":
+        return (
+          <CreateTribeScreen
+            user={user}
+            onBack={goBack}
+            onCreated={(id) => {
+              setActiveGroupId(id);
+              navigate("tribe_details");
+            }}
+          />
+        );
+      case "tribe_details":
+        return (
+          <GroupDetailsScreen
+            groupId={activeGroupId}
+            user={user}
+            onBack={goBack}
+            onSettings={(grp) => {
+              setActiveGroupObject(grp);
+              navigate("tribe_settings");
+            }}
+            onInvite={() => navigate("tribe_invite")}
+            onOpenProfile={setProfileToOpen}
+          />
+        );
+      case "tribe_settings":
+        return (
+          <GroupSettingsScreen
+            group={activeGroupObject}
+            user={user}
+            onBack={goBack}
+            onInvite={() => navigate("tribe_invite")}
+            onGroupDeleted={() => navigate("tribes_list")}
+            onLeft={() => navigate("tribes_list")}
+          />
+        );
+      case "tribe_invite":
+        return (
+          <InviteMembersScreen
+            groupId={activeGroupId}
+            user={user}
+            onBack={goBack}
+          />
+        );
+      case "conversations":
+        return (
+          <ConversationsListScreen
+            user={user}
+            onBack={goBack}
+            onOpenChat={handleOpenChat}
+            onOpenProfile={setProfileToOpen}
+          />
+        );
+      case "chat":
+        return (
+          <DirectChatScreen
+            targetUser={chatToOpen}
+            currentUser={user}
+            onBack={goBack}
+            onOpenProfile={setProfileToOpen}
+          />
+        );
+      default:
+        return <FeedScreen user={user} onOpenProfile={setProfileToOpen} />;
+    }
   };
-
 
   if (
   [
@@ -716,7 +727,7 @@ function TriboRoot() {
             </View>
           }
 
-          {pages[screen]}
+          {renderScreen(screen)}
           <PublicProfile
             user={profileToOpen}
             currentUserId={user.id}
@@ -735,7 +746,6 @@ function TriboRoot() {
             reason={platformSuspended?.reason}
             onRetry={checkPlatformStatus} />
 
-          {/* Bloqueio de Inicialização do App com Biometria Moderna */}
           {appLockEnabled && !isAppUnlocked && (
             <BiometricLockScreen
               visible={appLockEnabled && !isAppUnlocked}
@@ -744,7 +754,6 @@ function TriboRoot() {
             />
           )}
 
-          {/* Prompt de Biometria para Ações Protegidas (ex: abrir tribos/grupos) */}
           {biometricPrompt.visible && (
             <BiometricAuthModal
               visible={biometricPrompt.visible}
@@ -755,6 +764,8 @@ function TriboRoot() {
               onCancel={biometricPrompt.onCancel}
             />
           )}
+
+          <GoldBadgeModal user={user} />
           
         </SafeAreaView>
       </UserProvider>);
@@ -804,7 +815,7 @@ function TriboRoot() {
             onOpenMessages={() => navigate("conversations")}
             onOpenProfile={setProfileToOpen}>
             
-            {pages[screen]}
+            {renderScreen(screen)}
           </AppShell>
           
           <PublicProfile
@@ -830,7 +841,6 @@ function TriboRoot() {
             reason={platformSuspended?.reason}
             onRetry={checkPlatformStatus} />
           
-          {/* Bloqueio de Inicialização do App com Biometria Moderna */}
           {appLockEnabled && !isAppUnlocked && (
             <BiometricLockScreen
               visible={appLockEnabled && !isAppUnlocked}
@@ -839,7 +849,6 @@ function TriboRoot() {
             />
           )}
 
-          {/* Prompt de Biometria para Ações Protegidas (ex: abrir tribos/grupos) */}
           {biometricPrompt.visible && (
             <BiometricAuthModal
               visible={biometricPrompt.visible}
@@ -850,6 +859,8 @@ function TriboRoot() {
               onCancel={biometricPrompt.onCancel}
             />
           )}
+
+          <GoldBadgeModal user={user} />
         </View>
       </View>
     </UserProvider>);

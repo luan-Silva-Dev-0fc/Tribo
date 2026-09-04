@@ -7,9 +7,6 @@ export const SECURITY_KEYS = {
   GROUP_LOCK: "tribo.security.group_lock"
 };
 
-/**
- * Verifica se o dispositivo possui hardware biométrico e se há biometria cadastrada.
- */
 export async function checkBiometricAvailability() {
   try {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
@@ -35,9 +32,6 @@ export async function checkBiometricAvailability() {
   }
 }
 
-/**
- * Retorna as configurações de segurança atuais do usuário.
- */
 export async function getSecuritySettings() {
   try {
     const [appLock, postLock, groupLock] = await Promise.all([
@@ -61,9 +55,6 @@ export async function getSecuritySettings() {
   }
 }
 
-/**
- * Salva uma configuração de segurança específica.
- */
 export async function setSecuritySetting(key, enabled) {
   try {
     await AsyncStorage.setItem(key, enabled ? "true" : "false");
@@ -74,9 +65,6 @@ export async function setSecuritySetting(key, enabled) {
   }
 }
 
-/**
- * Executa o prompt nativo de autenticação biométrica do aparelho.
- */
 export async function authenticateWithBiometrics(reason = "Confirme sua identidade para continuar") {
   try {
     const isAvail = await LocalAuthentication.hasHardwareAsync();

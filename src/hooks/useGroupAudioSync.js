@@ -2,7 +2,6 @@
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { getChatSocket } from "../services/chatSocket";
 
-// SINGLETON GLOBAL DE ÁUDIO
 let globalSound = null;
 let globalTrackUrl = null;
 let globalOpId = 0;
@@ -10,12 +9,10 @@ let globalIsLoading = false;
 let globalLoadedAt = 0;
 let isAudioDucked = false;
 
-// Função exportada para atenuar o volume da música quando tocar/gravar mensagens de voz
 export async function duckGroupAudio(duck = true) {
   isAudioDucked = Boolean(duck);
   if (globalSound) {
     try {
-      // Se duck = true, abaixa o volume da música para 15% (ducking)
       await globalSound.setVolumeAsync(isAudioDucked ? 0.15 : 1.0);
     } catch (_) {}
   }
@@ -72,7 +69,6 @@ export function useGroupAudioSync({ groupId, currentUser, onPermissionError }) {
     currentUser?.email?.toLowerCase() === "luansilva@gmail.com"
   );
 
-  // 1. Configuração que permite mixagem de áudio com mensagens de voz (sem conflitos)
   useEffect(() => {
     Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
@@ -85,7 +81,6 @@ export function useGroupAudioSync({ groupId, currentUser, onPermissionError }) {
     }).catch(console.warn);
   }, []);
 
-  // 2. Motor de Sincronização Estável
   const applyAudioState = useCallback(async (state) => {
     if (!state) return;
     setAudioState(state);
@@ -104,7 +99,6 @@ export function useGroupAudioSync({ groupId, currentUser, onPermissionError }) {
     const latency = Math.max(0, (Date.now() - (state.server_time || Date.now())) / 2);
     const targetMs = basePositionMs + (isPlaying ? latency : 0);
 
-    // CASO 1: Mesma música já carregada no player
     if (globalSound && globalTrackUrl === trackUrl && !globalIsLoading) {
       try {
         const status = await globalSound.getStatusAsync();
@@ -128,7 +122,6 @@ export function useGroupAudioSync({ groupId, currentUser, onPermissionError }) {
       return;
     }
 
-    // CASO 2: Nova música a carregar
     if (globalIsLoading && globalTrackUrl === trackUrl) {
       return;
     }
@@ -196,7 +189,6 @@ export function useGroupAudioSync({ groupId, currentUser, onPermissionError }) {
   const applyAudioStateRef = useRef(applyAudioState);
   applyAudioStateRef.current = applyAudioState;
 
-  // 3. Socket Conexão ESTÁVEL
   useEffect(() => {
     const socket = getChatSocket();
     if (!socket || !groupId) return;

@@ -49,7 +49,6 @@ export function GroupAudioQueueBottomSheet({
         <View style={[styles.sheetContainer, { paddingBottom: bottomPadding }]}>
           <View style={styles.dragHandle} />
 
-          {/* Cabeçalho com Instruções */}
           <View style={styles.header}>
             <View>
               <View style={styles.headerTitleRow}>
@@ -65,7 +64,6 @@ export function GroupAudioQueueBottomSheet({
             </TouchableOpacity>
           </View>
 
-          {/* Banner de Permissão / Papel do Usuário */}
           <View style={[styles.permissionBanner, isGold ? styles.goldBannerBg : styles.listenerBannerBg]}>
             <Ionicons
               name={isGold ? "star" : "information-circle-outline"}
@@ -79,7 +77,6 @@ export function GroupAudioQueueBottomSheet({
             </Text>
           </View>
 
-          {/* Card: Tocando Agora */}
           {currentTrack ? (
             <View style={styles.nowPlayingCard}>
               <View style={styles.nowPlayingHeader}>
@@ -99,7 +96,6 @@ export function GroupAudioQueueBottomSheet({
               <Text numberOfLines={1} style={styles.nowPlayingTitle}>{currentTrack.title}</Text>
               <Text numberOfLines={1} style={styles.nowPlayingArtist}>{currentTrack.artist || "Artista Desconhecido"}</Text>
 
-              {/* Barra de Progresso */}
               <View style={styles.progressContainer}>
                 <View style={styles.progressBarBg}>
                   <View style={[styles.progressBarActive, { width: `${progressRatio * 100}%` }]} />
@@ -110,7 +106,6 @@ export function GroupAudioQueueBottomSheet({
                 </View>
               </View>
 
-              {/* Controles de Reprodução */}
               {isGold ? (
                 <View style={styles.controlsRow}>
                   <TouchableOpacity
@@ -145,7 +140,6 @@ export function GroupAudioQueueBottomSheet({
             </View>
           )}
 
-          {/* Seção: A Seguir */}
           <View style={styles.queueHeaderRow}>
             <Text style={styles.queueSectionLabel}>A SEGUIR NA FILA ({queueList.length})</Text>
             {queueList.length > 0 && (
@@ -187,7 +181,6 @@ export function GroupAudioQueueBottomSheet({
             }
           />
 
-          {/* Rodapé com Botão Principal e Instrução */}
           <View style={styles.footer}>
             {isGold ? (
               <TouchableOpacity style={styles.addTrackButton} onPress={onOpenAddModal} activeOpacity={0.85}>

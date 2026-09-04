@@ -26,7 +26,6 @@ export function BiometricLockScreen({
   const [errorMsg, setErrorMsg] = useState(null);
   const [authenticating, setAuthenticating] = useState(false);
 
-  // Animacoes de pulso concentrico
   const pulse1 = useRef(new Animated.Value(0)).current;
   const pulse2 = useRef(new Animated.Value(0)).current;
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -57,7 +56,6 @@ export function BiometricLockScreen({
     );
     anim.start();
 
-    // Disparo automatico rapido do prompt biometrico nativo
     const timer = setTimeout(() => {
       handleTriggerAuth();
     }, 250);
@@ -143,7 +141,6 @@ export function BiometricLockScreen({
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
       <View style={styles.container}>
         
-        {/* Topo: Novo Icone Oficial e Nome Tribo */}
         <View style={styles.header}>
           <Image
             source={triboLogo}
@@ -157,9 +154,7 @@ export function BiometricLockScreen({
           </View>
         </View>
 
-        {/* Centro: Card de Usuario e Sensor */}
         <View style={styles.centerSection}>
-          {/* Saudacao Discreta */}
           {user && (
             <View style={styles.userCard}>
               <Avatar user={user} size={36} />
@@ -171,9 +166,7 @@ export function BiometricLockScreen({
             </View>
           )}
 
-          {/* Sensor Biometrico Pulsante */}
           <Animated.View style={[styles.sensorWrapper, { transform: [{ translateX: shakeAnim }] }]}>
-            {/* Anéis Pulsantes */}
             <Animated.View
               style={[
                 styles.pulseRing,
@@ -195,7 +188,6 @@ export function BiometricLockScreen({
               ]}
             />
 
-            {/* Botao Central Redondo em Preto Puro */}
             <Pressable
               onPress={handleTriggerAuth}
               disabled={authenticating}
@@ -215,7 +207,6 @@ export function BiometricLockScreen({
             </Pressable>
           </Animated.View>
 
-          {/* Mensagem de Erro se houver */}
           {Boolean(errorMsg) && (
             <View style={styles.errorBox}>
               <Feather name="alert-circle" size={15} color="#ef4444" />
@@ -224,7 +215,6 @@ export function BiometricLockScreen({
           )}
         </View>
 
-        {/* Rodapé: Botao de Acao */}
         <View style={styles.footer}>
           <Pressable
             onPress={handleTriggerAuth}

@@ -52,7 +52,6 @@ import {
 "../../lib/format";
 import { useTheme } from "../../theme";
 
-
 function getYouTubeId(url) {
   if (!url || typeof url !== "string") return null;
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -167,7 +166,6 @@ export function Composer({ user, onPublished, onCreate }) {
         type: attachedYoutubeId ? "youtube" : undefined
       };
 
-      // Proteção de publicação por biometria
       const security = await getSecuritySettings();
       if (security.postLock) {
         const auth = await authenticateWithBiometrics(
@@ -325,7 +323,6 @@ export function Composer({ user, onPublished, onCreate }) {
           </ScrollView>
         }
 
-
         {}
         {!!attachedYoutubeId &&
         <View style={{ marginTop: 12, marginBottom: 8, paddingHorizontal: 16 }}>
@@ -476,7 +473,6 @@ export function Composer({ user, onPublished, onCreate }) {
           </Pressable>
         </View>
       </View>
-
 
       {}
       <Modal

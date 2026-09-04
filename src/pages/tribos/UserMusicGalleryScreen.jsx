@@ -149,7 +149,6 @@ export function UserMusicGalleryScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Abas */}
         <View style={styles.tabRow}>
           <TouchableOpacity
             style={[styles.tabButton, activeTab === "cloud" && styles.tabButtonActive]}
@@ -169,7 +168,6 @@ export function UserMusicGalleryScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Lista */}
         {activeTab === "cloud" ? (
           loading ? (
             <ActivityIndicator size="large" color="#FFB800" style={{ marginTop: 50 }} />
