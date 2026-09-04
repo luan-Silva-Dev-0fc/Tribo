@@ -168,13 +168,6 @@ export function StoryViewerModal({
     };
   }, []);
 
-  const effectiveKeyboardOffset =
-    keyboardHeight > 50
-      ? keyboardHeight
-      : isInputFocused
-      ? Math.min(Math.max(SCREEN_HEIGHT * 0.36, 290), 360)
-      : 0;
-
   const progressAnim = useRef(new Animated.Value(0)).current;
 
   const activeGroup = userGroups[currentUserIndex] || initialUserGroup;
@@ -633,14 +626,8 @@ export function StoryViewerModal({
             style={[
               styles.bottomContainer,
               {
-                bottom:
-                  effectiveKeyboardOffset > 0
-                    ? effectiveKeyboardOffset + (Platform.OS === "android" ? 10 : 8)
-                    : 0,
-                paddingBottom:
-                  effectiveKeyboardOffset > 0
-                    ? 8
-                    : Math.max(insets.bottom, 16) + 6
+                bottom: 0,
+                paddingBottom: Platform.OS === "android" ? 8 : Math.max(insets.bottom, 16)
               }
             ]}>
             {!!currentStory.caption && !editingCaption && (
