@@ -128,7 +128,6 @@ export function StoryViewerModal({
   const [shareTab, setShareTab] = useState("followers");
   const [localLikes, setLocalLikes] = useState({});
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [isInputFocused, setIsInputFocused] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     visible: false,
     type: "success",
@@ -138,42 +137,22 @@ export function StoryViewerModal({
   });
 
   useEffect(() => {
-    const showSub = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (e) => {
-        try {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        } catch (_) {}
-        const h = e.endCoordinates?.height || 0;
-        if (h > 50) {
-          setKeyboardHeight(h);
-        }
-        setIsInputFocused(true);
-        setPaused(true);
-      }
-    );
-    const hideSub = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => {
-        try {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        } catch (_) {}
-        setKeyboardHeight(0);
-        setIsInputFocused(false);
-      }
-    );
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      try { LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); } catch (_) {}
+      setKeyboardHeight(e.endCoordinates?.height || 0);
+      setPaused(true);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      try { LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); } catch (_) {}
+      setKeyboardHeight(0);
+    });
     return () => {
       showSub.remove();
       hideSub.remove();
     };
   }, []);
-
-  const currentBottomOffset =
-    keyboardHeight > 50
-      ? keyboardHeight
-      : isInputFocused
-      ? Math.min(Math.max(SCREEN_HEIGHT * 0.36, 290), 340)
-      : 0;
 
   const progressAnim = useRef(new Animated.Value(0)).current;
 
@@ -631,11 +610,8 @@ export function StoryViewerModal({
             style={[
               styles.bottomContainer,
               {
-                bottom: currentBottomOffset > 0 ? currentBottomOffset + 8 : 0,
-                paddingBottom:
-                  currentBottomOffset > 0
-                    ? 8
-                    : Math.max(insets.bottom, 16) + 8
+                bottom: keyboardHeight > 0 ? keyboardHeight + 8 : 0,
+                paddingBottom: keyboardHeight > 0 ? 8 : Math.max(insets.bottom, 16) + 8
               }
             ]}>
             {!!currentStory.caption && !editingCaption && (
@@ -645,15 +621,7 @@ export function StoryViewerModal({
             )}
 
             {editingCaption && (
-              <View
-                style={[
-                  styles.editCaptionBox,
-                  {
-                    backgroundColor: colors.card,
-                    borderColor: colors.border,
-                    borderWidth: 1
-                  }
-                ]}>
+              <View style={[styles.editCaptionBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <TextInput
                   value={captionValue}
                   onChangeText={setCaptionValue}
@@ -662,35 +630,13 @@ export function StoryViewerModal({
                   style={[styles.editCaptionInput, { color: colors.text }]}
                   autoFocus
                   underlineColorAndroid="transparent"
-                  onFocus={() => {
-                    try {
-                      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                    } catch (_) {}
-                    setIsInputFocused(true);
-                    setPaused(true);
-                  }}
-                  onBlur={() => {
-                    try {
-                      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                    } catch (_) {}
-                    setIsInputFocused(false);
-                  }}
                 />
                 <View style={styles.editCaptionActions}>
-                  <Pressable
-                    style={[styles.editBtn, { backgroundColor: colors.surfaceAlt }]}
-                    onPress={() => setEditingCaption(false)}>
+                  <Pressable style={[styles.editBtn, { backgroundColor: colors.surfaceAlt }]} onPress={() => setEditingCaption(false)}>
                     <Text style={[styles.editBtnText, { color: colors.text }]}>Cancelar</Text>
                   </Pressable>
-                  <Pressable
-                    style={[styles.editBtn, { backgroundColor: colors.primary }]}
-                    onPress={handleSaveCaption}
-                    disabled={savingCaption}>
-                    {savingCaption ? (
-                      <ActivityIndicator size="small" color="#ffffff" />
-                    ) : (
-                      <Text style={[styles.editBtnText, { color: "#ffffff" }]}>Salvar</Text>
-                    )}
+                  <Pressable style={[styles.editBtn, { backgroundColor: colors.primary }]} onPress={handleSaveCaption} disabled={savingCaption}>
+                    {savingCaption ? <ActivityIndicator size="small" color="#ffffff" /> : <Text style={[styles.editBtnText, { color: "#ffffff" }]}>Salvar</Text>}
                   </Pressable>
                 </View>
               </View>
@@ -698,14 +644,7 @@ export function StoryViewerModal({
 
             {!isOwner && !editingCaption && (
               <View style={styles.replyBar}>
-                <View
-                  style={[
-                    styles.replyInputContainer,
-                    {
-                      backgroundColor: "rgba(0,0,0,0.6)",
-                      borderColor: "rgba(255,255,255,0.2)"
-                    }
-                  ]}>
+                <View style={styles.replyInputContainer}>
                   <TextInput
                     placeholder="Enviar mensagem..."
                     placeholderTextColor="rgba(255,255,255,0.6)"
@@ -716,31 +655,12 @@ export function StoryViewerModal({
                     returnKeyType="send"
                     onSubmitEditing={handleSendReply}
                     underlineColorAndroid="transparent"
-                    onFocus={() => {
-                      try {
-                        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                      } catch (_) {}
-                      setIsInputFocused(true);
-                      setPaused(true);
-                    }}
-                    onBlur={() => {
-                      try {
-                        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                      } catch (_) {}
-                      setIsInputFocused(false);
-                      if (!replyText.trim()) setPaused(false);
-                    }}
+                    onFocus={() => setPaused(true)}
+                    onBlur={() => { if (!replyText.trim()) setPaused(false); }}
                   />
                   {!!replyText.trim() && (
-                    <Pressable
-                      onPress={handleSendReply}
-                      disabled={sendingReply}
-                      style={styles.sendReplyBtn}>
-                      {sendingReply ? (
-                        <ActivityIndicator size="small" color="#ffffff" />
-                      ) : (
-                        <Feather name="send" size={18} color="#ffffff" />
-                      )}
+                    <Pressable onPress={handleSendReply} disabled={sendingReply} style={styles.sendReplyBtn}>
+                      {sendingReply ? <ActivityIndicator size="small" color="#ffffff" /> : <Feather name="send" size={18} color="#ffffff" />}
                     </Pressable>
                   )}
                 </View>
@@ -752,23 +672,13 @@ export function StoryViewerModal({
                     likesCount: Number(currentStory.likes_count || currentStory.likesCount || 0)
                   };
                   return (
-                    <Pressable
-                      style={styles.iconCircleBtn}
-                      onPress={handleToggleLike}
-                      accessibilityLabel="Curtir story">
-                      <Feather
-                        name="heart"
-                        size={20}
-                        color={likeState.isLiked ? "#ef4444" : "#ffffff"}
-                      />
+                    <Pressable style={styles.iconCircleBtn} onPress={handleToggleLike} accessibilityLabel="Curtir story">
+                      <Feather name="heart" size={20} color={likeState.isLiked ? "#ef4444" : "#ffffff"} />
                     </Pressable>
                   );
                 })()}
 
-                <Pressable
-                  style={styles.iconCircleBtn}
-                  onPress={handleOpenShare}
-                  accessibilityLabel="Compartilhar story">
+                <Pressable style={styles.iconCircleBtn} onPress={handleOpenShare} accessibilityLabel="Compartilhar story">
                   <Feather name="send" size={20} color="#ffffff" />
                 </Pressable>
               </View>
@@ -1119,33 +1029,31 @@ const styles = StyleSheet.create({
   },
   replyInputContainer: {
     flex: 1,
-    minHeight: 50,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     flexDirection: "row",
-    paddingHorizontal: 12,
-    borderRadius: 25,
-    borderWidth: 1
+    alignItems: "center",
+    paddingHorizontal: 14
   },
   replyInput: {
     flex: 1,
-    height: 50,
+    height: "100%",
     color: "#ffffff",
-    fontSize: 16,
+    fontSize: 15,
     includeFontPadding: false,
     paddingVertical: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
     textAlignVertical: "center"
   },
   sendReplyBtn: {
     padding: 4
   },
   iconCircleBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: "rgba(0,0,0,0.6)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
