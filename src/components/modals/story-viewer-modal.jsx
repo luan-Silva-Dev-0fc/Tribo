@@ -5,6 +5,7 @@ import {
   Dimensions,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   LayoutAnimation,
   Modal,
   Platform,
@@ -703,41 +704,39 @@ export function StoryViewerModal({
           </View>
 
           {/* 4. Bottom Container: Caption & Reply Bar */}
-          <View
-            style={[
-              styles.bottomContainer,
-              {
-                bottom: keyboardHeight > 0 ? keyboardHeight + 8 : 0,
-                paddingBottom: keyboardHeight > 0 ? 8 : Math.max(insets.bottom, 16) + 8
-              }
-            ]}>
-            <StoryCaption
-              caption={currentStory.caption}
-              editingCaption={editingCaption}
-              captionValue={captionValue}
-              setCaptionValue={setCaptionValue}
-              onCancelEdit={() => setEditingCaption(false)}
-              onSaveCaption={handleSaveCaption}
-              savingCaption={savingCaption}
-              colors={colors}
-            />
-
-            {!isOwner && !editingCaption && (
-              <StoryReplyBar
-                replyText={replyText}
-                setReplyText={setReplyText}
-                sendingReply={sendingReply}
-                onSendReply={handleSendReply}
-                isLiked={currentLikeState.isLiked}
-                onToggleLike={handleToggleLike}
-                onOpenShare={handleOpenShare}
-                onFocusInput={() => setPaused(true)}
-                onBlurInput={() => {
-                  if (!replyText.trim()) setPaused(false);
-                }}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "android" ? 24 : 0}
+            style={styles.keyboardContainer}>
+            <View style={styles.bottomContainer}>
+              <StoryCaption
+                caption={currentStory.caption}
+                editingCaption={editingCaption}
+                captionValue={captionValue}
+                setCaptionValue={setCaptionValue}
+                onCancelEdit={() => setEditingCaption(false)}
+                onSaveCaption={handleSaveCaption}
+                savingCaption={savingCaption}
+                colors={colors}
               />
-            )}
-          </View>
+
+              {!isOwner && !editingCaption && (
+                <StoryReplyBar
+                  replyText={replyText}
+                  setReplyText={setReplyText}
+                  sendingReply={sendingReply}
+                  onSendReply={handleSendReply}
+                  isLiked={currentLikeState.isLiked}
+                  onToggleLike={handleToggleLike}
+                  onOpenShare={handleOpenShare}
+                  onFocusInput={() => setPaused(true)}
+                  onBlurInput={() => {
+                    if (!replyText.trim()) setPaused(false);
+                  }}
+                />
+              )}
+            </View>
+          </KeyboardAvoidingView>
         </View>
 
         {/* 5. Owner Options Sheet */}
@@ -1013,12 +1012,17 @@ const styles = StyleSheet.create({
   touchLeft: { flex: 1 },
   touchCenter: { flex: 1 },
   touchRight: { flex: 1 },
-  bottomContainer: {
+  keyboardContainer: {
     position: "absolute",
     left: 0,
     right: 0,
-    zIndex: 10,
-    paddingHorizontal: 14
+    bottom: 0,
+    zIndex: 999
+  },
+  bottomContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: Platform.OS === "android" ? 12 : 28,
+    width: "100%"
   },
   captionContainer: {
     backgroundColor: "rgba(0,0,0,0.65)",
@@ -1069,7 +1073,8 @@ const styles = StyleSheet.create({
   replyBar: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8
+    gap: 8,
+    width: "100%"
   },
   replyInputContainer: {
     flex: 1,
@@ -1084,7 +1089,7 @@ const styles = StyleSheet.create({
   },
   replyInput: {
     flex: 1,
-    height: "100%",
+    height: 48,
     color: "#ffffff",
     fontSize: 15,
     includeFontPadding: false,
