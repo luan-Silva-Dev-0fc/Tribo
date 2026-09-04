@@ -16,8 +16,13 @@ import {
   StatusBar,
   Text,
   TextInput,
+  UIManager,
   View
 } from "react-native";
+
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 import { useVideoPlayer, VideoView } from "expo-video";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { api } from "../../api";
@@ -123,6 +128,7 @@ export function StoryViewerModal({
   const [shareTab, setShareTab] = useState("followers");
   const [localLikes, setLocalLikes] = useState({});
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     visible: false,
     type: "success",
@@ -138,7 +144,11 @@ export function StoryViewerModal({
         try {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         } catch (_) {}
-        setKeyboardHeight(e.endCoordinates?.height || 0);
+        const h = e.endCoordinates?.height || 0;
+        if (h > 50) {
+          setKeyboardHeight(h);
+        }
+        setIsInputFocused(true);
         setPaused(true);
       }
     );
@@ -149,6 +159,7 @@ export function StoryViewerModal({
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         } catch (_) {}
         setKeyboardHeight(0);
+        setIsInputFocused(false);
       }
     );
     return () => {
@@ -156,6 +167,13 @@ export function StoryViewerModal({
       hideSub.remove();
     };
   }, []);
+
+  const effectiveKeyboardOffset =
+    keyboardHeight > 50
+      ? keyboardHeight
+      : isInputFocused
+      ? Math.min(Math.max(SCREEN_HEIGHT * 0.36, 290), 360)
+      : 0;
 
   const progressAnim = useRef(new Animated.Value(0)).current;
 
@@ -200,6 +218,9 @@ export function StoryViewerModal({
   }, [visible, initialUserGroup, userGroups]);
 
   const handleCloseViewer = useCallback(() => {
+    Keyboard.dismiss();
+    setIsInputFocused(false);
+    setKeyboardHeight(0);
     NativeOptimization.disableScreenSecurity();
     onClose?.();
   }, [onClose]);
@@ -330,6 +351,8 @@ export function StoryViewerModal({
 
       setReplyText("");
       Keyboard.dismiss();
+      setIsInputFocused(false);
+      setKeyboardHeight(0);
       setAlertConfig({
         visible: true,
         type: "success",
@@ -563,20 +586,46 @@ export function StoryViewerModal({
           <View style={styles.touchZones}>
             <Pressable
               style={styles.touchLeft}
-              onPress={handlePrevious}
+              onPress={() => {
+                if (isInputFocused) {
+                  Keyboard.dismiss();
+                  setIsInputFocused(false);
+                  return;
+                }
+                handlePrevious();
+              }}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)}
+              onPressOut={() => {
+                if (!isInputFocused) setPaused(false);
+              }}
             />
             <Pressable
               style={styles.touchCenter}
+              onPress={() => {
+                if (isInputFocused) {
+                  Keyboard.dismiss();
+                  setIsInputFocused(false);
+                }
+              }}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)}
+              onPressOut={() => {
+                if (!isInputFocused) setPaused(false);
+              }}
             />
             <Pressable
               style={styles.touchRight}
-              onPress={handleNext}
+              onPress={() => {
+                if (isInputFocused) {
+                  Keyboard.dismiss();
+                  setIsInputFocused(false);
+                  return;
+                }
+                handleNext();
+              }}
               onLongPress={() => setPaused(true)}
-              onPressOut={() => setPaused(false)}
+              onPressOut={() => {
+                if (!isInputFocused) setPaused(false);
+              }}
             />
           </View>
 
@@ -585,11 +634,11 @@ export function StoryViewerModal({
               styles.bottomContainer,
               {
                 bottom:
-                  keyboardHeight > 0
-                    ? keyboardHeight + (Platform.OS === "android" ? 20 : 10)
+                  effectiveKeyboardOffset > 0
+                    ? effectiveKeyboardOffset + (Platform.OS === "android" ? 10 : 8)
                     : 0,
                 paddingBottom:
-                  keyboardHeight > 0
+                  effectiveKeyboardOffset > 0
                     ? 8
                     : Math.max(insets.bottom, 16) + 6
               }
@@ -617,6 +666,19 @@ export function StoryViewerModal({
                   placeholderTextColor={colors.muted}
                   style={[styles.editCaptionInput, { color: colors.text }]}
                   autoFocus
+                  onFocus={() => {
+                    try {
+                      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                    } catch (_) {}
+                    setIsInputFocused(true);
+                    setPaused(true);
+                  }}
+                  onBlur={() => {
+                    try {
+                      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                    } catch (_) {}
+                    setIsInputFocused(false);
+                  }}
                 />
                 <View style={styles.editCaptionActions}>
                   <Pressable
@@ -655,8 +717,20 @@ export function StoryViewerModal({
                     onChangeText={setReplyText}
                     style={styles.replyInput}
                     editable={!sendingReply}
-                    onFocus={() => setPaused(true)}
+                    returnKeyType="send"
+                    onSubmitEditing={handleSendReply}
+                    onFocus={() => {
+                      try {
+                        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                      } catch (_) {}
+                      setIsInputFocused(true);
+                      setPaused(true);
+                    }}
                     onBlur={() => {
+                      try {
+                        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                      } catch (_) {}
+                      setIsInputFocused(false);
                       if (!replyText.trim()) setPaused(false);
                     }}
                   />
