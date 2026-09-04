@@ -168,6 +168,13 @@ export function StoryViewerModal({
     };
   }, []);
 
+  const currentBottomOffset =
+    keyboardHeight > 50
+      ? keyboardHeight
+      : isInputFocused
+      ? Math.min(Math.max(SCREEN_HEIGHT * 0.36, 290), 340)
+      : 0;
+
   const progressAnim = useRef(new Animated.Value(0)).current;
 
   const activeGroup = userGroups[currentUserIndex] || initialUserGroup;
@@ -479,9 +486,7 @@ export function StoryViewerModal({
       statusBarTranslucent={true}
       onRequestClose={handleCloseViewer}>
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.mediaWrapper}>
             {isVideo ? (
@@ -626,8 +631,11 @@ export function StoryViewerModal({
             style={[
               styles.bottomContainer,
               {
-                bottom: 0,
-                paddingBottom: Platform.OS === "android" ? 8 : Math.max(insets.bottom, 16)
+                bottom: currentBottomOffset > 0 ? currentBottomOffset + 8 : 0,
+                paddingBottom:
+                  currentBottomOffset > 0
+                    ? 8
+                    : Math.max(insets.bottom, 16) + 8
               }
             ]}>
             {!!currentStory.caption && !editingCaption && (
@@ -925,7 +933,7 @@ export function StoryViewerModal({
           buttonText={alertConfig.buttonText}
           onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
         />
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }
