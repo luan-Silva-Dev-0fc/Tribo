@@ -16,7 +16,7 @@ import { authenticateWithBiometrics } from "../../services/biometricsService";
 import { Avatar } from "../ui/ui";
 import { userName } from "../../lib/format";
 
-const triboLogo = require("../../../assets/icon.png");
+const triboLogo = require("../../../assets/icon-tribo.png");
 
 export function BiometricLockScreen({
   visible,
@@ -143,36 +143,31 @@ export function BiometricLockScreen({
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
       <View style={styles.container}>
         
-        {/* Glow Superior Suave Verde */}
-        <View style={styles.ambientGlow} />
-
-        {/* Topo: Logo Oficial e Nome Tribo */}
+        {/* Topo: Novo Icone Oficial e Nome Tribo */}
         <View style={styles.header}>
-          <View style={styles.logoBorder}>
-            <Image
-              source={triboLogo}
-              style={styles.logoImage}
-              resizeMode="cover"
-            />
-          </View>
+          <Image
+            source={triboLogo}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
           <Text style={styles.brandTitle}>Tribo</Text>
           <View style={styles.securityBadge}>
             <View style={styles.statusDot} />
-            <Text style={styles.securityText}>App Protegido por Biometria</Text>
+            <Text style={styles.securityText}>Protegido por Biometria</Text>
           </View>
         </View>
 
-        {/* Centro: Usuario e Sensor */}
+        {/* Centro: Card de Usuario e Sensor */}
         <View style={styles.centerSection}>
-          {/* Card do Usuario */}
+          {/* Saudacao Discreta */}
           {user && (
             <View style={styles.userCard}>
-              <Avatar user={user} size={38} />
+              <Avatar user={user} size={36} />
               <View style={styles.userTextContainer}>
                 <Text style={styles.userGreeting}>Olá, {displayName}</Text>
-                <Text style={styles.userStatus}>Toque para entrar</Text>
+                <Text style={styles.userStatus}>Sessão protegida</Text>
               </View>
-              <Ionicons name="lock-closed" size={16} color="#10b981" />
+              <Ionicons name="shield-checkmark" size={17} color="#10b981" />
             </View>
           )}
 
@@ -200,16 +195,13 @@ export function BiometricLockScreen({
               ]}
             />
 
-            {/* Botao Central Redondo */}
+            {/* Botao Central Redondo em Preto Puro */}
             <Pressable
               onPress={handleTriggerAuth}
               disabled={authenticating}
               style={({ pressed }) => [
                 styles.sensorButton,
                 {
-                  backgroundColor: errorMsg
-                    ? "rgba(239, 68, 68, 0.12)"
-                    : "#0a0a0c",
                   borderColor: errorMsg ? "#ef4444" : "#10b981",
                   transform: [{ scale: pressed ? 0.94 : 1 }]
                 }
@@ -251,7 +243,7 @@ export function BiometricLockScreen({
             </Text>
           </Pressable>
           <Text style={styles.hintText}>
-            Use a digital cadastrada no seu aparelho
+            Toque no sensor do celular para entrar
           </Text>
         </View>
 
@@ -266,56 +258,32 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
     justifyContent: "space-between",
     paddingHorizontal: 24,
-    paddingTop: 64,
+    paddingTop: 68,
     paddingBottom: 44
-  },
-  ambientGlow: {
-    position: "absolute",
-    top: -100,
-    alignSelf: "center",
-    width: 340,
-    height: 340,
-    borderRadius: 170,
-    backgroundColor: "rgba(16, 185, 129, 0.08)"
   },
   header: {
     alignItems: "center",
-    marginTop: 8
-  },
-  logoBorder: {
-    width: 76,
-    height: 76,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.15)",
-    overflow: "hidden",
-    marginBottom: 14,
-    backgroundColor: "#000000",
-    shadowColor: "#10b981",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 8
+    marginTop: 4
   },
   logoImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 22
+    width: 86,
+    height: 58,
+    marginBottom: 8
   },
   brandTitle: {
-    fontSize: 28,
+    fontSize: 30,
     fontFamily: "Poppins_700Bold",
     color: "#ffffff",
-    letterSpacing: 1.5,
+    letterSpacing: 2,
     marginBottom: 6
   },
   securityBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    backgroundColor: "#080808",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderColor: "#1c1c1e",
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 16
@@ -327,26 +295,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#10b981"
   },
   securityText: {
-    color: "#94a3b8",
+    color: "#a1a1aa",
     fontSize: 12,
     fontFamily: "Poppins_500Medium"
   },
   centerSection: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10
+    paddingVertical: 8
   },
   userCard: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#0d0d10",
+    backgroundColor: "#080808",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.08)",
+    borderColor: "#18181b",
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
-    marginBottom: 24,
+    marginBottom: 26,
     width: "100%",
     maxWidth: 320
   },
@@ -359,7 +327,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_600SemiBold"
   },
   userStatus: {
-    color: "#64748b",
+    color: "#71717a",
     fontSize: 11.5,
     fontFamily: "Poppins_400Regular"
   },
@@ -368,7 +336,7 @@ const styles = StyleSheet.create({
     height: 140,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 12,
+    marginVertical: 10,
     position: "relative"
   },
   pulseRing: {
@@ -383,6 +351,7 @@ const styles = StyleSheet.create({
     height: 96,
     borderRadius: 48,
     borderWidth: 2,
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#10b981",
@@ -436,7 +405,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_600SemiBold"
   },
   hintText: {
-    color: "#64748b",
+    color: "#71717a",
     fontSize: 12,
     fontFamily: "Poppins_400Regular"
   }
