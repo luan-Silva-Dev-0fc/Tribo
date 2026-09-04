@@ -718,6 +718,7 @@ export function CommentsModal({
                   value={content}
                   onChangeText={setContent}
                   multiline
+                  underlineColorAndroid="transparent"
                   style={[
                   styles.textInput,
                   { color: colors.text }]
@@ -1127,21 +1128,24 @@ const styles = StyleSheet.create({
   },
   inputFieldWrapper: {
     flex: 1,
-    flexDirection: "row",
+    minHeight: 50,
+    height: 50,
+    justifyContent: "center",
     alignItems: "center",
-    borderRadius: 24,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: Platform.OS === "ios" ? 8 : 4,
-    minHeight: 46,
-    maxHeight: 100
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    borderRadius: 25,
+    borderWidth: 1
   },
   textInput: {
     flex: 1,
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    lineHeight: 19,
-    paddingVertical: 4
+    height: 50,
+    fontSize: 16,
+    includeFontPadding: false,
+    paddingVertical: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    textAlignVertical: "center"
   },
   micBtn: {
     padding: 6,

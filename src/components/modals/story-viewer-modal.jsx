@@ -1088,16 +1088,17 @@ const styles = StyleSheet.create({
   },
   editCaptionBox: {
     borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
     marginBottom: 10,
-    minHeight: 48
+    minHeight: 50,
+    justifyContent: "center"
   },
   editCaptionInput: {
-    fontSize: 14,
-    fontFamily: "Poppins_400Regular",
-    minHeight: 40,
+    fontSize: 16,
+    height: 50,
     paddingVertical: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
     includeFontPadding: false,
     textAlignVertical: "center"
   },
@@ -1134,8 +1135,8 @@ const styles = StyleSheet.create({
   },
   replyInput: {
     flex: 1,
+    height: 50,
     color: "#ffffff",
-    fontFamily: "Poppins_400Regular",
     fontSize: 16,
     includeFontPadding: false,
     paddingVertical: 0,

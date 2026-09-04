@@ -817,6 +817,7 @@ export function DirectChatScreen({
                   onChangeText={setContent}
                   style={[styles.textInputMain, { color: colors.text }]}
                   editable={!mutualBlocked}
+                  underlineColorAndroid="transparent"
                   multiline
                 />
               </View>
@@ -1226,20 +1227,24 @@ const styles = StyleSheet.create({
   },
   composerInputWrapper: {
     flex: 1,
-    borderRadius: 22,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    minHeight: 46,
-    justifyContent: "center"
+    minHeight: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    borderRadius: 25,
+    borderWidth: 1
   },
   textInputMain: {
     flex: 1,
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    lineHeight: 20,
-    maxHeight: 110,
-    paddingVertical: 4
+    height: 50,
+    fontSize: 16,
+    includeFontPadding: false,
+    paddingVertical: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    textAlignVertical: "center"
   },
   inputActionBtn: {
     padding: 6

@@ -226,6 +226,7 @@ export function CreateStoryModal({ visible, onClose, onSuccess }) {
                   value={caption}
                   onChangeText={setCaption}
                   maxLength={200}
+                  underlineColorAndroid="transparent"
                   style={[
                     styles.captionInput,
                     { color: colors.mode === "light" ? "#0F1419" : "#FFFFFF" }
@@ -421,17 +422,23 @@ const styles = StyleSheet.create({
   captionBar: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 14,
+    justifyContent: "center",
+    borderRadius: 25,
     borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 12,
+    minHeight: 50,
+    height: 50,
     marginTop: 8
   },
   captionInput: {
     flex: 1,
-    fontSize: 13.5,
-    fontFamily: "Poppins_400Regular",
-    paddingVertical: 6
+    height: 50,
+    fontSize: 16,
+    includeFontPadding: false,
+    paddingVertical: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    textAlignVertical: "center"
   },
   singleViewToggle: {
     flexDirection: "row",
