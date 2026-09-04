@@ -666,6 +666,7 @@ export function StoryViewerModal({
                   placeholderTextColor={colors.muted}
                   style={[styles.editCaptionInput, { color: colors.text }]}
                   autoFocus
+                  underlineColorAndroid="transparent"
                   onFocus={() => {
                     try {
                       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -719,6 +720,7 @@ export function StoryViewerModal({
                     editable={!sendingReply}
                     returnKeyType="send"
                     onSubmitEditing={handleSendReply}
+                    underlineColorAndroid="transparent"
                     onFocus={() => {
                       try {
                         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -1086,13 +1088,18 @@ const styles = StyleSheet.create({
   },
   editCaptionBox: {
     borderRadius: 16,
-    padding: 12,
-    marginBottom: 10
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 10,
+    minHeight: 48
   },
   editCaptionInput: {
     fontSize: 14,
     fontFamily: "Poppins_400Regular",
-    minHeight: 40
+    minHeight: 40,
+    paddingVertical: 0,
+    includeFontPadding: false,
+    textAlignVertical: "center"
   },
   editCaptionActions: {
     flexDirection: "row",
@@ -1120,14 +1127,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 24,
     borderWidth: 1,
-    paddingHorizontal: 14,
-    height: 46
+    paddingHorizontal: 16,
+    minHeight: 48
   },
   replyInput: {
     flex: 1,
     color: "#ffffff",
-    fontSize: 13.5,
-    fontFamily: "Poppins_400Regular"
+    fontSize: 14,
+    fontFamily: "Poppins_400Regular",
+    paddingVertical: 0,
+    includeFontPadding: false,
+    textAlignVertical: "center"
   },
   sendReplyBtn: {
     padding: 4
