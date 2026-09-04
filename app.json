@@ -43,6 +43,7 @@
       "expo-font",
       "expo-web-browser",
       "expo-video",
+      "expo-local-authentication",
       [
         "expo-av",
         {
